@@ -15,6 +15,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
 import android.os.Environment;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -116,34 +117,60 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void cloneGit(String sRemoteUrl,String sUserName,String sUserPassword) {
+    private boolean checkGit(String sRemoteUrl, String sUserName, String sUserPassword) {
+        String sLocalDirectory = Environment.getExternalStorageDirectory() +
+                File.separator + "gitnotetaking" + File.separator + getLocalGitPath(sRemoteUrl);
+        Log.d(TAG, "default local directory = " + sLocalDirectory);
+        boolean bIsRemoteRepositoryExist = false;
+        boolean bIsLocalRepositoryExist = false;
+        GitUtil aGitUtil;
+        try {
+            aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
+            bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(sUserName, sUserPassword);
+            bIsLocalRepositoryExist = aGitUtil.checkLocalRepository();
+            Log.d(TAG,"bIsRemoteRepositoryExist="+bIsRemoteRepositoryExist+",bIsLocalRepositoryExist="+bIsLocalRepositoryExist);
+            aGitUtil.close();
+            if (bIsRemoteRepositoryExist && bIsLocalRepositoryExist) return true;
+        } catch (Exception ee) {
+            ee.printStackTrace();
+        }
+        return false;
+
+    }
+
+    private boolean cloneGit(String sRemoteUrl, String sUserName, String sUserPassword) {
 
         String sLocalDirectory = Environment.getExternalStorageDirectory() +
-                File.separator + "gitnotetaking"+ File.separator+ getLocalGitPath(sRemoteUrl);
-        Log.d(TAG,"default local directory = " + sLocalDirectory);
+                File.separator + "gitnotetaking" + File.separator + getLocalGitPath(sRemoteUrl);
+        Log.d(TAG, "default local directory = " + sLocalDirectory);
         boolean bIsRemoteRepositoryExist = false;
         GitUtil aGitUtil;
         try {
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
             bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(sUserName, sUserPassword);
-            if( !bIsRemoteRepositoryExist){
-                Log.e(TAG,"check remote url failed");
-                return ;
+            if (!bIsRemoteRepositoryExist) {
+                Log.e(TAG, "check remote url failed");
+                return false;
             }
 
             System.out.println("Remote repository exists ? " + bIsRemoteRepositoryExist);
             System.out.println("Local repository exists ? " + aGitUtil.checkLocalRepository());
             if (bIsRemoteRepositoryExist && !aGitUtil.checkLocalRepository()) {
                 System.out.println("try to clone remote repository if local repository is not exists \n");
-                if (aGitUtil.clone(sUserName, sUserPassword))
+                if (aGitUtil.clone(sUserName, sUserPassword)) {
                     System.out.println("clone finished!");
-                else
+                    return true;
+                } else {
                     System.out.println("clone failed!");
+                    return false;
+                }
             } else if (bIsRemoteRepositoryExist && aGitUtil.checkLocalRepository()) {
                 System.out.println("pull branch = " + aGitUtil.getDefaultBranch() + " , status : "
                         + aGitUtil.update(sUserName, sUserPassword));
+                return true;
             }
-
+            return false;
+/*
             System.out.println("Default branch : " + aGitUtil.getDefaultBranch());
             if (aGitUtil.checkLocalRepository()) {
                 List<Ref> aAllBranches = aGitUtil.getBranches();
@@ -166,9 +193,12 @@ public class MainActivity extends AppCompatActivity {
                 }
                 aGitUtil.close();
             }
+
+ */
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     @Override
@@ -178,6 +208,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         isInternetPermissionGranted();
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+
+        StrictMode.setThreadPolicy(policy);
+
         //   isReadStoragePermissionGranted();
         boolean writepermission = isWriteStoragePermissionGranted();
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -197,11 +231,9 @@ public class MainActivity extends AppCompatActivity {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                cloneGit (sRemoteUrl,sUserName,sUserPassword);
-
+                                cloneGit(sRemoteUrl, sUserName, sUserPassword);
                             }
                         }).start();
-
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -209,10 +241,34 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-
     }
 
+
+@Override
+public void onStart(){
+        super.onStart();
+     final String sRemoteUrl = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitUrl", null);
+    final String sUserName = PreferenceManager.getDefaultSharedPreferences(activity).getString("UserName", null);
+    final String sUserPassword = PreferenceManager.getDefaultSharedPreferences(activity).getString("Password", null);
+    try {
+        Log.d(TAG,"check git ...");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if( checkGit(sRemoteUrl,sUserName,sUserPassword)){
+                    Log.d(TAG,"check git success");
+                    FloatingActionButton fab = findViewById(R.id.fab);
+                    fab.setImageDrawable(getResources().getDrawable(android.R.drawable.checkbox_on_background, getApplicationContext().getTheme()));
+
+                }
+            }
+        }).start();
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+}
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -235,10 +291,10 @@ public class MainActivity extends AppCompatActivity {
     public static String getLocalGitPath(String sRemoteUrl) {
         String sReturn = "";
         int lastPath = sRemoteUrl.lastIndexOf("//");
-        if (lastPath!=-1){
-            sReturn = sRemoteUrl.substring(lastPath+1);
+        if (lastPath != -1) {
+            sReturn = sRemoteUrl.substring(lastPath + 1);
         }
-        sReturn = sReturn.substring(0,sReturn.length()-4);
+        sReturn = sReturn.substring(0, sReturn.length() - 4);
         return sReturn;
     }
 }
