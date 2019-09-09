@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
             bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(sUserName, sUserPassword);
             bIsLocalRepositoryExist = aGitUtil.checkLocalRepository();
-            Log.d(TAG,"bIsRemoteRepositoryExist="+bIsRemoteRepositoryExist+",bIsLocalRepositoryExist="+bIsLocalRepositoryExist);
+            Log.d(TAG, "bIsRemoteRepositoryExist=" + bIsRemoteRepositoryExist + ",bIsLocalRepositoryExist=" + bIsLocalRepositoryExist);
             aGitUtil.close();
             if (bIsRemoteRepositoryExist && bIsLocalRepositoryExist) return true;
         } catch (Exception ee) {
@@ -244,31 +244,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-@Override
-public void onStart(){
+    @Override
+    public void onStart() {
         super.onStart();
-     final String sRemoteUrl = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitUrl", null);
-    final String sUserName = PreferenceManager.getDefaultSharedPreferences(activity).getString("UserName", null);
-    final String sUserPassword = PreferenceManager.getDefaultSharedPreferences(activity).getString("Password", null);
-    try {
-        Log.d(TAG,"check git ...");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if( checkGit(sRemoteUrl,sUserName,sUserPassword)){
-                    Log.d(TAG,"check git success");
-                    FloatingActionButton fab = findViewById(R.id.fab);
-                    fab.setImageDrawable(getResources().getDrawable(android.R.drawable.checkbox_on_background, getApplicationContext().getTheme()));
-
-                }
-            }
-        }).start();
-
-    } catch (Exception e) {
-        e.printStackTrace();
     }
 
-}
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -283,6 +263,11 @@ public void onStart(){
             Intent Intent = new Intent(MainActivity.this, PreferencesSettings.class);
             startActivity(Intent);
             return true;
+        }
+        else if( id==R.id.action_create){
+            Intent Intent = new Intent(MainActivity.this, CloneGitActivity.class);
+            startActivity(Intent);
+
         }
 
         return super.onOptionsItemSelected(item);

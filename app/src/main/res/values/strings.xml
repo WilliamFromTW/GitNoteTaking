@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">InMethodGitNoteTaking</string>
     <string name="action_settings">Settings</string>
+    <string name="action_clone">Clone Git</string>
     <string name="GitUrl">Click to modify Git URL</string>
     <string name="GitUserName">Click to modify Git User Name</string>
     <string name="GitPassword">Click to modify Git Password</string>
