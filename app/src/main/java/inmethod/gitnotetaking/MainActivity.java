@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.util.List;
 
+import inmethod.gitnotetaking.utility.MyGitUtility;
 import inmethod.jakarta.vcs.GitUtil;
 
 
@@ -117,90 +118,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean checkGit(String sRemoteUrl, String sUserName, String sUserPassword) {
-        String sLocalDirectory = Environment.getExternalStorageDirectory() +
-                File.separator + "gitnotetaking" + File.separator + getLocalGitPath(sRemoteUrl);
-        Log.d(TAG, "default local directory = " + sLocalDirectory);
-        boolean bIsRemoteRepositoryExist = false;
-        boolean bIsLocalRepositoryExist = false;
-        GitUtil aGitUtil;
-        try {
-            aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
-            bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(sUserName, sUserPassword);
-            bIsLocalRepositoryExist = aGitUtil.checkLocalRepository();
-            Log.d(TAG, "bIsRemoteRepositoryExist=" + bIsRemoteRepositoryExist + ",bIsLocalRepositoryExist=" + bIsLocalRepositoryExist);
-            aGitUtil.close();
-            if (bIsRemoteRepositoryExist && bIsLocalRepositoryExist) return true;
-        } catch (Exception ee) {
-            ee.printStackTrace();
-        }
-        return false;
-
-    }
-
-    private boolean cloneGit(String sRemoteUrl, String sUserName, String sUserPassword) {
-
-        String sLocalDirectory = Environment.getExternalStorageDirectory() +
-                File.separator + "gitnotetaking" + File.separator + getLocalGitPath(sRemoteUrl);
-        Log.d(TAG, "default local directory = " + sLocalDirectory);
-        boolean bIsRemoteRepositoryExist = false;
-        GitUtil aGitUtil;
-        try {
-            aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
-            bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(sUserName, sUserPassword);
-            if (!bIsRemoteRepositoryExist) {
-                Log.e(TAG, "check remote url failed");
-                return false;
-            }
-
-            System.out.println("Remote repository exists ? " + bIsRemoteRepositoryExist);
-            System.out.println("Local repository exists ? " + aGitUtil.checkLocalRepository());
-            if (bIsRemoteRepositoryExist && !aGitUtil.checkLocalRepository()) {
-                System.out.println("try to clone remote repository if local repository is not exists \n");
-                if (aGitUtil.clone(sUserName, sUserPassword)) {
-                    System.out.println("clone finished!");
-                    return true;
-                } else {
-                    System.out.println("clone failed!");
-                    return false;
-                }
-            } else if (bIsRemoteRepositoryExist && aGitUtil.checkLocalRepository()) {
-                System.out.println("pull branch = " + aGitUtil.getDefaultBranch() + " , status : "
-                        + aGitUtil.update(sUserName, sUserPassword));
-                return true;
-            }
-            return false;
-/*
-            System.out.println("Default branch : " + aGitUtil.getDefaultBranch());
-            if (aGitUtil.checkLocalRepository()) {
-                List<Ref> aAllBranches = aGitUtil.getBranches();
-                if (aAllBranches != null) {
-                    System.out.println("\nList All Local Branch Name\n--------------------------------");
-                    for (Ref aBranch : aAllBranches) {
-                        System.out.println("branch : " + aBranch.getName());
-                    }
-                    System.out.println("");
-                }
-                System.out.println("Switch local branch to master: " + aGitUtil.checkout("master"));
-                List<Ref> aAllTags = aGitUtil.getLocalTags();
-                if (aAllTags != null) {
-                    System.out.println("\nList All Local Tags Name\n--------------------------------");
-                    for (Ref aTag : aAllTags) {
-                        System.out.println("Tag : " + aTag.getName() + "(" + aGitUtil.getTagDate(aTag, "yyyy-MM-dd HH:mm:ss") + " created!)");
-                        System.out.println("Commit messages\n==\n" + aGitUtil.getCommitMessageByTagName(aTag) + "\n");
-                    }
-                    System.out.println("");
-                }
-                aGitUtil.close();
-            }
-
- */
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -209,38 +126,10 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         isInternetPermissionGranted();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-
         StrictMode.setThreadPolicy(policy);
 
         //   isReadStoragePermissionGranted();
         boolean writepermission = isWriteStoragePermissionGranted();
-        FloatingActionButton fab = findViewById(R.id.fab);
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                final String sRemoteUrl = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitUrl", null);
-                final String sUserName = PreferenceManager.getDefaultSharedPreferences(activity).getString("UserName", null);
-                final String sUserPassword = PreferenceManager.getDefaultSharedPreferences(activity).getString("Password", null);
-                boolean writepermission = isWriteStoragePermissionGranted();
-                Log.d(TAG, "writepermission = " + writepermission + ",sGitUrl=" + sRemoteUrl + ",sUserName=" + sUserName + ",sPassword" + sUserPassword);
-                if (sRemoteUrl != null && sUserName != null && sUserPassword != null && writepermission) {
-                    try {
-
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                cloneGit(sRemoteUrl, sUserName, sUserPassword);
-                            }
-                        }).start();
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
     }
 
 
@@ -273,13 +162,5 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static String getLocalGitPath(String sRemoteUrl) {
-        String sReturn = "";
-        int lastPath = sRemoteUrl.lastIndexOf("//");
-        if (lastPath != -1) {
-            sReturn = sRemoteUrl.substring(lastPath + 1);
-        }
-        sReturn = sReturn.substring(0, sReturn.length() - 4);
-        return sReturn;
-    }
+
 }
