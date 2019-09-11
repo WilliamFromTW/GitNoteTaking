@@ -7,12 +7,11 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Environment;
 import android.os.StrictMode;
@@ -21,6 +20,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import org.eclipse.jgit.lib.Ref;
 
@@ -29,6 +29,8 @@ import java.io.FileDescriptor;
 import java.util.List;
 
 import inmethod.gitnotetaking.utility.MyGitUtility;
+import inmethod.gitnotetaking.view.GitList;
+import inmethod.gitnotetaking.view.RecyclerAdapterForDevice;
 import inmethod.jakarta.vcs.GitUtil;
 
 
@@ -36,9 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "GitNoteTaking";
     private Activity activity = this;
-    private String sRemoteUrl = null;
-    private String sUserName = null;
-    private String sUserPassword = null;
+    RecyclerView rv = null;
+    RecyclerAdapterForDevice adapter = null;
 
     public boolean isInternetPermissionGranted() {
         if (Build.VERSION.SDK_INT >= 23) {
@@ -136,6 +137,28 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+        rv = (RecyclerView) findViewById(R.id.rv);
+        adapter = new RecyclerAdapterForDevice(this);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        rv.setLayoutManager(llm);
+        rv.setAdapter(adapter);
+        adapter.setOnItemClickListener(new RecyclerAdapterForDevice.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Toast.makeText(activity, "position=" + position, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        GitList aGitList = new GitList("a111dddddddddsdf","asddddddddddddddddddddddddddddd\nddddddd\nddddddd\ndddddf");
+        adapter.addData(aGitList);
+     //   adapter.notifyDataSetChanged();
+         aGitList = new GitList("a111s222df","a222sdf");
+        adapter.addData(aGitList);
+     //   adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -152,8 +175,7 @@ public class MainActivity extends AppCompatActivity {
             Intent Intent = new Intent(MainActivity.this, PreferencesSettings.class);
             startActivity(Intent);
             return true;
-        }
-        else if( id==R.id.action_create){
+        } else if (id == R.id.action_create) {
             Intent Intent = new Intent(MainActivity.this, CloneGitActivity.class);
             startActivity(Intent);
 
