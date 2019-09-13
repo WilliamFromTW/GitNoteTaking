@@ -12,7 +12,7 @@ public class GitList {
     private GitList(){
 
     }
-    public GitList(String sRemoteUrl,String sGitName){
+    public GitList(String sGitName,String sRemoteUrl){
         this.sGitName = sGitName;
         this.sRemoteUrl = sRemoteUrl;
     }
@@ -34,8 +34,8 @@ public class GitList {
 
     public static void mapDeviceInfoToLayout(Object[] layoutData, Object aGitListObject ){
         GitList aGitList = (GitList)aGitListObject;
-        ((TextView)layoutData[0]).setText( aGitList.getRemoteUrl());
-        ((TextView)layoutData[1]).setText(aGitList.getGitName());
+        ((TextView)layoutData[0]).setText(aGitList.getGitName());
+        ((TextView)layoutData[1]).setText( aGitList.getRemoteUrl());
 
     }
 

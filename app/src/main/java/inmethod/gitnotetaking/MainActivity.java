@@ -26,8 +26,11 @@ import org.eclipse.jgit.lib.Ref;
 
 import java.io.File;
 import java.io.FileDescriptor;
+import java.util.ArrayList;
 import java.util.List;
 
+import inmethod.gitnotetaking.db.RemoteGit;
+import inmethod.gitnotetaking.db.RemoteGitDAO;
 import inmethod.gitnotetaking.utility.MyGitUtility;
 import inmethod.gitnotetaking.view.GitList;
 import inmethod.gitnotetaking.view.RecyclerAdapterForDevice;
@@ -153,12 +156,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        GitList aGitList = new GitList("a111dddddddddsdf","asddddddddddddddddddddddddddddd\nddddddd\nddddddd\ndddddf");
-        adapter.addData(aGitList);
-     //   adapter.notifyDataSetChanged();
-         aGitList = new GitList("a111s222df","a222sdf");
-        adapter.addData(aGitList);
-     //   adapter.notifyDataSetChanged();
+        ArrayList<RemoteGit> aList = getDBList();
+        for(RemoteGit a:aList) {
+            adapter.addData(new GitList( a.getNickname(),a.getUrl()));
+        }
+
+    }
+
+    private ArrayList<RemoteGit> getDBList(){
+        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
+        return aRemoteGitDAO.getAll();
     }
 
     @Override
