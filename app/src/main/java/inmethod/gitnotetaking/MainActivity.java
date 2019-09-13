@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.eclipse.jgit.lib.Ref;
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private Activity activity = this;
     RecyclerView rv = null;
     RecyclerAdapterForDevice adapter = null;
+    private RemoteGitDAO aRemoteGitDAO = null;
 
     public boolean isInternetPermissionGranted() {
         if (Build.VERSION.SDK_INT >= 23) {
@@ -131,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
         isInternetPermissionGranted();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-
         //   isReadStoragePermissionGranted();
         boolean writepermission = isWriteStoragePermissionGranted();
     }
@@ -148,9 +150,43 @@ public class MainActivity extends AppCompatActivity {
         adapter.setOnItemClickListener(new RecyclerAdapterForDevice.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Toast.makeText(activity, "position=" + position, Toast.LENGTH_LONG).show();
+                Toast.makeText(activity, "click position=" + position, Toast.LENGTH_LONG).show();
             }
         });
+
+        adapter.setOnItemLongClickListener(new RecyclerAdapterForDevice.OnItemLongClickListener(){
+            @Override
+            public void onItemLongClick(View view,int position){
+                final Object[] aTextView = GitList.getDeviceInfoFromLayoutId(view);
+                final String sRemoteUrl = ((TextView)aTextView[1]).getText().toString();
+                Toast.makeText(activity, "Long click position=" + position+",git name="+sRemoteUrl, Toast.LENGTH_LONG).show();
+
+                //Creating the instance of PopupMenu
+                PopupMenu popup = new PopupMenu(MainActivity.this, view);
+                //Inflating the Popup using xml file
+                popup.getMenuInflater()
+                        .inflate(R.menu.lognclick_popup_menu, popup.getMenu());
+                //registering popup with OnMenuItemClickListener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+                        Toast.makeText(
+                                MainActivity.this,
+                                "You Clicked : " + item.getTitle(),
+                                Toast.LENGTH_SHORT
+                        ).show();
+                        getGitDAO().delete(((TextView)aTextView[1]).getText().toString());
+                        Log.d(TAG,"try to delete local git repository");
+                        MyGitUtility.deleteLocalGitRepository(sRemoteUrl);
+                        adapter.cleaer();
+                        return true;
+                    }
+                });
+
+                popup.show(); //showing popup menu popup = new PopupMenu(MainActivity.this, button1);
+
+            }
+        });
+
     }
 
     @Override
@@ -163,9 +199,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private RemoteGitDAO getGitDAO(){
+        if( aRemoteGitDAO == null)
+        return new RemoteGitDAO(activity);
+        else return aRemoteGitDAO;
+    }
+
     private ArrayList<RemoteGit> getDBList(){
-        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
-        return aRemoteGitDAO.getAll();
+        return getGitDAO().getAll();
     }
 
     @Override

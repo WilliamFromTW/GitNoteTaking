@@ -121,6 +121,15 @@ class RemoteGitDAO(context: Context) {
         return db.delete(TABLE_NAME, where, null) > 0
     }
 
+
+    // 刪除參數指定編號的資料
+    fun delete(sRemoteUrl: String): Boolean {
+        // 設定條件為編號，格式為「欄位名稱=資料」
+        val where = URL_COLUMN + "='" + sRemoteUrl+"'"
+        // 刪除指定編號資料並回傳刪除是否成功
+        return db.delete(TABLE_NAME, where, null) > 0
+    }
+
     // 取得指定編號的資料物件
     operator fun get(id: Long): RemoteGit? {
         // 準備回傳結果用的物件
