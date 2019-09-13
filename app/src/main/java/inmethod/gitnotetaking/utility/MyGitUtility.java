@@ -2,26 +2,28 @@ package inmethod.gitnotetaking.utility;
 
 import android.os.Environment;
 import android.util.Log;
+
 import java.io.File;
+
 import inmethod.jakarta.vcs.GitUtil;
 
 public class MyGitUtility {
 
     public static final String TAG = "GitNoteTaking";
 
-    public static boolean deleteLocalGitRepository(String sRemoteUrl){
+    public static boolean deleteLocalGitRepository(String sRemoteUrl) {
         String sLocalDirectory = Environment.getExternalStorageDirectory() +
                 File.separator + "gitnotetaking" + File.separator + getLocalGitDir(sRemoteUrl);
-Log.d(TAG,"check local repository, status = "+ checkLocalGitRepository(sRemoteUrl));
-        if( checkLocalGitRepository(sRemoteUrl)) {
+     //   Log.d(TAG, "check local repository, status = " + checkLocalGitRepository(sRemoteUrl));
+        if (checkLocalGitRepository(sRemoteUrl)) {
 
             GitUtil aGitUtil;
             try {
                 aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
-                aGitUtil.removeLocalGitReposition();
+                aGitUtil.removeLocalGitRepository();
                 return true;
             } catch (Exception ee) {
-ee.printStackTrace();
+                ee.printStackTrace();
             }
         }
         return false;
@@ -32,7 +34,7 @@ ee.printStackTrace();
         String sLocalDirectory = Environment.getExternalStorageDirectory() +
                 File.separator + "gitnotetaking" + File.separator + getLocalGitDir(sRemoteUrl);
 
-        if( checkLocalGitRepository(sRemoteUrl)){
+        if (checkLocalGitRepository(sRemoteUrl)) {
             return false;
         }
         boolean bIsRemoteRepositoryExist = false;
@@ -45,7 +47,7 @@ ee.printStackTrace();
                 return false;
             }
             System.out.println("Remote repository exists ? " + bIsRemoteRepositoryExist);
-            if ( bIsRemoteRepositoryExist ) {
+            if (bIsRemoteRepositoryExist) {
                 System.out.println("try to clone remote repository if local repository is not exists \n");
                 if (aGitUtil.clone(sUserName, sUserPassword)) {
                     System.out.println("clone finished!");
@@ -94,13 +96,13 @@ ee.printStackTrace();
 
     private static String getLocalGitDir(String sRemoteUrl) {
         String sReturn = "";
-        if( sRemoteUrl.indexOf(".git")==-1) return sReturn;
+        if (sRemoteUrl.indexOf(".git") == -1) return sReturn;
         int lastPath = sRemoteUrl.lastIndexOf("//");
         if (lastPath != -1) {
             sReturn = sRemoteUrl.substring(lastPath + 1);
         }
-        if( sReturn.length()>4)
-          sReturn = sReturn.substring(0, sReturn.length() - 4);
+        if (sReturn.length() > 4)
+            sReturn = sReturn.substring(0, sReturn.length() - 4);
         else return "";
         return sReturn;
     }
@@ -112,7 +114,7 @@ ee.printStackTrace();
         Log.d(TAG, "default local directory = " + sLocalDirectory);
         boolean bIsLocalRepositoryExist = false;
         try {
-            bIsLocalRepositoryExist = GitUtil.checkLocalRepository(sLocalDirectory+"/.git");
+            bIsLocalRepositoryExist = GitUtil.checkLocalRepository(sLocalDirectory + "/.git");
             Log.d(TAG, "bIsLocalRepositoryExist=" + bIsLocalRepositoryExist);
             if (bIsLocalRepositoryExist) return true;
         } catch (Exception ee) {
