@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,7 +26,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -47,17 +54,20 @@ public class FileExplorerActivity extends AppCompatActivity {
     private List<String> m_path;
     private List<String> m_files;
     private List<String> m_filesPath;
-    private  String sRootDir;
+    private String sGitRootDir;
+    private String sGitName;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_explorer_main);
         Intent myIntent = getIntent(); // gets the previously created intent
-        sRootDir = myIntent.getStringExtra("ROOT_DIR");
+        sGitRootDir = myIntent.getStringExtra("GIT_ROOT_DIR");
+        sGitName = myIntent.getStringExtra("GIT_NAME");
         Toolbar toolbar = findViewById(R.id.toolbar2);
+        toolbar.setTitle("GIT NAME:"+sGitName);
         setSupportActionBar(toolbar);
-
 
     }
 
@@ -66,7 +76,7 @@ public class FileExplorerActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         view = (ListView) findViewById(R.id.rl_lvListRoot);
-        getDirFromRoot(sRootDir);
+        getDirFromRoot(sGitRootDir);
     }
 
     @Override
@@ -84,7 +94,7 @@ public class FileExplorerActivity extends AppCompatActivity {
         m_filesPath=new ArrayList<String>();
         File m_file = new File(p_rootPath);
         File[] m_filesArray = m_file.listFiles();
-        if(!p_rootPath.equals(sRootDir))
+        if(!p_rootPath.equals(sGitRootDir))
         {
             m_item.add("../");
             m_path.add(m_file.getParent());
@@ -129,12 +139,25 @@ public class FileExplorerActivity extends AppCompatActivity {
                 }
                 else
                 {
-                    Toast.makeText(FileExplorerActivity.this, "This is File", Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(FileExplorerActivity.this, "File Name = "+m_isFile.getAbsoluteFile()+",uri="+Uri.fromFile(m_isFile), Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(FileExplorerActivity.this, ViewFileActivity.class);
+                    intent.putExtra("FILE_PATH",m_isFile.getAbsoluteFile().toString());
+
+                    startActivity(intent);
                 }
             }
         });
     }
 
+    public static String getMimeType(String url) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
 
+        if (extension != null) {
+            MimeTypeMap mime = MimeTypeMap.getSingleton();
+            type = mime.getMimeTypeFromExtension(extension);
+        }
+        return type;
+    }
 
 }

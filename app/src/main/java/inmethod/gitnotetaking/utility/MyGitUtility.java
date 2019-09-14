@@ -20,10 +20,49 @@ public class MyGitUtility {
             try {
                 aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
                 aGitUtil.removeLocalGitRepository();
+
                 return true;
             } catch (Exception ee) {
                 ee.printStackTrace();
             }
+        }
+        return false;
+    }
+public static boolean update(String sRemoteUrl, String sUserName, String sUserPassword){
+
+
+
+        String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
+
+
+        boolean bIsRemoteRepositoryExist = false;
+        GitUtil aGitUtil;
+        try {
+            aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
+            bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(sUserName, sUserPassword);
+            if (!bIsRemoteRepositoryExist) {
+                Log.e(TAG, "check remote url failed");
+                return false;
+            }
+            System.out.println("Remote repository exists ? " + bIsRemoteRepositoryExist);
+            if (bIsRemoteRepositoryExist) {
+                System.out.println("try to update remote repository if local repository is not exists \n");
+                if (aGitUtil.update(sUserName,sUserPassword)) {
+                    System.out.println("update finished!");
+                    return true;
+                } else {
+                    System.out.println("update failed!");
+                    return false;
+                }
+            } else if (bIsRemoteRepositoryExist && aGitUtil.checkLocalRepository()) {
+                System.out.println("pull branch = " + aGitUtil.getDefaultBranch() + " , status : "
+                        + aGitUtil.update(sUserName, sUserPassword));
+                return true;
+            }
+            return false;
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return false;
     }

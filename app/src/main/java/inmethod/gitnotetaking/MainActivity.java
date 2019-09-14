@@ -132,10 +132,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         isInternetPermissionGranted();
+        isReadStoragePermissionGranted();
+        isWriteStoragePermissionGranted();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        //   isReadStoragePermissionGranted();
-        boolean writepermission = isWriteStoragePermissionGranted();
     }
 
 
@@ -153,8 +153,12 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(activity, "click position=" + position, Toast.LENGTH_LONG).show();
                 Intent Intent = new Intent(MainActivity.this, FileExplorerActivity.class);
                 Object[] aTextView = GitList.getDeviceInfoFromLayoutId(view);
+                String sGitName = ((TextView)aTextView[0]).getText().toString();
                 String sRemoteUrl = ((TextView)aTextView[1]).getText().toString();
-                Intent.putExtra("ROOT_DIR",MyGitUtility.getLocalGitDirectory(sRemoteUrl));
+
+
+                Intent.putExtra("GIT_ROOT_DIR",MyGitUtility.getLocalGitDirectory(sRemoteUrl));
+                Intent.putExtra("GIT_NAME",sGitName);
                 startActivity(Intent);
             }
         });
@@ -198,8 +202,16 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         ArrayList<RemoteGit> aList = getDBList();
-        for(RemoteGit a:aList) {
+        for(final RemoteGit a:aList) {
             adapter.addData(new GitList( a.getNickname(),a.getUrl()));
+            Log.d(TAG,"try to update pull remote git to local repository");
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    MyGitUtility.update(a.getUrl(),a.getUid(),a.getPwd());
+                }
+            }).start();
+
         }
 
     }
