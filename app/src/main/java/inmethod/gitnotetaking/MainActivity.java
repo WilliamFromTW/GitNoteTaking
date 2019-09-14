@@ -151,6 +151,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, int position) {
                 Toast.makeText(activity, "click position=" + position, Toast.LENGTH_LONG).show();
+                Intent Intent = new Intent(MainActivity.this, FileExplorerActivity.class);
+                Object[] aTextView = GitList.getDeviceInfoFromLayoutId(view);
+                String sRemoteUrl = ((TextView)aTextView[1]).getText().toString();
+                Intent.putExtra("ROOT_DIR",MyGitUtility.getLocalGitDirectory(sRemoteUrl));
+                startActivity(Intent);
             }
         });
 
@@ -177,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
                         getGitDAO().delete(((TextView)aTextView[1]).getText().toString());
                         Log.d(TAG,"try to delete local git repository");
                         MyGitUtility.deleteLocalGitRepository(sRemoteUrl);
-                        adapter.cleaer();
+                        adapter.clear();
                         return true;
                     }
                 });

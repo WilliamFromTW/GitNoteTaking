@@ -52,7 +52,7 @@ public class RecyclerAdapterForDevice extends RecyclerView.Adapter<RecyclerAdapt
     }
 
 
-    public void cleaer(){
+    public void clear(){
         if(mData!=null && mData.size()>0){
             mData.clear();
             this.notifyDataSetChanged();

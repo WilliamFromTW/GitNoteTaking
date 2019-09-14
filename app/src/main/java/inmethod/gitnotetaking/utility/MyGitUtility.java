@@ -12,8 +12,7 @@ public class MyGitUtility {
     public static final String TAG = "GitNoteTaking";
 
     public static boolean deleteLocalGitRepository(String sRemoteUrl) {
-        String sLocalDirectory = Environment.getExternalStorageDirectory() +
-                File.separator + "gitnotetaking" + File.separator + getLocalGitDir(sRemoteUrl);
+        String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
      //   Log.d(TAG, "check local repository, status = " + checkLocalGitRepository(sRemoteUrl));
         if (checkLocalGitRepository(sRemoteUrl)) {
 
@@ -31,8 +30,7 @@ public class MyGitUtility {
 
     public static boolean cloneGit(String sRemoteUrl, String sUserName, String sUserPassword) {
 
-        String sLocalDirectory = Environment.getExternalStorageDirectory() +
-                File.separator + "gitnotetaking" + File.separator + getLocalGitDir(sRemoteUrl);
+        String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
 
         if (checkLocalGitRepository(sRemoteUrl)) {
             return false;
@@ -108,9 +106,13 @@ public class MyGitUtility {
     }
 
 
-    public static boolean checkLocalGitRepository(String sRemoteUrl) {
-        String sLocalDirectory = Environment.getExternalStorageDirectory() +
+    public static String getLocalGitDirectory(String sRemoteUrl){
+       return  Environment.getExternalStorageDirectory() +
                 File.separator + "gitnotetaking" + File.separator + getLocalGitDir(sRemoteUrl);
+    }
+
+    public static boolean checkLocalGitRepository(String sRemoteUrl) {
+        String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
         Log.d(TAG, "default local directory = " + sLocalDirectory);
         boolean bIsLocalRepositoryExist = false;
         try {
