@@ -19,18 +19,22 @@ class RemoteGitDAO(context: Context) {
         val KEY_ID = "_id"
 
         // 其它表格欄位名稱
+        val REMOTE_NAME_COLUMN = "REMOTE_NAME"
         val URL_COLUMN = "URL"
         val UID_COLUMN = "UID"
         val PWD_COLUMN = "PWD"
         val NICKNAME_COLUMN = "NICKNAME"
+        val PUSH_STATUS_COLUMN = "PUSH_STATUS"
 
         // 使用上面宣告的變數建立表格的SQL敘述
         val CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
                 KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                REMOTE_NAME_COLUMN + " TEXT NOT NULL , " +
                 URL_COLUMN + " TEXT NOT NULL , " +
                 UID_COLUMN + " TEXT NOT NULL, " +
                 PWD_COLUMN + " TEXT NOT NULL, " +
-                NICKNAME_COLUMN + " TEXT NOT NULL)" ;
+                NICKNAME_COLUMN + " TEXT NOT NULL, "+
+                PUSH_STATUS_COLUMN + " INTEGER DEFAULT 0)";
     }
 
     // 資料庫物件
@@ -107,10 +111,12 @@ class RemoteGitDAO(context: Context) {
 
     private fun itemToContentValues(item : RemoteGit, cv : ContentValues) {
         // 第一個參數是欄位名稱， 第二個參數是欄位的資料
+        cv.put(REMOTE_NAME_COLUMN, item.remoteName)
         cv.put(URL_COLUMN, item.url)
         cv.put(UID_COLUMN, item.uid)
         cv.put(PWD_COLUMN,item.pwd)
         cv.put(NICKNAME_COLUMN,item.nickname)
+        cv.put(PUSH_STATUS_COLUMN,item.push_status)
     }
 
     // 刪除參數指定編號的資料
@@ -177,22 +183,16 @@ class RemoteGitDAO(context: Context) {
     fun getRecord(cursor: Cursor): RemoteGit {
         // 準備回傳結果用的物件
         val result = RemoteGit()
-
         result.id = cursor.getLong(0)
-        result.url = cursor.getString(1)
-        result.uid = cursor.getString(2)
-        result.pwd = cursor.getString(3)
-        result.nickname = cursor.getString(4)
-
+        result.remoteName = cursor.getString(1)
+        result.url = cursor.getString(2)
+        result.uid = cursor.getString(3)
+        result.pwd = cursor.getString(4)
+        result.nickname = cursor.getString(5)
+        result.push_status = cursor.getLong(6)
         // 回傳結果
         return result
     }
 
-    // 建立範例資料
-    fun createSampleData() {
-        val item = RemoteGit(0, "HTTPS://github.com/FromTW/test.git","WilliamFromTW","!Lois0023","william git hub");
-        insert(item)
-
-    }
 
 }

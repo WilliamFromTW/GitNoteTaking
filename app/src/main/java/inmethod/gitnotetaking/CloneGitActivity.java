@@ -18,6 +18,7 @@ import inmethod.gitnotetaking.utility.MyGitUtility;
 
 public class CloneGitActivity extends AppCompatActivity {
 
+    private EditText editRemoteName = null;
     private EditText editRemoteURL = null;
     private EditText editUserName = null;
     private EditText editUserPassword = null;
@@ -29,6 +30,7 @@ public class CloneGitActivity extends AppCompatActivity {
         setContentView(R.layout.activity_clone_git);
         final Activity activity = this;
 
+        editRemoteName = (EditText) findViewById(R.id.editRemoteName);
         editRemoteURL = (EditText) findViewById(R.id.editRemoteURL);
         editUserName = (EditText) findViewById(R.id.editUserName);
         editUserPassword = (EditText) findViewById(R.id.editUserPassword);
@@ -40,7 +42,7 @@ public class CloneGitActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (editRemoteURL.getText().toString().equals("") || editUserName.getText().toString().equals("") || editUserPassword.getText().toString().equals("") || editNickName.getText().toString().equals("")) {
+                if (editRemoteName.getText().toString().equals("")||editRemoteURL.getText().toString().equals("") || editUserName.getText().toString().equals("") || editUserPassword.getText().toString().equals("") || editNickName.getText().toString().equals("")) {
                     AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
                     MyAlertDialog.setTitle("Remote Git Clong");
                     MyAlertDialog.setMessage("All Parametes must be set");
@@ -84,11 +86,13 @@ public class CloneGitActivity extends AppCompatActivity {
                                         if (MyGitUtility.cloneGit(editRemoteURL.getText().toString(), editUserName.getText().toString(), editUserPassword.getText().toString())) {
                                             RemoteGit aValue = new RemoteGit();
                                             aValue.setId(0);
+                                            aValue.setRemoteName(editRemoteName.getText().toString());
                                             aValue.setUrl(editRemoteURL.getText().toString());
                                             aValue.setUid(editUserName.getText().toString());
                                             aValue.setPwd(editUserPassword.getText().toString());
                                             aValue.setNickname(editNickName.getText().toString());
                                             aRemoteGitDAO.insert(aValue);
+                                            aRemoteGitDAO.close();
                                             dialog.dismiss();
                                             Looper.prepare();
                                             final AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
@@ -145,7 +149,7 @@ public class CloneGitActivity extends AppCompatActivity {
                     MyAlertDialog.setNeutralButton("OK", OkClick);
                     MyAlertDialog.show();
                 }
-                Log.d("asdf", "count=" + aRemoteGitDAO.getCount());
+              //  Log.d("asdf", "count=" + aRemoteGitDAO.getCount());
             }
         });
     }

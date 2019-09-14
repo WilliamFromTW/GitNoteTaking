@@ -14,5 +14,5 @@
         android:singleLine="false"  android:gravity="top|left"
         android:inputType="textMultiLine"
         android:scrollHorizontally="false"
-        android:textSize="12sp"></EditText>
+        android:textSize="14sp"></EditText>
 </androidx.constraintlayout.widget.ConstraintLayout>

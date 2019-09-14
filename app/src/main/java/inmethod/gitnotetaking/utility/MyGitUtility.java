@@ -13,7 +13,7 @@ public class MyGitUtility {
 
     public static boolean deleteLocalGitRepository(String sRemoteUrl) {
         String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
-     //   Log.d(TAG, "check local repository, status = " + checkLocalGitRepository(sRemoteUrl));
+        //   Log.d(TAG, "check local repository, status = " + checkLocalGitRepository(sRemoteUrl));
         if (checkLocalGitRepository(sRemoteUrl)) {
 
             GitUtil aGitUtil;
@@ -28,9 +28,59 @@ public class MyGitUtility {
         }
         return false;
     }
-public static boolean update(String sRemoteUrl, String sUserName, String sUserPassword){
+
+    public static boolean push(String sRemoteName,String sRemoteUrl, String sUserName, String sUserPassword){
+        String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
 
 
+        boolean bIsRemoteRepositoryExist = false;
+        GitUtil aGitUtil;
+        try {
+            aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
+            bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(sUserName, sUserPassword);
+            if (!bIsRemoteRepositoryExist) {
+                Log.e(TAG, "check remote url failed");
+                return false;
+            }
+            System.out.println("Remote repository exists ? " + bIsRemoteRepositoryExist);
+            if (bIsRemoteRepositoryExist) {
+                System.out.println("try to commit \n");
+                if (aGitUtil.push(sRemoteName,sUserName,sUserPassword)){;
+                    System.out.println("commit finished!");
+                    return true;
+                } else {
+                    System.out.println("commit failed!");
+                    return false;
+                }
+            }
+            return false;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static boolean commit(String sRemoteUrl, String sUserName, String sUserPassword,String sCommitMessages) {
+        String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
+        GitUtil aGitUtil;
+        try {
+            aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
+
+                if (aGitUtil.commit(sUserName,sUserPassword,sCommitMessages)){
+                    System.out.println("commit finished!");
+                    return true;
+                } else {
+                    System.out.println("commit failed!");
+                    return false;
+                }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static boolean pull(String sRemoteUrl, String sUserName, String sUserPassword) {
 
         String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
 
@@ -47,17 +97,13 @@ public static boolean update(String sRemoteUrl, String sUserName, String sUserPa
             System.out.println("Remote repository exists ? " + bIsRemoteRepositoryExist);
             if (bIsRemoteRepositoryExist) {
                 System.out.println("try to update remote repository if local repository is not exists \n");
-                if (aGitUtil.update(sUserName,sUserPassword)) {
+                if (aGitUtil.pull(sUserName, sUserPassword)) {
                     System.out.println("update finished!");
                     return true;
                 } else {
                     System.out.println("update failed!");
                     return false;
                 }
-            } else if (bIsRemoteRepositoryExist && aGitUtil.checkLocalRepository()) {
-                System.out.println("pull branch = " + aGitUtil.getDefaultBranch() + " , status : "
-                        + aGitUtil.update(sUserName, sUserPassword));
-                return true;
             }
             return false;
 
@@ -95,7 +141,7 @@ public static boolean update(String sRemoteUrl, String sUserName, String sUserPa
                 }
             } else if (bIsRemoteRepositoryExist && aGitUtil.checkLocalRepository()) {
                 System.out.println("pull branch = " + aGitUtil.getDefaultBranch() + " , status : "
-                        + aGitUtil.update(sUserName, sUserPassword));
+                        + aGitUtil.pull(sUserName, sUserPassword));
                 return true;
             }
             return false;
@@ -145,8 +191,8 @@ public static boolean update(String sRemoteUrl, String sUserName, String sUserPa
     }
 
 
-    public static String getLocalGitDirectory(String sRemoteUrl){
-       return  Environment.getExternalStorageDirectory() +
+    public static String getLocalGitDirectory(String sRemoteUrl) {
+        return Environment.getExternalStorageDirectory() +
                 File.separator + "gitnotetaking" + File.separator + getLocalGitDir(sRemoteUrl);
     }
 

@@ -56,6 +56,7 @@ public class FileExplorerActivity extends AppCompatActivity {
     private List<String> m_filesPath;
     private String sGitRootDir;
     private String sGitName;
+    private String sGitRemoteUrl;
 
 
     @Override
@@ -63,10 +64,11 @@ public class FileExplorerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_explorer_main);
         Intent myIntent = getIntent(); // gets the previously created intent
+        sGitRemoteUrl = myIntent.getStringExtra("GIT_REMOTE_URL");
         sGitRootDir = myIntent.getStringExtra("GIT_ROOT_DIR");
         sGitName = myIntent.getStringExtra("GIT_NAME");
         Toolbar toolbar = findViewById(R.id.toolbar2);
-        toolbar.setTitle("GIT NAME:"+sGitName);
+        toolbar.setTitle("GIT NAME : "+sGitName);
         setSupportActionBar(toolbar);
 
     }
@@ -106,6 +108,8 @@ public class FileExplorerActivity extends AppCompatActivity {
         for(int i=0; i < m_filesArray.length; i++)
         {
             File file = m_filesArray[i];
+            if( !file.getName().substring(0,1).equalsIgnoreCase(".")){
+
             if(file.isDirectory())
             {
                 m_item.add(file.getName());
@@ -115,6 +119,7 @@ public class FileExplorerActivity extends AppCompatActivity {
             {
                 m_files.add(file.getName());
                 m_filesPath.add(file.getPath());
+            }
             }
         }
         for(String m_AddFile:m_files)
@@ -133,31 +138,35 @@ public class FileExplorerActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 File m_isFile=new File(m_path.get(position));
+
                 if(m_isFile.isDirectory())
                 {
                     getDirFromRoot(m_isFile.toString());
                 }
                 else
                 {
-                   // Toast.makeText(FileExplorerActivity.this, "File Name = "+m_isFile.getAbsoluteFile()+",uri="+Uri.fromFile(m_isFile), Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(FileExplorerActivity.this, ViewFileActivity.class);
-                    intent.putExtra("FILE_PATH",m_isFile.getAbsoluteFile().toString());
+                    String sFileName = m_isFile.getName().toLowerCase();
+                    if(sFileName.indexOf(".txt")!=-1||
+                            sFileName.indexOf(".xml")!=-1||
+                            sFileName.indexOf(".kt")!=-1||
+                            sFileName.indexOf(".java")!=-1||
+                            sFileName.indexOf(".c")!=-1||
+                            sFileName.indexOf(".html")!=-1||
+                            sFileName.indexOf(".py")!=-1||
+                            sFileName.indexOf(".sql")!=-1||
+                            sFileName.indexOf(".md")!=-1
+                    ) {
+                        // Toast.makeText(FileExplorerActivity.this, "File Name = "+m_isFile.getAbsoluteFile()+",uri="+Uri.fromFile(m_isFile), Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(FileExplorerActivity.this, ViewFileActivity.class);
+                        intent.putExtra("FILE_PATH", m_isFile.getAbsoluteFile().toString());
+                        intent.putExtra("GIT_REMOTE_URL",sGitRemoteUrl);
+                        startActivity(intent);
+                    }else{
 
-                    startActivity(intent);
+                    }
                 }
             }
         });
-    }
-
-    public static String getMimeType(String url) {
-        String type = null;
-        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
-
-        if (extension != null) {
-            MimeTypeMap mime = MimeTypeMap.getSingleton();
-            type = mime.getMimeTypeFromExtension(extension);
-        }
-        return type;
     }
 
 }

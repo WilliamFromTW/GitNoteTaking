@@ -4,9 +4,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
@@ -150,25 +152,24 @@ public class MainActivity extends AppCompatActivity {
         adapter.setOnItemClickListener(new RecyclerAdapterForDevice.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Toast.makeText(activity, "click position=" + position, Toast.LENGTH_LONG).show();
+                // Toast.makeText(activity, "click position=" + position, Toast.LENGTH_LONG).show();
                 Intent Intent = new Intent(MainActivity.this, FileExplorerActivity.class);
                 Object[] aTextView = GitList.getDeviceInfoFromLayoutId(view);
-                String sGitName = ((TextView)aTextView[0]).getText().toString();
-                String sRemoteUrl = ((TextView)aTextView[1]).getText().toString();
-
-
-                Intent.putExtra("GIT_ROOT_DIR",MyGitUtility.getLocalGitDirectory(sRemoteUrl));
-                Intent.putExtra("GIT_NAME",sGitName);
+                String sGitName = ((TextView) aTextView[0]).getText().toString();
+                String sRemoteUrl = ((TextView) aTextView[1]).getText().toString();
+                Intent.putExtra("GIT_ROOT_DIR", MyGitUtility.getLocalGitDirectory(sRemoteUrl));
+                Intent.putExtra("GIT_NAME", sGitName);
+                Intent.putExtra("GIT_REMOTE_URL", sRemoteUrl);
                 startActivity(Intent);
             }
         });
 
-        adapter.setOnItemLongClickListener(new RecyclerAdapterForDevice.OnItemLongClickListener(){
+        adapter.setOnItemLongClickListener(new RecyclerAdapterForDevice.OnItemLongClickListener() {
             @Override
-            public void onItemLongClick(View view,int position){
+            public void onItemLongClick(View view, int position) {
                 final Object[] aTextView = GitList.getDeviceInfoFromLayoutId(view);
-                final String sRemoteUrl = ((TextView)aTextView[1]).getText().toString();
-                Toast.makeText(activity, "Long click position=" + position+",git name="+sRemoteUrl, Toast.LENGTH_LONG).show();
+                final String sRemoteUrl = ((TextView) aTextView[1]).getText().toString();
+                //    Toast.makeText(activity, "Long click position=" + position+",git name="+sRemoteUrl, Toast.LENGTH_LONG).show();
 
                 //Creating the instance of PopupMenu
                 PopupMenu popup = new PopupMenu(MainActivity.this, view);
@@ -178,20 +179,42 @@ public class MainActivity extends AppCompatActivity {
                 //registering popup with OnMenuItemClickListener
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     public boolean onMenuItemClick(MenuItem item) {
-                        Toast.makeText(
-                                MainActivity.this,
-                                "You Clicked : " + item.getTitle(),
-                                Toast.LENGTH_SHORT
-                        ).show();
-                        getGitDAO().delete(((TextView)aTextView[1]).getText().toString());
-                        Log.d(TAG,"try to delete local git repository");
-                        MyGitUtility.deleteLocalGitRepository(sRemoteUrl);
-                        adapter.clear();
+                        int id = item.getItemId();
+                        if (id == R.id.Remove) {
+                            getGitDAO().delete(((TextView) aTextView[1]).getText().toString());
+                            Log.d(TAG, "try to delete local git repository");
+                            MyGitUtility.deleteLocalGitRepository(sRemoteUrl);
+                            adapter.clear();
+                            return true;
+                        } else if (id == R.id.Push) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                            builder.setCancelable(false); // if you want user to wait for some process to finish,
+                            builder.setView(R.layout.loading_dialog);
+                            final AlertDialog dialog = builder.create();
+                            dialog.show();
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    RemoteGit aRemoteGit = getGitDAO().getByURL(((TextView) aTextView[1]).getText().toString());
+                                    if (MyGitUtility.push(aRemoteGit.getRemoteName(), aRemoteGit.getUrl(), aRemoteGit.getUid(), aRemoteGit.getPwd())) {
+                                        aRemoteGit.setPush_status(GitList.PUSH_SUCCESS);
+                                        getGitDAO().update(aRemoteGit);
+
+                                        ((TextView) aTextView[0]).setTextColor(Color.BLACK);
+                                        dialog.dismiss();
+                                    } else {
+                                    }
+
+                                }
+                            }).start();
+
+
+                        }
                         return true;
                     }
                 });
 
-                popup.show(); //showing popup menu popup = new PopupMenu(MainActivity.this, button1);
+                popup.show();
 
             }
         });
@@ -202,13 +225,16 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         ArrayList<RemoteGit> aList = getDBList();
-        for(final RemoteGit a:aList) {
-            adapter.addData(new GitList( a.getNickname(),a.getUrl()));
-            Log.d(TAG,"try to update pull remote git to local repository");
+        adapter.clear();
+        if (aList.size() > 0)
+            Toast.makeText(activity, "pull from remote to local will run in backupgroud", Toast.LENGTH_LONG).show();
+        for (final RemoteGit a : aList) {
+            adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getPush_status()));
+            Log.d(TAG, "try to update remote git to local repository");
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    MyGitUtility.update(a.getUrl(),a.getUid(),a.getPwd());
+                    MyGitUtility.pull(a.getUrl(), a.getUid(), a.getPwd());
                 }
             }).start();
 
@@ -216,13 +242,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private RemoteGitDAO getGitDAO(){
-        if( aRemoteGitDAO == null)
-        return new RemoteGitDAO(activity);
+    private RemoteGitDAO getGitDAO() {
+        if (aRemoteGitDAO == null)
+            return new RemoteGitDAO(activity);
         else return aRemoteGitDAO;
     }
 
-    private ArrayList<RemoteGit> getDBList(){
+    private ArrayList<RemoteGit> getDBList() {
         return getGitDAO().getAll();
     }
 
@@ -235,12 +261,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
+/*
         if (id == R.id.action_settings) {
             Intent Intent = new Intent(MainActivity.this, PreferencesSettings.class);
             startActivity(Intent);
             return true;
-        } else if (id == R.id.action_create) {
+        } else */
+
+        if (id == R.id.action_create) {
             Intent Intent = new Intent(MainActivity.this, CloneGitActivity.class);
             startActivity(Intent);
 
