@@ -226,8 +226,8 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         ArrayList<RemoteGit> aList = getDBList();
         adapter.clear();
-        if (aList.size() > 0)
-            Toast.makeText(activity, "pull from remote to local will run in backupgroud", Toast.LENGTH_LONG).show();
+        //if (aList.size() > 0)
+            //Toast.makeText(activity, "pull from remote to local will run in backupgroud", Toast.LENGTH_LONG).show();
         for (final RemoteGit a : aList) {
             adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getPush_status()));
             Log.d(TAG, "try to update remote git to local repository");
@@ -261,12 +261,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-/*
+
         if (id == R.id.action_settings) {
             Intent Intent = new Intent(MainActivity.this, PreferencesSettings.class);
             startActivity(Intent);
             return true;
-        } else */
+        } else
 
         if (id == R.id.action_create) {
             Intent Intent = new Intent(MainActivity.this, CloneGitActivity.class);

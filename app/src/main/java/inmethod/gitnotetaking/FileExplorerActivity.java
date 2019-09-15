@@ -68,8 +68,9 @@ public class FileExplorerActivity extends AppCompatActivity {
         sGitRootDir = myIntent.getStringExtra("GIT_ROOT_DIR");
         sGitName = myIntent.getStringExtra("GIT_NAME");
         Toolbar toolbar = findViewById(R.id.toolbar2);
-        toolbar.setTitle("GIT NAME : "+sGitName);
+        toolbar.setTitle("Explorer : "+sGitName);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
     }
 
@@ -169,4 +170,13 @@ public class FileExplorerActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if( id==android.R.id.home){
+            onBackPressed();
+            return true;
+        }
+        return true;
+    }
 }

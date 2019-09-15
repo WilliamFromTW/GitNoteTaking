@@ -2,26 +2,19 @@
 <androidx.preference.PreferenceScreen
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
+
     <androidx.preference.PreferenceCategory
-        app:title="GIT URL">
+        app:title="Authoer Name">
             <androidx.preference.EditTextPreference
-                app:key="GitUrl"
-                app:title="@string/GitUrl"
-                app:defaultValue="https://github.hlmt.com.tw/920405/testtest.git" />
+                app:key="GitAuthorName"
+                app:title="@string/GitAuthorName"
+                app:defaultValue="root" />
         </androidx.preference.PreferenceCategory>
     <androidx.preference.PreferenceCategory
-        app:title="User Name" >
+        app:title="Ahtor Email" >
         <androidx.preference.EditTextPreference
-            app:key="UserName"
-            app:title="@string/GitUserName"
-            app:defaultValue="920405" />
-    </androidx.preference.PreferenceCategory>
-    <androidx.preference.PreferenceCategory
-        app:title="Password" >
-        <androidx.preference.EditTextPreference
-            app:key="Password"
-            app:singleLine="true"
-            app:title="@string/GitPassword"
-            app:defaultValue="!lois0023" />
+            app:key="GitAuthorEmail"
+            app:title="@string/GitAuthorEmail"
+            app:defaultValue="root@your.email.com" />
     </androidx.preference.PreferenceCategory>
 </androidx.preference.PreferenceScreen>

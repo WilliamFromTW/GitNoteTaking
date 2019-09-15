@@ -1,10 +1,9 @@
 <resources>
-    <string name="app_name">InMethodGitNoteTaking</string>
+    <string name="app_name">Simple Git Note</string>
     <string name="action_settings">Settings</string>
     <string name="action_clone">Clone Git</string>
     <string name="view_file_action_edit">Edit</string>
     <string name="view_file_action_save">Save</string>
-    <string name="GitUrl">Click to modify Git URL</string>
-    <string name="GitUserName">Click to modify Git User Name</string>
-    <string name="GitPassword">Click to modify Git Password</string>
+    <string name="GitAuthorName">Click to modify Git Author Name</string>
+    <string name="GitAuthorEmail">Click to modify Git Author email</string>
 </resources>

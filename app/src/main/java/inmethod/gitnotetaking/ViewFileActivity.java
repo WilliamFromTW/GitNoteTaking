@@ -22,6 +22,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.preference.PreferenceManager;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -77,6 +78,7 @@ public class ViewFileActivity extends AppCompatActivity {
         else
             toolbar.setTitle("");
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
     }
 
@@ -139,7 +141,10 @@ public class ViewFileActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.view_file_action_edit) {
+        if( id==android.R.id.home){
+            onBackPressed();
+            return true;
+        }else if (id == R.id.view_file_action_edit) {
             iMode = MODE_EDIT;
             editText.setEnabled(true);
             itemSave.setVisible(false);
@@ -160,7 +165,7 @@ public class ViewFileActivity extends AppCompatActivity {
             if (aRemoteGit != null) {
                 final EditText txtUrl = new EditText(this);
 
-                //  txtUrl.setHint("http://www.librarising.com/astrology/celebs/images2/QR/queenelizabethii.jpg");
+                //  txtUrl.setHint("your hint");
 
                 new AlertDialog.Builder(this)
                         .setTitle("Commit")
@@ -176,7 +181,9 @@ public class ViewFileActivity extends AppCompatActivity {
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        boolean bCommitStatus = MyGitUtility.commit(sGitRemoteUrl, aRemoteGit.getUid(), aRemoteGit.getPwd(), txtUrl.getText().toString());
+                                        String sAuthorName = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName","root");
+                                        String sAuthorEmail = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail","root@your.email.com");
+                                        boolean bCommitStatus = MyGitUtility.commit(sGitRemoteUrl, aRemoteGit.getUid(), aRemoteGit.getPwd(), txtUrl.getText().toString(),sAuthorName,sAuthorEmail);
                                         boolean bPullStatus = false;
                                         String sPullMessage = "";
                                         if (bCommitStatus) {

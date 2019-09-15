@@ -61,13 +61,13 @@ public class MyGitUtility {
         return false;
     }
 
-    public static boolean commit(String sRemoteUrl, String sUserName, String sUserPassword,String sCommitMessages) {
+    public static boolean commit(String sRemoteUrl, String sUserName, String sUserPassword,String sCommitMessages,String sAuthorName,String sAuthorEmail) {
         String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
         GitUtil aGitUtil;
         try {
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
 
-                if (aGitUtil.commit(sUserName,sUserPassword,sCommitMessages)){
+                if (aGitUtil.commit(sUserName,sUserPassword,sCommitMessages,sAuthorName,sAuthorEmail)){
                     System.out.println("commit finished!");
                     return true;
                 } else {
