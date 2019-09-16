@@ -1,10 +1,17 @@
 package inmethod.gitnotetaking.utility;
 
+import android.app.Activity;
 import android.os.Environment;
 import android.util.Log;
 
-import java.io.File;
+import androidx.preference.PreferenceManager;
 
+import java.io.File;
+import java.util.ArrayList;
+
+import inmethod.gitnotetaking.db.RemoteGit;
+import inmethod.gitnotetaking.db.RemoteGitDAO;
+import inmethod.gitnotetaking.view.GitList;
 import inmethod.jakarta.vcs.GitUtil;
 
 public class MyGitUtility {
@@ -29,27 +36,37 @@ public class MyGitUtility {
         return false;
     }
 
-    public static boolean push(String sRemoteName,String sRemoteUrl, String sUserName, String sUserPassword){
+    public static boolean push(Activity activity, String sRemoteUrl) {
+        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
+        RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
+        if (aRemoteGit == null) return false;
         String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
-
 
         boolean bIsRemoteRepositoryExist = false;
         GitUtil aGitUtil;
         try {
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
-            bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(sUserName, sUserPassword);
+            bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(aRemoteGit.getUid(), aRemoteGit.getPwd());
             if (!bIsRemoteRepositoryExist) {
                 Log.e(TAG, "check remote url failed");
+                aRemoteGit.setPush_status(GitList.PUSH_FAIL);
+                aRemoteGitDAO.update(aRemoteGit);
                 return false;
             }
-            System.out.println("Remote repository exists ? " + bIsRemoteRepositoryExist);
+            Log.d(TAG,"Remote repository exists ? " + bIsRemoteRepositoryExist);
             if (bIsRemoteRepositoryExist) {
-                System.out.println("try to commit \n");
-                if (aGitUtil.push(sRemoteName,sUserName,sUserPassword)){;
-                    System.out.println("commit finished!");
+                Log.d(TAG,"try to push \n");
+                if (aGitUtil.push(aRemoteGit.getRemoteName(), aRemoteGit.getUid(), aRemoteGit.getPwd())) {
+                    Log.d(TAG,"push finished!");
+                    aRemoteGit.setPush_status(GitList.PUSH_SUCCESS);
+                    aRemoteGitDAO.update(aRemoteGit);
+                    aRemoteGitDAO.close();
                     return true;
                 } else {
-                    System.out.println("commit failed!");
+                    aRemoteGit.setPush_status(GitList.PUSH_FAIL);
+                    aRemoteGitDAO.update(aRemoteGit);
+                    Log.d(TAG,"push failed!");
+                    aRemoteGitDAO.close();
                     return false;
                 }
             }
@@ -61,30 +78,45 @@ public class MyGitUtility {
         return false;
     }
 
-    public static boolean commit(String sRemoteUrl, String sUserName, String sUserPassword,String sCommitMessages,String sAuthorName,String sAuthorEmail) {
+    public static boolean commit(Activity activity, String sRemoteUrl, String sCommitMessages) {
+
         String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
         GitUtil aGitUtil;
         try {
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
 
-                if (aGitUtil.commit(sUserName,sUserPassword,sCommitMessages,sAuthorName,sAuthorEmail)){
-                    System.out.println("commit finished!");
-                    return true;
-                } else {
-                    System.out.println("commit failed!");
-                    return false;
-                }
+            String sAuthorName = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", "root");
+            String sAuthorEmail = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", "root@your.email.com");
+            if (aGitUtil.commit(sCommitMessages, sAuthorName, sAuthorEmail)) {
+                Log.d(TAG,"commit finished!");
+                return true;
+            } else {
+                Log.d(TAG,"commit failed!");
+                return false;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
 
+    public static boolean deleteByRemoteUrl(Activity activity,String sRemoteUrl){
+        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
+        boolean sReturn = aRemoteGitDAO.delete(sRemoteUrl);
+        aRemoteGitDAO.close();
+        return sReturn;
+
+    }
+
+    public static ArrayList<RemoteGit> getRemoteGitList(Activity activity){
+        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
+        ArrayList<RemoteGit> aList =  aRemoteGitDAO.getAll();
+        aRemoteGitDAO.close();
+        return aList;
+
+    }
     public static boolean pull(String sRemoteUrl, String sUserName, String sUserPassword) {
-
         String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
-
-
         boolean bIsRemoteRepositoryExist = false;
         GitUtil aGitUtil;
         try {
@@ -94,14 +126,14 @@ public class MyGitUtility {
                 Log.e(TAG, "check remote url failed");
                 return false;
             }
-            System.out.println("Remote repository exists ? " + bIsRemoteRepositoryExist);
+            Log.d(TAG,"Remote repository exists ? " + bIsRemoteRepositoryExist);
             if (bIsRemoteRepositoryExist) {
-                System.out.println("try to update remote repository if local repository is not exists \n");
+                Log.d(TAG,"try to update remote repository if local repository is not exists \n");
                 if (aGitUtil.pull(sUserName, sUserPassword)) {
-                    System.out.println("update finished!");
+                    Log.d(TAG,"update finished!");
                     return true;
                 } else {
-                    System.out.println("update failed!");
+                    Log.d(TAG,"update failed!");
                     return false;
                 }
             }
@@ -112,6 +144,7 @@ public class MyGitUtility {
         }
         return false;
     }
+
 
     public static boolean cloneGit(String sRemoteUrl, String sUserName, String sUserPassword) {
 
@@ -129,47 +162,22 @@ public class MyGitUtility {
                 Log.e(TAG, "check remote url failed");
                 return false;
             }
-            System.out.println("Remote repository exists ? " + bIsRemoteRepositoryExist);
+            Log.d(TAG,"Remote repository exists ? " + bIsRemoteRepositoryExist);
             if (bIsRemoteRepositoryExist) {
-                System.out.println("try to clone remote repository if local repository is not exists \n");
+                Log.d(TAG,"try to clone remote repository if local repository is not exists \n");
                 if (aGitUtil.clone(sUserName, sUserPassword)) {
-                    System.out.println("clone finished!");
+                    Log.d(TAG,"clone finished!");
                     return true;
                 } else {
-                    System.out.println("clone failed!");
+                    Log.d(TAG,"clone failed!");
                     return false;
                 }
             } else if (bIsRemoteRepositoryExist && aGitUtil.checkLocalRepository()) {
-                System.out.println("pull branch = " + aGitUtil.getDefaultBranch() + " , status : "
+                Log.d(TAG,"pull branch = " + aGitUtil.getDefaultBranch() + " , status : "
                         + aGitUtil.pull(sUserName, sUserPassword));
                 return true;
             }
             return false;
-/*
-            System.out.println("Default branch : " + aGitUtil.getDefaultBranch());
-            if (aGitUtil.checkLocalRepository()) {
-                List<Ref> aAllBranches = aGitUtil.getBranches();
-                if (aAllBranches != null) {
-                    System.out.println("\nList All Local Branch Name\n--------------------------------");
-                    for (Ref aBranch : aAllBranches) {
-                        System.out.println("branch : " + aBranch.getName());
-                    }
-                    System.out.println("");
-                }
-                System.out.println("Switch local branch to master: " + aGitUtil.checkout("master"));
-                List<Ref> aAllTags = aGitUtil.getLocalTags();
-                if (aAllTags != null) {
-                    System.out.println("\nList All Local Tags Name\n--------------------------------");
-                    for (Ref aTag : aAllTags) {
-                        System.out.println("Tag : " + aTag.getName() + "(" + aGitUtil.getTagDate(aTag, "yyyy-MM-dd HH:mm:ss") + " created!)");
-                        System.out.println("Commit messages\n==\n" + aGitUtil.getCommitMessageByTagName(aTag) + "\n");
-                    }
-                    System.out.println("");
-                }
-                aGitUtil.close();
-            }
-
- */
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -182,7 +190,7 @@ public class MyGitUtility {
         if (sRemoteUrl.indexOf(".git") == -1) return sReturn;
         int lastPath = sRemoteUrl.lastIndexOf("//");
         if (lastPath != -1) {
-            sReturn = sRemoteUrl.substring(lastPath + 1);
+            sReturn = sRemoteUrl.substring(lastPath + 2);
         }
         if (sReturn.length() > 4)
             sReturn = sReturn.substring(0, sReturn.length() - 4);

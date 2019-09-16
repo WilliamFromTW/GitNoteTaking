@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">簡單GIT筆記</string>
+    <string name="action_settings">設定</string>
+    <string name="action_clone">複製GIT</string>
+    <string name="view_file_action_edit">編輯</string>
+    <string name="view_file_action_save">存檔</string>
+    <string name="GitAuthorName">點此修改名字</string>
+    <string name="GitAuthorEmail">點此修改email</string>
+    <string name="action_create_file">新增檔案</string>
+    <string name="action_create_folder">新增目錄</string>
+    <string name="action_delete">刪除</string>
+
+    // FileExplorerActivity
+    <string name="create_folder">新增目錄</string>
+    <string name="create_file">新增檔案</string>
+    <string name="select_file_or_directory">必須選擇檔案或目錄</string>
+
+    // ViewFileActivity
+    <string name="commit">提交</string>
+    <string name="commit_messages">請輸入原由</string>
+
+    // GitCloneActivity Layout
+    <string name="tv_clone_git_repository">複製Git倉庫</string>
+    <string name="tv_remote_name">遠端GIT代號</string>
+    <string name="tv_remote_url">遠端GIT URL</string>
+    <string name="tv_user_name">帳號</string>
+    <string name="tv_git_nick_name">GIT別名</string>
+    <string name="tv_password">密碼</string>
+
+
+
+</resources>

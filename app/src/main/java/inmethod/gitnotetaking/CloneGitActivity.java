@@ -106,7 +106,6 @@ public class CloneGitActivity extends AppCompatActivity {
                                                             onBackPressed();
                                                         }
                                                     });
-
                                                 }
                                             };
                                             MyAlertDialog.setNeutralButton("OK", OkClick);

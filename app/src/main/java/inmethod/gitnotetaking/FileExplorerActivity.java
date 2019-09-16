@@ -2,6 +2,7 @@ package inmethod.gitnotetaking;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -9,16 +10,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
@@ -30,6 +34,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,7 +62,7 @@ public class FileExplorerActivity extends AppCompatActivity {
     private String sGitRootDir;
     private String sGitName;
     private String sGitRemoteUrl;
-
+    private String m_curDir;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +73,7 @@ public class FileExplorerActivity extends AppCompatActivity {
         sGitRootDir = myIntent.getStringExtra("GIT_ROOT_DIR");
         sGitName = myIntent.getStringExtra("GIT_NAME");
         Toolbar toolbar = findViewById(R.id.toolbar2);
-        toolbar.setTitle("Explorer : "+sGitName);
+        toolbar.setTitle(sGitName);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -87,6 +92,28 @@ public class FileExplorerActivity extends AppCompatActivity {
         super.onResume();
 
     }
+    void deleteFile()
+    {
+        if( adapter.m_selectedItem.size()==0 ){
+            Toast.makeText(FileExplorerActivity.this, getResources().getString(R.string.select_file_or_directory), Toast.LENGTH_SHORT).show();
+        }
+        else {
+            for (int m_delItem : adapter.m_selectedItem) {
+                File m_delFile = new File(m_path.get(m_delItem));
+                Log.d("file", m_path.get(m_delItem));
+                boolean m_isDelete = m_delFile.delete();
+            }
+            getDirFromRoot(m_curDir);
+            if(MyGitUtility.commit(activity,sGitRemoteUrl,"delete files"))
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    MyGitUtility.push(activity, sGitRemoteUrl);
+                }
+            }).start();
+        }
+    }
+
 
     public void getDirFromRoot(String p_rootPath)
     {
@@ -97,13 +124,14 @@ public class FileExplorerActivity extends AppCompatActivity {
         m_filesPath=new ArrayList<String>();
         File m_file = new File(p_rootPath);
         File[] m_filesArray = m_file.listFiles();
+        Log.d(TAG,"rootPath="+p_rootPath+",GitRootDir="+sGitRootDir);
         if(!p_rootPath.equals(sGitRootDir))
         {
             m_item.add("../");
             m_path.add(m_file.getParent());
             m_isRoot=false;
         }
-        String m_curDir=p_rootPath;
+        m_curDir=p_rootPath;
         //sorting file list in alphabetical order
         Arrays.sort(m_filesArray);
         for(int i=0; i < m_filesArray.length; i++)
@@ -170,13 +198,79 @@ public class FileExplorerActivity extends AppCompatActivity {
         });
     }
 
+    void createNewFolder( final int p_opt)
+    {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        if( p_opt==1)
+        builder.setTitle(getResources().getString(R.string.create_folder));
+        else builder.setTitle(getResources().getString(R.string.create_file));
+        // Set up the input
+        final EditText m_edtinput = new EditText(this);
+        // Specify the type of input expected;
+        m_edtinput.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String m_text = m_edtinput.getText().toString();
+                if(p_opt == 1)
+                {
+                    File m_newPath=new File(m_curDir,m_text);
+                    Log.d("cur dir",m_curDir);
+                    if(!m_newPath.exists()) {
+                        m_newPath.mkdirs();
+                    }
+                }
+                else
+                {
+                    try {
+                        FileOutputStream m_Output = new FileOutputStream((m_curDir+File.separator+m_text), false);
+                        m_Output.close();
+
+                    } catch (FileNotFoundException e)
+                    {
+                        e.printStackTrace();
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                getDirFromRoot(m_curDir);
+
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.setView(m_edtinput);
+        builder.show();
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.file_explorer_menu, menu);
+        return true;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if( id==android.R.id.home){
             onBackPressed();
             return true;
+        }else if( id==R.id.action_delete){
+            deleteFile();
+        }else if( id==R.id.action_create_folder){
+            createNewFolder(1);
+        }else if( id==R.id.action_create_file){
+            createNewFolder(0);
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 }

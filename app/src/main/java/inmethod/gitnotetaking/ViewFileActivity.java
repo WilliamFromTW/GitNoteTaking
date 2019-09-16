@@ -91,7 +91,6 @@ public class ViewFileActivity extends AppCompatActivity {
             editText.setEnabled(false);
             if (file.exists()) {
                 FileReader fr = new FileReader(file);
-
                 BufferedReader br = new BufferedReader(fr);
                 while (br.ready()) {
                     editText.append(br.readLine() + "\n");
@@ -141,10 +140,10 @@ public class ViewFileActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if( id==android.R.id.home){
+        if (id == android.R.id.home) {
             onBackPressed();
             return true;
-        }else if (id == R.id.view_file_action_edit) {
+        } else if (id == R.id.view_file_action_edit) {
             iMode = MODE_EDIT;
             editText.setEnabled(true);
             itemSave.setVisible(false);
@@ -158,83 +157,38 @@ public class ViewFileActivity extends AppCompatActivity {
             itemEdit.setVisible(false);
 
             FileWriter fw = null;
-            final RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
-            final RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sGitRemoteUrl);
 
 
-            if (aRemoteGit != null) {
-                final EditText txtUrl = new EditText(this);
+            final EditText txtUrl = new EditText(this);
 
-                //  txtUrl.setHint("your hint");
+            //  txtUrl.setHint("your hint");
 
-                new AlertDialog.Builder(this)
-                        .setTitle("Commit")
-                        .setMessage("Please input your commit message!")
-                        .setView(txtUrl)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                                builder.setCancelable(false);
-                                builder.setView(R.layout.loading_dialog);
-                                final AlertDialog dialogs = builder.create();
-                                dialogs.show();
+            new AlertDialog.Builder(this)
+                    .setTitle(getResources().getString(R.string.commit))
+                    .setMessage(getResources().getString(R.string.commit_messages))
+                    .setView(txtUrl)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                            builder.setCancelable(false);
+                            builder.setView(R.layout.loading_dialog);
+                            final AlertDialog dialogs = builder.create();
+                            dialogs.show();
+                            boolean bCommitStatus = MyGitUtility.commit(activity, sGitRemoteUrl, txtUrl.getText().toString());
+                            dialogs.dismiss();
+                            if (bCommitStatus) {
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        String sAuthorName = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName","root");
-                                        String sAuthorEmail = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail","root@your.email.com");
-                                        boolean bCommitStatus = MyGitUtility.commit(sGitRemoteUrl, aRemoteGit.getUid(), aRemoteGit.getPwd(), txtUrl.getText().toString(),sAuthorName,sAuthorEmail);
-                                        boolean bPullStatus = false;
-                                        String sPullMessage = "";
-                                        if (bCommitStatus) {
-                                            bPullStatus = MyGitUtility.push(aRemoteGit.getRemoteName(), sGitRemoteUrl, aRemoteGit.getUid(), aRemoteGit.getPwd());
-                                            if (bPullStatus) {
-                                                sPullMessage = "\nPush success!";
-                                                aRemoteGit.setPush_status(0);
-                                                aRemoteGitDAO.update(aRemoteGit);
-                                            }
-                                            else {
-                                                sPullMessage = "\nPush failed try later";
-                                                aRemoteGit.setPush_status(-1);
-                                                aRemoteGitDAO.update(aRemoteGit);
-                                            }
-                                            dialogs.dismiss();
-                                            Looper.prepare();
-                                            final AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
-                                            MyAlertDialog.setTitle("Git Repository");
-                                            MyAlertDialog.setMessage("Commit Success!" + sPullMessage);
-                                            DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    aRemoteGitDAO.close();
-                                                }
-                                            };
-                                            MyAlertDialog.setNeutralButton("OK", OkClick);
-                                            MyAlertDialog.show();
-                                            Looper.loop();
-                                        } else {
-                                            Looper.prepare();
-                                            dialogs.dismiss();
-                                            final AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
-                                            MyAlertDialog.setTitle("Local Git Repository");
-                                            MyAlertDialog.setMessage("Commit Fail!");
-                                            DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    aRemoteGitDAO.close();
-                                                }
-                                            };
-                                            MyAlertDialog.setNeutralButton("OK", OkClick);
-                                            MyAlertDialog.show();
-                                            Looper.loop();
-                                        }
+
+                                        MyGitUtility.push(activity, sGitRemoteUrl);
 
                                     }
                                 }).start();
-
                             }
-                        }).show();
-            } else {
-                Toast.makeText(activity, "No Git Info in DB", Toast.LENGTH_SHORT).show();
-            }
+                        }
+                    }).show();
+
             try {
                 fw = new FileWriter(new File(sFilePath));
                 BufferedWriter bw = new BufferedWriter(fw);

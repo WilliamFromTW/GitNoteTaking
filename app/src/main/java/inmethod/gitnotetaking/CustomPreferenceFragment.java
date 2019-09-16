@@ -9,7 +9,6 @@ import androidx.preference.PreferenceFragmentCompat;
 
 public  class CustomPreferenceFragment extends PreferenceFragmentCompat {
 
-    private static String sPassword = "";
     public static final String FRAGMENT_TAG = "my_preference_fragment";
 
     @Override

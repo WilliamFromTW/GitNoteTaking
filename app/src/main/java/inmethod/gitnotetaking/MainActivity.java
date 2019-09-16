@@ -170,7 +170,6 @@ public class MainActivity extends AppCompatActivity {
                 final Object[] aTextView = GitList.getDeviceInfoFromLayoutId(view);
                 final String sRemoteUrl = ((TextView) aTextView[1]).getText().toString();
                 //    Toast.makeText(activity, "Long click position=" + position+",git name="+sRemoteUrl, Toast.LENGTH_LONG).show();
-
                 //Creating the instance of PopupMenu
                 PopupMenu popup = new PopupMenu(MainActivity.this, view);
                 //Inflating the Popup using xml file
@@ -181,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onMenuItemClick(MenuItem item) {
                         int id = item.getItemId();
                         if (id == R.id.Remove) {
-                            getGitDAO().delete(((TextView) aTextView[1]).getText().toString());
+                            MyGitUtility.deleteByRemoteUrl(activity,((TextView) aTextView[1]).getText().toString());
                             Log.d(TAG, "try to delete local git repository");
                             MyGitUtility.deleteLocalGitRepository(sRemoteUrl);
                             adapter.clear();
@@ -195,14 +194,11 @@ public class MainActivity extends AppCompatActivity {
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    RemoteGit aRemoteGit = getGitDAO().getByURL(((TextView) aTextView[1]).getText().toString());
-                                    if (MyGitUtility.push(aRemoteGit.getRemoteName(), aRemoteGit.getUrl(), aRemoteGit.getUid(), aRemoteGit.getPwd())) {
-                                        aRemoteGit.setPush_status(GitList.PUSH_SUCCESS);
-                                        getGitDAO().update(aRemoteGit);
-
+                                    if (MyGitUtility.push(activity,((TextView) aTextView[1]).getText().toString())) {
                                         ((TextView) aTextView[0]).setTextColor(Color.BLACK);
                                         dialog.dismiss();
                                     } else {
+                                        dialog.dismiss();
                                     }
 
                                 }
@@ -218,13 +214,12 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        ArrayList<RemoteGit> aList = getDBList();
+        ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(activity);
         adapter.clear();
         //if (aList.size() > 0)
             //Toast.makeText(activity, "pull from remote to local will run in backupgroud", Toast.LENGTH_LONG).show();
@@ -240,16 +235,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-    }
-
-    private RemoteGitDAO getGitDAO() {
-        if (aRemoteGitDAO == null)
-            return new RemoteGitDAO(activity);
-        else return aRemoteGitDAO;
-    }
-
-    private ArrayList<RemoteGit> getDBList() {
-        return getGitDAO().getAll();
     }
 
     @Override
