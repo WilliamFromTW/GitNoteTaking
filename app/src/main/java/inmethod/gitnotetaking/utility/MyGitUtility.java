@@ -18,10 +18,10 @@ public class MyGitUtility {
 
     public static final String TAG = "GitNoteTaking";
 
-    public static boolean deleteLocalGitRepository(String sRemoteUrl) {
-        String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
+    public static boolean deleteLocalGitRepository(Activity activity,String sRemoteUrl) {
+        String sLocalDirectory = getLocalGitDirectory(activity,sRemoteUrl);
         //   Log.d(TAG, "check local repository, status = " + checkLocalGitRepository(sRemoteUrl));
-        if (checkLocalGitRepository(sRemoteUrl)) {
+        if (checkLocalGitRepository(activity,sRemoteUrl)) {
 
             GitUtil aGitUtil;
             try {
@@ -40,7 +40,7 @@ public class MyGitUtility {
         RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
         if (aRemoteGit == null) return false;
-        String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
+        String sLocalDirectory = getLocalGitDirectory(activity,sRemoteUrl);
 
         boolean bIsRemoteRepositoryExist = false;
         GitUtil aGitUtil;
@@ -80,7 +80,7 @@ public class MyGitUtility {
 
     public static boolean commit(Activity activity, String sRemoteUrl, String sCommitMessages) {
 
-        String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
+        String sLocalDirectory = getLocalGitDirectory(activity,sRemoteUrl);
         GitUtil aGitUtil;
         try {
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
@@ -115,8 +115,14 @@ public class MyGitUtility {
         return aList;
 
     }
-    public static boolean pull(String sRemoteUrl, String sUserName, String sUserPassword) {
-        String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
+    public static boolean pull(Activity activity,String sRemoteUrl) {
+        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
+        RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
+        if (aRemoteGit == null) return false;
+        String sUserName = aRemoteGit.getUid();
+        String sUserPassword = aRemoteGit.getPwd();
+        aRemoteGitDAO.close();
+        String sLocalDirectory = getLocalGitDirectory(activity,sRemoteUrl);
         boolean bIsRemoteRepositoryExist = false;
         GitUtil aGitUtil;
         try {
@@ -130,10 +136,10 @@ public class MyGitUtility {
             if (bIsRemoteRepositoryExist) {
                 Log.d(TAG,"try to update remote repository if local repository is not exists \n");
                 if (aGitUtil.pull(sUserName, sUserPassword)) {
-                    Log.d(TAG,"update finished!");
+                    Log.d(TAG,"pull finished!");
                     return true;
                 } else {
-                    Log.d(TAG,"update failed!");
+                    Log.d(TAG,"pull failed!");
                     return false;
                 }
             }
@@ -146,11 +152,10 @@ public class MyGitUtility {
     }
 
 
-    public static boolean cloneGit(String sRemoteUrl, String sUserName, String sUserPassword) {
+    public static boolean cloneGit(Activity activity,String sRemoteUrl,String sUserName,String sUserPassword) {
+        String sLocalDirectory = getLocalGitDirectory(activity,sRemoteUrl);
 
-        String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
-
-        if (checkLocalGitRepository(sRemoteUrl)) {
+        if (checkLocalGitRepository(activity,sRemoteUrl)) {
             return false;
         }
         boolean bIsRemoteRepositoryExist = false;
@@ -199,13 +204,13 @@ public class MyGitUtility {
     }
 
 
-    public static String getLocalGitDirectory(String sRemoteUrl) {
+    public static String getLocalGitDirectory(Activity activity,String sRemoteUrl) {
         return Environment.getExternalStorageDirectory() +
-                File.separator + "gitnotetaking" + File.separator + getLocalGitDir(sRemoteUrl);
+                File.separator +  PreferenceManager.getDefaultSharedPreferences(activity).getString("GitLocalDirName", "gitnotetaking")  + File.separator + getLocalGitDir(sRemoteUrl);
     }
 
-    public static boolean checkLocalGitRepository(String sRemoteUrl) {
-        String sLocalDirectory = getLocalGitDirectory(sRemoteUrl);
+    public static boolean checkLocalGitRepository(Activity activity,String sRemoteUrl) {
+        String sLocalDirectory = getLocalGitDirectory(activity,sRemoteUrl);
         Log.d(TAG, "default local directory = " + sLocalDirectory);
         boolean bIsLocalRepositoryExist = false;
         try {

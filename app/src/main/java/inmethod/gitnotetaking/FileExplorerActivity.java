@@ -124,7 +124,7 @@ public class FileExplorerActivity extends AppCompatActivity {
         m_filesPath=new ArrayList<String>();
         File m_file = new File(p_rootPath);
         File[] m_filesArray = m_file.listFiles();
-        Log.d(TAG,"rootPath="+p_rootPath+",GitRootDir="+sGitRootDir);
+        //Log.d(TAG,"rootPath="+p_rootPath+",GitRootDir="+sGitRootDir);
         if(!p_rootPath.equals(sGitRootDir))
         {
             m_item.add("../");
@@ -132,6 +132,7 @@ public class FileExplorerActivity extends AppCompatActivity {
             m_isRoot=false;
         }
         m_curDir=p_rootPath;
+        if( m_filesArray==null) return;
         //sorting file list in alphabetical order
         Arrays.sort(m_filesArray);
         for(int i=0; i < m_filesArray.length; i++)

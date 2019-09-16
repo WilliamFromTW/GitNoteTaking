@@ -1,20 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.preference.PreferenceScreen
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.preference.PreferenceCategory
-        app:title="Author Name">
-            <androidx.preference.EditTextPreference
-                app:key="GitAuthorName"
-                app:title="@string/GitAuthorName"
-                app:defaultValue="root" />
-        </androidx.preference.PreferenceCategory>
-    <androidx.preference.PreferenceCategory
-        app:title="Ahtor Email" >
-        <androidx.preference.EditTextPreference
-            app:key="GitAuthorEmail"
-            app:title="@string/GitAuthorEmail"
-            app:defaultValue="root@your.email.com" />
-    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.EditTextPreference
+        app:defaultValue="root"
+        app:key="GitAuthorName"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:title="@string/GitAuthorName">
+    </androidx.preference.EditTextPreference>
+
+    <androidx.preference.EditTextPreference
+        app:defaultValue="root@your.email.com"
+        app:key="GitAuthorEmail"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:title="@string/GitAuthorEmail">
+    </androidx.preference.EditTextPreference>
+    <androidx.preference.EditTextPreference
+        app:defaultValue="14"
+        app:key="GitEditTextSize"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:title="@string/GitEditTextSize">
+    </androidx.preference.EditTextPreference>
+    <androidx.preference.EditTextPreference
+        app:defaultValue="gitnotetaking"
+        app:key="GitLocalDirName"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:title="@string/GitLocalDirName">
+    </androidx.preference.EditTextPreference>
+
 </androidx.preference.PreferenceScreen>

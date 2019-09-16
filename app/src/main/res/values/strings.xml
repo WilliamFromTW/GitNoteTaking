@@ -4,11 +4,15 @@
     <string name="action_clone">Clone Git</string>
     <string name="view_file_action_edit">Edit</string>
     <string name="view_file_action_save">Save</string>
-    <string name="GitAuthorName">Click to modify Git Author Name</string>
-    <string name="GitAuthorEmail">Click to modify Git Author email</string>
+    <string name="GitAuthorName">Git Author Name</string>
+    <string name="GitAuthorEmail">Git Author email</string>
     <string name="action_create_file">Create File</string>
     <string name="action_create_folder">Create Folder</string>
     <string name="action_delete">Delete</string>
+    <string name="GitEditTextSize">Notes Text Size</string>
+    <string name="GitLocalDirName">Local Git root directory(must reset all local git)</string>
+    <string name="title_remove">Remove</string>
+    <string name="title_push">Push</string>
 
     // FileExplorerActivity
     <string name="create_folder">Create Folder</string>
@@ -19,13 +23,23 @@
     <string name="commit">Commit</string>
     <string name="commit_messages">Please input your  messages</string>
 
-    // GitCloneActivity Layout
+    // GitCloneActivity
+    // Layout
     <string name="tv_clone_git_repository">Clone Git Repository</string>
     <string name="tv_remote_name">Remote Name</string>
     <string name="tv_remote_url">Remote URL</string>
     <string name="tv_user_name">User Name</string>
     <string name="tv_git_nick_name">Git Nick Name</string>
     <string name="tv_password">Password</string>
+    <string name="tv_please_wait">Please wait! This may take a moment.</string>
+    // activity
+    <string name="tv_all_parametes_must_be_set">All Parametes must be set</string>
+    <string name="tv_title_remote_git_clone">Remote Git Clone</string>
+    <string name="tv_local_git_already_exists">Local Git Repository already exists</string>
+    <string name="tv_clone_success">Clone Success!</string>
+    <string name="tv_clone_fail">Clone Failed!</string>
+    <string name="tv_git_already_cloned">Git already cloned</string>
+
 
 
 

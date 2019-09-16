@@ -1,8 +1,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <item
         android:id="@+id/Remove"
-        android:title="Remove"/>
+        android:title="@string/title_remove"/>
     <item
         android:id="@+id/Push"
-        android:title="Push"/>
+        android:title="@string/title_push"/>
 </menu>

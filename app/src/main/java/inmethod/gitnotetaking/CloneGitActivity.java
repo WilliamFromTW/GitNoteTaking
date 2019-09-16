@@ -44,8 +44,8 @@ public class CloneGitActivity extends AppCompatActivity {
 
                 if (editRemoteName.getText().toString().equals("")||editRemoteURL.getText().toString().equals("") || editUserName.getText().toString().equals("") || editUserPassword.getText().toString().equals("") || editNickName.getText().toString().equals("")) {
                     AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
-                    MyAlertDialog.setTitle("Remote Git Clong");
-                    MyAlertDialog.setMessage("All Parametes must be set");
+                    MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_remote_git_clone));
+                    MyAlertDialog.setMessage(getResources().getString (R.string.tv_all_parametes_must_be_set));
                     DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                         }
@@ -61,10 +61,10 @@ public class CloneGitActivity extends AppCompatActivity {
 
                 if (aValue == null) {
                     try {
-                        if (MyGitUtility.checkLocalGitRepository(editRemoteURL.getText().toString())) {
+                        if (MyGitUtility.checkLocalGitRepository(activity,editRemoteURL.getText().toString())) {
                             AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
-                            MyAlertDialog.setTitle("Remote Git Clong");
-                            MyAlertDialog.setMessage("Local Git Repository already exists");
+                            MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_remote_git_clone));
+                            MyAlertDialog.setMessage(getResources().getString(R.string.tv_local_git_already_exists));
                             DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                 }
@@ -83,7 +83,7 @@ public class CloneGitActivity extends AppCompatActivity {
                                 new Thread(new Runnable(){
                                     @Override
                                     public void run() {
-                                        if (MyGitUtility.cloneGit(editRemoteURL.getText().toString(), editUserName.getText().toString(), editUserPassword.getText().toString())) {
+                                        if (MyGitUtility.cloneGit(activity,editRemoteURL.getText().toString(), editUserName.getText().toString(), editUserPassword.getText().toString())) {
                                             RemoteGit aValue = new RemoteGit();
                                             aValue.setId(0);
                                             aValue.setRemoteName(editRemoteName.getText().toString());
@@ -96,8 +96,8 @@ public class CloneGitActivity extends AppCompatActivity {
                                             dialog.dismiss();
                                             Looper.prepare();
                                             final AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
-                                            MyAlertDialog.setTitle("Remote Git ");
-                                            MyAlertDialog.setMessage("Clone Success!");
+                                            MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_remote_git_clone));
+                                            MyAlertDialog.setMessage(getResources().getString(R.string.tv_clone_success));
                                             DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     runOnUiThread(new Runnable() {
@@ -115,8 +115,8 @@ public class CloneGitActivity extends AppCompatActivity {
                                             dialog.dismiss();
                                             Looper.prepare();
                                             final AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
-                                            MyAlertDialog.setTitle("Remote Git ");
-                                            MyAlertDialog.setMessage("Clone Failed!");
+                                            MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_remote_git_clone));
+                                            MyAlertDialog.setMessage(getResources().getString(R.string.tv_clone_fail));
                                             DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int which) {
                                                 }
@@ -139,8 +139,8 @@ public class CloneGitActivity extends AppCompatActivity {
 
                 } else {
                     AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
-                    MyAlertDialog.setTitle("Remote Git ");
-                    MyAlertDialog.setMessage("Git already clone");
+                    MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_remote_git_clone));
+                    MyAlertDialog.setMessage(getResources().getString(R.string.tv_git_already_cloned));
                     DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                         }

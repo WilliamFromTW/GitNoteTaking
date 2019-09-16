@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
                 Object[] aTextView = GitList.getDeviceInfoFromLayoutId(view);
                 String sGitName = ((TextView) aTextView[0]).getText().toString();
                 String sRemoteUrl = ((TextView) aTextView[1]).getText().toString();
-                Intent.putExtra("GIT_ROOT_DIR", MyGitUtility.getLocalGitDirectory(sRemoteUrl));
+                Intent.putExtra("GIT_ROOT_DIR", MyGitUtility.getLocalGitDirectory(activity,sRemoteUrl));
                 Intent.putExtra("GIT_NAME", sGitName);
                 Intent.putExtra("GIT_REMOTE_URL", sRemoteUrl);
                 startActivity(Intent);
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
                         if (id == R.id.Remove) {
                             MyGitUtility.deleteByRemoteUrl(activity,((TextView) aTextView[1]).getText().toString());
                             Log.d(TAG, "try to delete local git repository");
-                            MyGitUtility.deleteLocalGitRepository(sRemoteUrl);
+                            MyGitUtility.deleteLocalGitRepository(activity,sRemoteUrl);
                             adapter.clear();
                             return true;
                         } else if (id == R.id.Push) {
@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    MyGitUtility.pull(a.getUrl(), a.getUid(), a.getPwd());
+                    MyGitUtility.pull(activity,a.getUrl());
                 }
             }).start();
 

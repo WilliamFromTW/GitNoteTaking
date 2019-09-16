@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
@@ -89,6 +90,9 @@ public class ViewFileActivity extends AppCompatActivity {
         try {
             editText = findViewById(R.id.editFile);
             editText.setEnabled(false);
+            int iTextSize = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitEditTextSize", "16"));
+            editText.setTextSize(iTextSize);
+            editText.setTextColor(Color.BLACK);
             if (file.exists()) {
                 FileReader fr = new FileReader(file);
                 BufferedReader br = new BufferedReader(fr);

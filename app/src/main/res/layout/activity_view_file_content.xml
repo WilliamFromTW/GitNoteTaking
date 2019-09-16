@@ -6,7 +6,10 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     >
-
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <EditText
         android:id="@+id/editFile"
         android:layout_width="match_parent"
@@ -14,5 +17,6 @@
         android:singleLine="false"  android:gravity="top|left"
         android:inputType="textMultiLine"
         android:scrollHorizontally="false"
-        android:textSize="14sp"></EditText>
+        android:textSize="16sp"></EditText>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
