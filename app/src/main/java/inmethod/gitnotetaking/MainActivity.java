@@ -31,6 +31,7 @@ import org.eclipse.jgit.lib.Ref;
 
 import java.io.File;
 import java.io.FileDescriptor;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,6 +140,12 @@ public class MainActivity extends AppCompatActivity {
         isWriteStoragePermissionGranted();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+        try{
+            Method m = StrictMode.class.getMethod("disableDeathOnFileUriExposure");
+            m.invoke(null);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
 
@@ -275,6 +282,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 
 }

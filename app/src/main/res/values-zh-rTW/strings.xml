@@ -27,6 +27,7 @@
     // ViewFileActivity
     <string name="commit">提交</string>
     <string name="commit_messages">請輸入修改原因</string>
+    <string name="view_attach_files"> 附件. 點此觀看</string>
 
     // GitCloneActivity Layout
     <string name="tv_clone_git_repository">複製Git資料</string>

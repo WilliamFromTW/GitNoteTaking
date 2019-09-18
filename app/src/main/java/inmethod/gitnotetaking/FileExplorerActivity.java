@@ -2,6 +2,9 @@ package inmethod.gitnotetaking;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -90,108 +93,123 @@ public class FileExplorerActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-
     }
-    void deleteFile()
-    {
-        if( adapter.m_selectedItem.size()==0 ){
+
+    void deleteFile() {
+        if (adapter.m_selectedItem.size() == 0) {
             Toast.makeText(FileExplorerActivity.this, getResources().getString(R.string.select_file_or_directory), Toast.LENGTH_SHORT).show();
-        }
-        else {
+        } else {
             for (int m_delItem : adapter.m_selectedItem) {
                 File m_delFile = new File(m_path.get(m_delItem));
                 Log.d("file", m_path.get(m_delItem));
                 boolean m_isDelete = m_delFile.delete();
             }
             getDirFromRoot(m_curDir);
-            if(MyGitUtility.commit(activity,sGitRemoteUrl,"delete files"))
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    MyGitUtility.push(activity, sGitRemoteUrl);
-                }
-            }).start();
+            if (MyGitUtility.commit(activity, sGitRemoteUrl, "delete files"))
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MyGitUtility.push(activity, sGitRemoteUrl);
+                    }
+                }).start();
         }
     }
 
 
-    public void getDirFromRoot(String p_rootPath)
-    {
+    public void getDirFromRoot(String p_rootPath) {
         m_item = new ArrayList<String>();
-        Boolean m_isRoot=true;
+        Boolean m_isRoot = true;
         m_path = new ArrayList<String>();
-        m_files=new ArrayList<String>();
-        m_filesPath=new ArrayList<String>();
+        m_files = new ArrayList<String>();
+        m_filesPath = new ArrayList<String>();
         File m_file = new File(p_rootPath);
         File[] m_filesArray = m_file.listFiles();
         //Log.d(TAG,"rootPath="+p_rootPath+",GitRootDir="+sGitRootDir);
-        if(!p_rootPath.equals(sGitRootDir))
-        {
+        if (!p_rootPath.equals(sGitRootDir)) {
             m_item.add("../");
             m_path.add(m_file.getParent());
-            m_isRoot=false;
+            m_isRoot = false;
         }
-        m_curDir=p_rootPath;
-        if( m_filesArray==null) return;
+        m_curDir = p_rootPath;
+        if (m_filesArray == null) return;
         //sorting file list in alphabetical order
         Arrays.sort(m_filesArray);
-        for(int i=0; i < m_filesArray.length; i++)
-        {
+        for (int i = 0; i < m_filesArray.length; i++) {
             File file = m_filesArray[i];
-            if( !file.getName().substring(0,1).equalsIgnoreCase(".")){
 
-            if(file.isDirectory())
-            {
-                m_item.add(file.getName());
-                m_path.add(file.getPath());
-            }
-            else
-            {
-                m_files.add(file.getName());
-                m_filesPath.add(file.getPath());
-            }
-            }
+
+                if (file.isDirectory()) {
+                    try {
+                        if( file.getCanonicalPath().indexOf("_attach")!=-1)
+                            continue;
+                        else if(file.getName().substring(0,1).equals(".") )
+                            continue;
+                        else{
+                            m_item.add(file.getName());
+                            m_path.add(file.getPath());
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        continue;
+                    }
+                } else {
+                    m_files.add(file.getName());
+                    m_filesPath.add(file.getPath());
+                }
         }
-        for(String m_AddFile:m_files)
-        {
+        for (String m_AddFile : m_files) {
             m_item.add(m_AddFile);
         }
-        for(String m_AddPath:m_filesPath)
-        {
+        for (String m_AddPath : m_filesPath) {
             m_path.add(m_AddPath);
         }
-        adapter=new FileExplorerListAdapter(this,m_item,m_path,m_isRoot);
+        adapter = new FileExplorerListAdapter(this, m_item, m_path, m_isRoot);
         view.setAdapter(adapter);
         view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                File m_isFile=new File(m_path.get(position));
+                File m_isFile = new File(m_path.get(position));
 
-                if(m_isFile.isDirectory())
-                {
+                if (m_isFile.isDirectory()) {
                     getDirFromRoot(m_isFile.toString());
-                }
-                else
-                {
+                } else {
                     String sFileName = m_isFile.getName().toLowerCase();
-                    if(sFileName.indexOf(".txt")!=-1||
-                            sFileName.indexOf(".xml")!=-1||
-                            sFileName.indexOf(".kt")!=-1||
-                            sFileName.indexOf(".java")!=-1||
-                            sFileName.indexOf(".c")!=-1||
-                            sFileName.indexOf(".html")!=-1||
-                            sFileName.indexOf(".py")!=-1||
-                            sFileName.indexOf(".sql")!=-1||
-                            sFileName.indexOf(".md")!=-1
+                    //Log.d(TAG,"file name = "+ sFileName);
+                    if (sFileName.indexOf(".txt") != -1 ||
+                            sFileName.indexOf(".xml") != -1 ||
+                            sFileName.indexOf(".kt") != -1 ||
+                            sFileName.indexOf(".java") != -1 ||
+                            sFileName.indexOf(".html") != -1 ||
+                            sFileName.indexOf(".py") != -1 ||
+                            sFileName.indexOf(".sql") != -1 ||
+                            sFileName.indexOf(".md") != -1
                     ) {
                         // Toast.makeText(FileExplorerActivity.this, "File Name = "+m_isFile.getAbsoluteFile()+",uri="+Uri.fromFile(m_isFile), Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(FileExplorerActivity.this, ViewFileActivity.class);
                         intent.putExtra("FILE_PATH", m_isFile.getAbsoluteFile().toString());
-                        intent.putExtra("GIT_REMOTE_URL",sGitRemoteUrl);
+                        intent.putExtra("GIT_REMOTE_URL", sGitRemoteUrl);
                         startActivity(intent);
-                    }else{
+                    } else if (sFileName.indexOf(".png") != -1 ||
+                            sFileName.indexOf(".gif") != -1 ||
+                            sFileName.indexOf(".jpg") != -1 ||
+                            sFileName.indexOf(".jpeg") != -1 ||
+                            sFileName.indexOf(".bmp") != -1
+                    ) {
+                        Uri path = Uri.fromFile(m_isFile);
+                        if (m_isFile.exists()) {
+                            Intent intent = new Intent();
+                            intent.setAction(android.content.Intent.ACTION_VIEW);
+                            //Log.d(TAG, "file type = " + getMimeType(Uri.fromFile(m_isFile), activity));
+                            intent.setDataAndType(path, getMimeType(Uri.fromFile(m_isFile), activity));
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            try {
+                                startActivity(intent);
+                            } catch (ActivityNotFoundException e) {
+                            }
+                        }
+                    } else {
 
                     }
                 }
@@ -199,11 +217,10 @@ public class FileExplorerActivity extends AppCompatActivity {
         });
     }
 
-    void createNewFolder( final int p_opt)
-    {
+    void createNewFolder(final int p_opt) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        if( p_opt==1)
-        builder.setTitle(getResources().getString(R.string.create_folder));
+        if (p_opt == 1)
+            builder.setTitle(getResources().getString(R.string.create_folder));
         else builder.setTitle(getResources().getString(R.string.create_file));
         // Set up the input
         final EditText m_edtinput = new EditText(this);
@@ -215,25 +232,20 @@ public class FileExplorerActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String m_text = m_edtinput.getText().toString();
-                if(p_opt == 1)
-                {
-                    File m_newPath=new File(m_curDir,m_text);
-                    Log.d("cur dir",m_curDir);
-                    if(!m_newPath.exists()) {
+                if (p_opt == 1) {
+                    File m_newPath = new File(m_curDir, m_text);
+                    Log.d("cur dir", m_curDir);
+                    if (!m_newPath.exists()) {
                         m_newPath.mkdirs();
                     }
-                }
-                else
-                {
+                } else {
                     try {
-                        FileOutputStream m_Output = new FileOutputStream((m_curDir+File.separator+m_text), false);
+                        FileOutputStream m_Output = new FileOutputStream((m_curDir + File.separator + m_text), false);
                         m_Output.close();
 
-                    } catch (FileNotFoundException e)
-                    {
+                    } catch (FileNotFoundException e) {
                         e.printStackTrace();
-                    } catch (IOException e)
-                    {
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -262,16 +274,30 @@ public class FileExplorerActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if( id==android.R.id.home){
+        if (id == android.R.id.home) {
             onBackPressed();
             return true;
-        }else if( id==R.id.action_delete){
+        } else if (id == R.id.action_delete) {
             deleteFile();
-        }else if( id==R.id.action_create_folder){
+        } else if (id == R.id.action_create_folder) {
             createNewFolder(1);
-        }else if( id==R.id.action_create_file){
+        } else if (id == R.id.action_create_file) {
             createNewFolder(0);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public String getMimeType(Uri uri, Context context) {
+        String mimeType = null;
+        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            ContentResolver cr = context.getContentResolver();
+            mimeType = cr.getType(uri);
+        } else {
+            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
+                    .toString());
+            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                    fileExtension.toLowerCase());
+        }
+        return mimeType;
     }
 }

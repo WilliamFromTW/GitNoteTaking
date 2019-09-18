@@ -17,6 +17,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -63,6 +64,7 @@ public class ViewFileActivity extends AppCompatActivity {
     private MenuItem itemEdit;
     private MenuItem itemSave;
     EditText editText;
+  //  TextView tvCountFiles;
 
 
     @Override
@@ -90,6 +92,8 @@ public class ViewFileActivity extends AppCompatActivity {
         try {
             editText = findViewById(R.id.editFile);
             editText.setEnabled(false);
+      //      tvCountFiles = findViewById(R.id.textCountFiles);
+
             int iTextSize = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitEditTextSize", "16"));
             editText.setTextSize(iTextSize);
             editText.setTextColor(Color.BLACK);
@@ -100,6 +104,15 @@ public class ViewFileActivity extends AppCompatActivity {
                     editText.append(br.readLine() + "\n");
                 }
                 fr.close();
+                Log.d(TAG,"file = "+ file.getCanonicalPath());
+                File attachDirectory = new File(file.getAbsolutePath()+"_attach");
+                if(attachDirectory.isDirectory() ) {
+         //           tvCountFiles.setText(countFilesInDirectory(attachDirectory) + getResources().getString(R.string.view_attach_files));
+             //       tvCountFiles.setTextColor(Color.BLUE);
+                }
+                else{
+            //        tvCountFiles.setText("");
+                }
             } else {
                 Toast.makeText(activity, "File read error!", Toast.LENGTH_SHORT).show();
             }
@@ -112,8 +125,6 @@ public class ViewFileActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-
-
     }
 
     @Override
@@ -208,4 +219,17 @@ public class ViewFileActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public static int countFilesInDirectory(File directory) {
+
+        int count = 0;
+        for (File file : directory.listFiles()) {
+            if (file.isFile()) {
+                count++;
+            }
+            if (file.isDirectory()) {
+                count += countFilesInDirectory(file);
+            }
+        }
+        return count;
+    }
 }
