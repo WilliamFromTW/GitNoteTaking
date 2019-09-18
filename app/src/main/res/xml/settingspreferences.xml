@@ -4,7 +4,6 @@
 
 
     <androidx.preference.EditTextPreference
-        app:defaultValue="root"
         app:key="GitAuthorName"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
@@ -12,7 +11,6 @@
     </androidx.preference.EditTextPreference>
 
     <androidx.preference.EditTextPreference
-        app:defaultValue="root@your.email.com"
         app:key="GitAuthorEmail"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
@@ -31,6 +29,13 @@
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:title="@string/GitLocalDirName">
+    </androidx.preference.EditTextPreference>
+    <androidx.preference.EditTextPreference
+        app:defaultValue="origin"
+        app:key="GitRemoteName"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:title="@string/GitRemoteName">
     </androidx.preference.EditTextPreference>
 
 </androidx.preference.PreferenceScreen>

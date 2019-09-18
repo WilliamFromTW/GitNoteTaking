@@ -2,6 +2,7 @@ package inmethod.gitnotetaking;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -15,10 +16,11 @@ import android.widget.EditText;
 import inmethod.gitnotetaking.db.RemoteGit;
 import inmethod.gitnotetaking.db.RemoteGitDAO;
 import inmethod.gitnotetaking.utility.MyGitUtility;
+import inmethod.gitnotetaking.view.GitList;
 
 public class CloneGitActivity extends AppCompatActivity {
 
-    private EditText editRemoteName = null;
+    private String sRemoteName = "";
     private EditText editRemoteURL = null;
     private EditText editUserName = null;
     private EditText editUserPassword = null;
@@ -30,7 +32,7 @@ public class CloneGitActivity extends AppCompatActivity {
         setContentView(R.layout.activity_clone_git);
         final Activity activity = this;
 
-        editRemoteName = (EditText) findViewById(R.id.editRemoteName);
+        sRemoteName = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitRemoteName", "origin");
         editRemoteURL = (EditText) findViewById(R.id.editRemoteURL);
         editUserName = (EditText) findViewById(R.id.editUserName);
         editUserPassword = (EditText) findViewById(R.id.editUserPassword);
@@ -42,7 +44,7 @@ public class CloneGitActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (editRemoteName.getText().toString().equals("")||editRemoteURL.getText().toString().equals("") || editUserName.getText().toString().equals("") || editUserPassword.getText().toString().equals("") || editNickName.getText().toString().equals("")) {
+                if (sRemoteName.equals("")||editRemoteURL.getText().toString().equals("") || editUserName.getText().toString().equals("") || editUserPassword.getText().toString().equals("") || editNickName.getText().toString().equals("")) {
                     AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
                     MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_remote_git_clone));
                     MyAlertDialog.setMessage(getResources().getString (R.string.tv_all_parametes_must_be_set));
@@ -86,11 +88,14 @@ public class CloneGitActivity extends AppCompatActivity {
                                         if (MyGitUtility.cloneGit(activity,editRemoteURL.getText().toString(), editUserName.getText().toString(), editUserPassword.getText().toString())) {
                                             RemoteGit aValue = new RemoteGit();
                                             aValue.setId(0);
-                                            aValue.setRemoteName(editRemoteName.getText().toString());
+                                            aValue.setRemoteName(sRemoteName);
                                             aValue.setUrl(editRemoteURL.getText().toString());
                                             aValue.setUid(editUserName.getText().toString());
                                             aValue.setPwd(editUserPassword.getText().toString());
                                             aValue.setNickname(editNickName.getText().toString());
+                                            aValue.setPush_status(GitList.PUSH_SUCCESS);
+                                            aValue.setAuthor_name(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", "root"));
+                                            aValue.setAuthor_email(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", "root@your.email.com"));
                                             aRemoteGitDAO.insert(aValue);
                                             aRemoteGitDAO.close();
                                             dialog.dismiss();

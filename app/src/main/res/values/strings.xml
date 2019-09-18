@@ -4,15 +4,20 @@
     <string name="action_clone">Clone Git</string>
     <string name="view_file_action_edit">Edit</string>
     <string name="view_file_action_save">Save</string>
-    <string name="GitAuthorName">Git Author Name</string>
-    <string name="GitAuthorEmail">Git Author email</string>
+    <string name="GitAuthorName">Name</string>
+    <string name="GitAuthorEmail">Email</string>
     <string name="action_create_file">Create File</string>
     <string name="action_create_folder">Create Folder</string>
     <string name="action_delete">Delete</string>
     <string name="GitEditTextSize">Notes Text Size</string>
-    <string name="GitLocalDirName">Local Git root directory(must reset all local git)</string>
+    <string name="GitLocalDirName">Local Git root directory(default)</string>
+    <string name="GitRemoteName">Remote GIT Name(default)</string>
     <string name="title_remove">Remove</string>
     <string name="title_push">Push</string>
+
+    // MainActivity
+    <string name="tv_title_first_time">First Launch</string>
+    <string name="tv_first_time">Please Setup your name and email</string>
 
     // FileExplorerActivity
     <string name="create_folder">Create Folder</string>

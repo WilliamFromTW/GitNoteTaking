@@ -25,6 +25,9 @@ class RemoteGitDAO(context: Context) {
         val PWD_COLUMN = "PWD"
         val NICKNAME_COLUMN = "NICKNAME"
         val PUSH_STATUS_COLUMN = "PUSH_STATUS"
+        val BRANCH_COLUMN = "BRANCH"
+        var AUTHOR_NAME = "AUTHOR_NAME"
+        var AUTHOR_EMAIL = "AUTHOR_EMAIL"
 
         // 使用上面宣告的變數建立表格的SQL敘述
         val CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
@@ -34,7 +37,10 @@ class RemoteGitDAO(context: Context) {
                 UID_COLUMN + " TEXT NOT NULL, " +
                 PWD_COLUMN + " TEXT NOT NULL, " +
                 NICKNAME_COLUMN + " TEXT NOT NULL, "+
-                PUSH_STATUS_COLUMN + " INTEGER DEFAULT 0)";
+                PUSH_STATUS_COLUMN + " INTEGER DEFAULT 0," +
+                BRANCH_COLUMN +" TEXT NOT NULL, " +
+                AUTHOR_NAME +" TEXT NOT NULL, " +
+                AUTHOR_EMAIL + " TEXT NOT NULL) ";
     }
 
     // 資料庫物件
@@ -117,6 +123,9 @@ class RemoteGitDAO(context: Context) {
         cv.put(PWD_COLUMN,item.pwd)
         cv.put(NICKNAME_COLUMN,item.nickname)
         cv.put(PUSH_STATUS_COLUMN,item.push_status)
+        cv.put(BRANCH_COLUMN,item.branch)
+        cv.put(AUTHOR_NAME,item.author_name)
+        cv.put(AUTHOR_EMAIL,item.author_email)
     }
 
     // 刪除參數指定編號的資料
@@ -190,6 +199,9 @@ class RemoteGitDAO(context: Context) {
         result.pwd = cursor.getString(4)
         result.nickname = cursor.getString(5)
         result.push_status = cursor.getLong(6)
+        result.branch = cursor.getString(7)
+        result.author_name = cursor.getString(8)
+        result.author_email = cursor.getString(9)
         // 回傳結果
         return result
     }

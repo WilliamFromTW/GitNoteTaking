@@ -82,11 +82,14 @@ public class MyGitUtility {
 
         String sLocalDirectory = getLocalGitDirectory(activity,sRemoteUrl);
         GitUtil aGitUtil;
+        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
+        RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
+        aRemoteGitDAO.close();
         try {
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
 
-            String sAuthorName = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", "root");
-            String sAuthorEmail = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", "root@your.email.com");
+            String sAuthorName = aRemoteGit.getAuthor_name();
+            String sAuthorEmail = aRemoteGit.getAuthor_email();
             if (aGitUtil.commit(sCommitMessages, sAuthorName, sAuthorEmail)) {
                 Log.d(TAG,"commit finished!");
                 return true;

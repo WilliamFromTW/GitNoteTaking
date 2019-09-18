@@ -2,6 +2,7 @@ package inmethod.gitnotetaking;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -13,12 +14,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Environment;
 import android.os.StrictMode;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
@@ -219,22 +220,37 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(activity);
-        adapter.clear();
-        //if (aList.size() > 0)
-            //Toast.makeText(activity, "pull from remote to local will run in backupgroud", Toast.LENGTH_LONG).show();
-        for (final RemoteGit a : aList) {
-            adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getPush_status()));
-            Log.d(TAG, "try to update remote git to local repository");
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    MyGitUtility.pull(activity,a.getUrl());
+        String sGitAuthorName = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName",null);
+        String sGitAuthorEmail = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail",null);
+
+        if(sGitAuthorName==null ||sGitAuthorName.equals("")||sGitAuthorEmail==null||sGitAuthorEmail.equals("")){
+            AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
+            MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_first_time));
+            MyAlertDialog.setMessage(getResources().getString(R.string.tv_first_time));
+            DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(MainActivity.this, PreferencesSettings.class);
+                        startActivity(intent);
                 }
-            }).start();
-
+            };
+            MyAlertDialog.setNeutralButton("OK", OkClick);
+            MyAlertDialog.show();
+        }else {
+            adapter.clear();
+            //if (aList.size() > 0)
+            //Toast.makeText(activity, "pull from remote to local will run in backupgroud", Toast.LENGTH_LONG).show();
+            ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(activity);
+            for (final RemoteGit a : aList) {
+                adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getPush_status()));
+                Log.d(TAG, "try to update remote git to local repository");
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MyGitUtility.pull(activity, a.getUrl());
+                    }
+                }).start();
+            }
         }
-
     }
 
     @Override
@@ -248,17 +264,15 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            Intent Intent = new Intent(MainActivity.this, PreferencesSettings.class);
-            startActivity(Intent);
+            Intent intent = new Intent(MainActivity.this, PreferencesSettings.class);
+            startActivity(intent);
             return true;
         } else
 
         if (id == R.id.action_create) {
-            Intent Intent = new Intent(MainActivity.this, CloneGitActivity.class);
-            startActivity(Intent);
-
+            Intent intent = new Intent(MainActivity.this, CloneGitActivity.class);
+            startActivity(intent);
         }
-
         return super.onOptionsItemSelected(item);
     }
 
