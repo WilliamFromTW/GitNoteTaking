@@ -138,24 +138,24 @@ public class FileExplorerActivity extends AppCompatActivity {
             File file = m_filesArray[i];
 
 
-                if (file.isDirectory()) {
-                    try {
-                        if( file.getCanonicalPath().indexOf("_attach")!=-1)
-                            continue;
-                        else if(file.getName().substring(0,1).equals(".") )
-                            continue;
-                        else{
-                            m_item.add(file.getName());
-                            m_path.add(file.getPath());
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+            if (file.isDirectory()) {
+                try {
+                    if (file.getCanonicalPath().indexOf("_attach") != -1)
                         continue;
+                    else if (file.getName().substring(0, 1).equals("."))
+                        continue;
+                    else {
+                        m_item.add(file.getName());
+                        m_path.add(file.getPath());
                     }
-                } else {
-                    m_files.add(file.getName());
-                    m_filesPath.add(file.getPath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    continue;
                 }
+            } else {
+                m_files.add(file.getName());
+                m_filesPath.add(file.getPath());
+            }
         }
         for (String m_AddFile : m_files) {
             m_item.add(m_AddFile);
@@ -219,14 +219,18 @@ public class FileExplorerActivity extends AppCompatActivity {
 
     void createNewFolder(final int p_opt) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        if (p_opt == 1)
-            builder.setTitle(getResources().getString(R.string.create_folder));
-        else builder.setTitle(getResources().getString(R.string.create_file));
-        // Set up the input
         final EditText m_edtinput = new EditText(this);
+        if (p_opt == 1) {
+            builder.setTitle(getResources().getString(R.string.create_folder));
+            m_edtinput.setText("NewFolder");
+        }
+        else {
+            builder.setTitle(getResources().getString(R.string.create_file));
+            m_edtinput.setText("NewFile.txt");
+        }
+        // Set up the input
         // Specify the type of input expected;
         m_edtinput.setInputType(InputType.TYPE_CLASS_TEXT);
-
         // Set up the buttons
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override

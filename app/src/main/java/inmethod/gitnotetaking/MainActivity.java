@@ -140,13 +140,13 @@ public class MainActivity extends AppCompatActivity {
         isWriteStoragePermissionGranted();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        try{
+        try {
             Method m = StrictMode.class.getMethod("disableDeathOnFileUriExposure");
             m.invoke(null);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+        }
 
 
     @Override
@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                 Object[] aTextView = GitList.getDeviceInfoFromLayoutId(view);
                 String sGitName = ((TextView) aTextView[0]).getText().toString();
                 String sRemoteUrl = ((TextView) aTextView[1]).getText().toString();
-                Intent.putExtra("GIT_ROOT_DIR", MyGitUtility.getLocalGitDirectory(activity,sRemoteUrl));
+                Intent.putExtra("GIT_ROOT_DIR", MyGitUtility.getLocalGitDirectory(activity, sRemoteUrl));
                 Intent.putExtra("GIT_NAME", sGitName);
                 Intent.putExtra("GIT_REMOTE_URL", sRemoteUrl);
                 startActivity(Intent);
@@ -188,9 +188,9 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onMenuItemClick(MenuItem item) {
                         int id = item.getItemId();
                         if (id == R.id.Remove) {
-                            MyGitUtility.deleteByRemoteUrl(activity,((TextView) aTextView[1]).getText().toString());
+                            MyGitUtility.deleteByRemoteUrl(activity, ((TextView) aTextView[1]).getText().toString());
                             Log.d(TAG, "try to delete local git repository");
-                            MyGitUtility.deleteLocalGitRepository(activity,sRemoteUrl);
+                            MyGitUtility.deleteLocalGitRepository(activity, sRemoteUrl);
                             adapter.clear();
                             return true;
                         } else if (id == R.id.Push) {
@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if (MyGitUtility.push(activity,((TextView) aTextView[1]).getText().toString())) {
+                                    if (MyGitUtility.push(activity, ((TextView) aTextView[1]).getText().toString())) {
                                         ((TextView) aTextView[0]).setTextColor(Color.BLACK);
                                         dialog.dismiss();
                                     } else {
@@ -222,27 +222,30 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        String sGitAuthorName = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", null);
+        String sGitAuthorEmail = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", null);
+
+        if (sGitAuthorName == null || sGitAuthorName.equals("") || sGitAuthorEmail == null || sGitAuthorEmail.equals("")) {
+            final AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
+            MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_first_time));
+            MyAlertDialog.setMessage(getResources().getString(R.string.tv_first_time));
+            DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(MainActivity.this, PreferencesSettings.class);
+                    startActivity(intent);
+                    dialog.dismiss();
+                }
+            };
+            MyAlertDialog.setNeutralButton("OK", OkClick);
+            MyAlertDialog.show();
+
+        }
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        String sGitAuthorName = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName",null);
-        String sGitAuthorEmail = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail",null);
-
-        if(sGitAuthorName==null ||sGitAuthorName.equals("")||sGitAuthorEmail==null||sGitAuthorEmail.equals("")){
-            AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
-            MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_first_time));
-            MyAlertDialog.setMessage(getResources().getString(R.string.tv_first_time));
-            DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(MainActivity.this, PreferencesSettings.class);
-                        startActivity(intent);
-                }
-            };
-            MyAlertDialog.setNeutralButton("OK", OkClick);
-            MyAlertDialog.show();
-        }else {
             adapter.clear();
             //if (aList.size() > 0)
             //Toast.makeText(activity, "pull from remote to local will run in backupgroud", Toast.LENGTH_LONG).show();
@@ -257,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }).start();
             }
-        }
+
     }
 
     @Override
@@ -274,9 +277,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, PreferencesSettings.class);
             startActivity(intent);
             return true;
-        } else
-
-        if (id == R.id.action_create) {
+        } else if (id == R.id.action_create) {
             Intent intent = new Intent(MainActivity.this, CloneGitActivity.class);
             startActivity(intent);
         }

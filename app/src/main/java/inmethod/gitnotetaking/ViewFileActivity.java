@@ -78,6 +78,7 @@ public class ViewFileActivity extends AppCompatActivity {
     EditText editText;
     LinearLayout layoutAttachment;
     public static int READ_REQUEST_CODE = 2;
+    private boolean isModify = false;
     //  TextView tvCountFiles;
 
 
@@ -106,9 +107,9 @@ public class ViewFileActivity extends AppCompatActivity {
         try {
             editText = findViewById(R.id.editFile);
             editText.setEnabled(false);
+            editText.setText("");
             layoutAttachment = findViewById(R.id.layoutAttachment);
             layoutAttachment.removeAllViews();
-            //      tvCountFiles = findViewById(R.id.textCountFiles);
 
             int iTextSize = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitEditTextSize", "16"));
             editText.setTextSize(iTextSize);
@@ -172,12 +173,16 @@ public class ViewFileActivity extends AppCompatActivity {
                                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int whichButton) {
                                                     try {
-                                                        file.getCanonicalFile().deleteOnExit();
+                                                        file.getCanonicalFile().delete();
+
                                                         new Thread(new Runnable() {
                                                             @Override
                                                             public void run() {
-                                                                MyGitUtility.commit(activity, sGitRemoteUrl, "delte attachment file");
+                                                                if(MyGitUtility.commit(activity, sGitRemoteUrl, "delte attachment file"))
                                                                 MyGitUtility.push(activity, sGitRemoteUrl);
+                                                                else{
+
+                                                                }
                                                             }
                                                         }).start();
                                                         layoutAttachment.removeView(aTV);
@@ -245,6 +250,54 @@ public class ViewFileActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed(){
+        if(isModify){
+            editText.setEnabled(false);
+            FileWriter fw = null;
+            final EditText txtUrl = new EditText(this);
+            //  txtUrl.setHint("your hint");
+
+            new AlertDialog.Builder(this)
+                    .setTitle(getResources().getString(R.string.commit))
+                    .setMessage(getResources().getString(R.string.commit_messages))
+                    .setView(txtUrl)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                            builder.setCancelable(false);
+                            builder.setView(R.layout.loading_dialog);
+                            final AlertDialog dialogs = builder.create();
+                            dialogs.show();
+                            boolean bCommitStatus = MyGitUtility.commit(activity, sGitRemoteUrl, txtUrl.getText().toString());
+                            isModify = false;
+                            dialogs.dismiss();
+                            if (bCommitStatus) {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+
+                                        MyGitUtility.push(activity, sGitRemoteUrl);
+
+                                    }
+                                }).start();
+                            }
+                        }
+                    }).show();
+
+            try {
+                fw = new FileWriter(new File(sFilePath));
+                BufferedWriter bw = new BufferedWriter(fw);
+                fw.write(editText.getText().toString());
+                fw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else
+        super.onBackPressed();
+
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
@@ -253,15 +306,12 @@ public class ViewFileActivity extends AppCompatActivity {
         } else if (id == R.id.view_file_action_edit) {
             iMode = MODE_EDIT;
             editText.setEnabled(true);
-            itemSave.setVisible(false);
-            itemEdit.setVisible(false);
+            isModify = true;
             return true;
         } else if (id == R.id.view_file_action_save) {
             iMode = MODE_READ;
-
+isModify = false;
             editText.setEnabled(false);
-            itemSave.setVisible(false);
-            itemEdit.setVisible(false);
             FileWriter fw = null;
             final EditText txtUrl = new EditText(this);
             //  txtUrl.setHint("your hint");

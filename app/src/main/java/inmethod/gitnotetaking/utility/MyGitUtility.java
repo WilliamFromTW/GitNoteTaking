@@ -91,6 +91,7 @@ public class MyGitUtility {
             String sAuthorName = aRemoteGit.getAuthor_name();
             String sAuthorEmail = aRemoteGit.getAuthor_email();
             if (aGitUtil.commit(sCommitMessages, sAuthorName, sAuthorEmail)) {
+                aRemoteGit.setPush_status(GitList.PUSH_FAIL);
                 Log.d(TAG,"commit finished!");
                 return true;
             } else {
