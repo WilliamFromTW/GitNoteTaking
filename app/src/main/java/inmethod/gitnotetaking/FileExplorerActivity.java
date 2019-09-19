@@ -202,7 +202,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                             Intent intent = new Intent();
                             intent.setAction(android.content.Intent.ACTION_VIEW);
                             //Log.d(TAG, "file type = " + getMimeType(Uri.fromFile(m_isFile), activity));
-                            intent.setDataAndType(path, getMimeType(Uri.fromFile(m_isFile), activity));
+                            intent.setDataAndType(path, getMimeType(path, activity));
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             try {
                                 startActivity(intent);

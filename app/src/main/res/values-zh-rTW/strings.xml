@@ -28,6 +28,9 @@
     <string name="commit">提交</string>
     <string name="commit_messages">請輸入修改原因</string>
     <string name="view_attach_files"> 附件. 點此觀看</string>
+    <string name="view_title_remove_attach">刪除</string>
+    <string name="view_remove_attach">刪除附件</string>
+    <string name="view_file_action_select_file">新增附件</string>
 
     // GitCloneActivity Layout
     <string name="tv_clone_git_repository">複製Git資料</string>

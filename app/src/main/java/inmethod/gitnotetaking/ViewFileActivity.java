@@ -2,13 +2,19 @@ package inmethod.gitnotetaking;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +22,7 @@ import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +33,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.preference.PreferenceManager;
 
+import org.w3c.dom.Text;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,12 +43,15 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import inmethod.gitnotetaking.db.RemoteGit;
 import inmethod.gitnotetaking.db.RemoteGitDAO;
+import inmethod.gitnotetaking.utility.FileUtility;
 import inmethod.gitnotetaking.utility.MyGitUtility;
 import inmethod.gitnotetaking.view.FileExplorerListAdapter;
 
@@ -64,7 +76,9 @@ public class ViewFileActivity extends AppCompatActivity {
     private MenuItem itemEdit;
     private MenuItem itemSave;
     EditText editText;
-  //  TextView tvCountFiles;
+    LinearLayout layoutAttachment;
+    public static int READ_REQUEST_CODE = 2;
+    //  TextView tvCountFiles;
 
 
     @Override
@@ -92,7 +106,9 @@ public class ViewFileActivity extends AppCompatActivity {
         try {
             editText = findViewById(R.id.editFile);
             editText.setEnabled(false);
-      //      tvCountFiles = findViewById(R.id.textCountFiles);
+            layoutAttachment = findViewById(R.id.layoutAttachment);
+            layoutAttachment.removeAllViews();
+            //      tvCountFiles = findViewById(R.id.textCountFiles);
 
             int iTextSize = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitEditTextSize", "16"));
             editText.setTextSize(iTextSize);
@@ -104,14 +120,90 @@ public class ViewFileActivity extends AppCompatActivity {
                     editText.append(br.readLine() + "\n");
                 }
                 fr.close();
-                Log.d(TAG,"file = "+ file.getCanonicalPath());
-                File attachDirectory = new File(file.getAbsolutePath()+"_attach");
-                if(attachDirectory.isDirectory() ) {
-         //           tvCountFiles.setText(countFilesInDirectory(attachDirectory) + getResources().getString(R.string.view_attach_files));
-             //       tvCountFiles.setTextColor(Color.BLUE);
-                }
-                else{
-            //        tvCountFiles.setText("");
+                Log.d(TAG, "file = " + file.getCanonicalPath());
+                File attachDirectory = new File(file.getAbsolutePath() + "_attach");
+                if (attachDirectory.isDirectory()) {
+                    for (final File file : attachDirectory.listFiles()) {
+                        if (file.isFile()) {
+                            final TextView aTV = new TextView(activity);
+                            aTV.setText(file.getName());
+                            aTV.setTextColor(Color.BLUE);
+                            aTV.setBackgroundColor(Color.LTGRAY);
+
+                            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                            lp.setMargins(0, 0, 10, 0);
+                            aTV.setLayoutParams(lp);
+                            final Uri filuri = Uri.fromFile(file);
+                            if (getMimeType(filuri, activity).toLowerCase().indexOf("image") != -1)
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.image20, 0, 0, 0);
+                            else if (getMimeType(filuri, activity).toLowerCase().indexOf("plain") != -1)
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.txt20, 0, 0, 0);
+                            else if (getMimeType(filuri, activity).toLowerCase().indexOf("excel") != -1)
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.xls20, 0, 0, 0);
+                            else if (getMimeType(filuri, activity).toLowerCase().indexOf("word") != -1)
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.doc20, 0, 0, 0);
+                            else if (getMimeType(filuri, activity).toLowerCase().indexOf("pdf") != -1)
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.pdf20, 0, 0, 0);
+                            else
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.unknown20, 0, 0, 0);
+
+
+                            aTV.setTextSize(16);
+                            aTV.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent intent = new Intent();
+                                    intent.setAction(android.content.Intent.ACTION_VIEW);
+                                    intent.setDataAndType(filuri, getMimeType(filuri, activity));
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    try {
+                                        startActivity(intent);
+                                    } catch (ActivityNotFoundException e) {
+                                    }
+                                }
+                            });
+                            aTV.setOnLongClickListener(new View.OnLongClickListener() {
+                                @Override
+                                public boolean onLongClick(View view) {
+                                    new AlertDialog.Builder(activity)
+                                            .setTitle(getResources().getString(R.string.view_title_remove_attach))
+                                            .setMessage(file.getName())
+                                            .setCancelable(true)
+                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int whichButton) {
+                                                    try {
+                                                        file.getCanonicalFile().deleteOnExit();
+                                                        new Thread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                MyGitUtility.commit(activity, sGitRemoteUrl, "delte attachment file");
+                                                                MyGitUtility.push(activity, sGitRemoteUrl);
+                                                            }
+                                                        }).start();
+                                                        layoutAttachment.removeView(aTV);
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
+
+                                                }
+                                            })
+                                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    // finish();
+                                                }
+                                            })
+                                            .show();
+
+                                    return true;
+                                }
+                            });
+                            layoutAttachment.addView(aTV);
+                        }
+                    }
+                    //           tvCountFiles.setText(countFilesInDirectory(attachDirectory) + getResources().getString(R.string.view_attach_files));
+                    //       tvCountFiles.setTextColor(Color.BLUE);
+                } else {
+                    //        tvCountFiles.setText("");
                 }
             } else {
                 Toast.makeText(activity, "File read error!", Toast.LENGTH_SHORT).show();
@@ -170,12 +262,8 @@ public class ViewFileActivity extends AppCompatActivity {
             editText.setEnabled(false);
             itemSave.setVisible(false);
             itemEdit.setVisible(false);
-
             FileWriter fw = null;
-
-
             final EditText txtUrl = new EditText(this);
-
             //  txtUrl.setHint("your hint");
 
             new AlertDialog.Builder(this)
@@ -212,9 +300,14 @@ public class ViewFileActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
             return true;
+        } else if (id == R.id.view_file_action_select_file) {
+
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            //   intent.setType("image/*");
+            intent.setType("*/*");
+            startActivityForResult(intent, READ_REQUEST_CODE);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -231,5 +324,68 @@ public class ViewFileActivity extends AppCompatActivity {
             }
         }
         return count;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode,
+                                 Intent resultData) {
+        super.onActivityResult(requestCode, resultCode, resultData);
+        // The ACTION_OPEN_DOCUMENT intent was sent with the request code
+        // READ_REQUEST_CODE. If the request code seen here doesn't match, it's the
+        // response to some other intent, and the code below shouldn't run at all.
+
+        if (requestCode == READ_REQUEST_CODE) {
+            // The document selected by the user won't be returned in the intent.
+            // Instead, a URI to that document will be contained in the return intent
+            // provided to this method as a parameter.
+            // Pull that URI using resultData.getData().
+            Uri uri = null;
+            if (resultData != null) {
+                uri = resultData.getData();
+                File aSelectedFile = new File(FileUtility.getPath(activity, uri));
+                try {
+                    File aDestFileDirectory = new File(file.getCanonicalPath().toString() + "_attach".trim());
+                    //  Log.d(TAG,"aDestFileDirectory file = "+aDestFileDirectory.getCanonicalPath());
+                    if (!aDestFileDirectory.isDirectory())
+                        aDestFileDirectory.mkdir();
+                    File aDestFile = new File(aDestFileDirectory.getCanonicalPath() + File.separator + aSelectedFile.getName().trim());
+                    //     Log.d(TAG,"dest file = "+aDestFile.getCanonicalPath());
+                    Files.copy(aSelectedFile.toPath(), aDestFile.toPath());
+                    MyGitUtility.commit(activity, sGitRemoteUrl, "add attach file = " + aSelectedFile.getName().trim());
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            MyGitUtility.push(activity, sGitRemoteUrl);
+                        }
+                    }).start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+                try {
+                    Log.d(TAG, "selected file name = " + aSelectedFile.getCanonicalPath());
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        }
+    }
+
+    public String getMimeType(Uri uri, Context context) {
+        String mimeType = null;
+        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            ContentResolver cr = context.getContentResolver();
+            mimeType = cr.getType(uri);
+        } else {
+            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
+                    .toString());
+            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                    fileExtension.toLowerCase());
+        }
+        return mimeType;
     }
 }

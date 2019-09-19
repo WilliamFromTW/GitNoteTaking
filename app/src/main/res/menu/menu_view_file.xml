@@ -14,5 +14,10 @@
         android:orderInCategory="101"
         android:title="@string/view_file_action_save"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/view_file_action_select_file"
+        android:orderInCategory="102"
+        android:title="@string/view_file_action_select_file"
+        app:showAsAction="never" />
 
 </menu>
