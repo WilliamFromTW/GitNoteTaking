@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onMenuItemClick(MenuItem item) {
                         int id = item.getItemId();
                         if (id == R.id.Remove) {
-                            if( ((TextView) aTextView[1]).getText().toString().indexOf("local")!=-1)
+                            if( ((TextView) aTextView[1]).getText().toString().indexOf("local")==-1)
                               MyGitUtility.deleteByRemoteUrl(activity, ((TextView) aTextView[1]).getText().toString());
                             Log.d(TAG, "try to delete local git repository");
                             MyGitUtility.deleteLocalGitRepository(activity, sRemoteUrl);
