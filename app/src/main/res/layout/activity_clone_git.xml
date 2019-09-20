@@ -74,7 +74,7 @@
         app:layout_constraintTop_toBottomOf="@+id/editUserName" />
 
     <EditText
-        android:id="@+id/editNickName"
+        android:id="@+id/editLocalGitName"
         android:layout_width="137dp"
         android:layout_height="39dp"
         android:layout_marginStart="8dp"
@@ -103,7 +103,7 @@
         android:layout_marginTop="8dp"
         android:text="OK"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editNickName" />
+        app:layout_constraintTop_toBottomOf="@+id/editLocalGitName" />
 
     <TextView
         android:id="@+id/textNickName"

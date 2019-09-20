@@ -1,5 +1,6 @@
 package inmethod.gitnotetaking.view;
 
+import android.app.Application;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.TextView;
@@ -45,9 +46,11 @@ public class GitList {
     public static void mapDeviceInfoToLayout(Object[] layoutData, Object aGitListObject ){
         GitList aGitList = (GitList)aGitListObject;
         TextView layout0 = ((TextView)layoutData[0]);
-        if( aGitList.getPushStatus()==PUSH_FAIL )
-            layout0.setTextColor(Color.RED);
+
         layout0.setText(aGitList.getGitName());
+        if( aGitList.getRemoteUrl().indexOf("local")==-1)
+            if( aGitList.getPushStatus()==PUSH_FAIL )
+                layout0.setTextColor(Color.RED);
         ((TextView)layoutData[1]).setText( aGitList.getRemoteUrl());
 
     }

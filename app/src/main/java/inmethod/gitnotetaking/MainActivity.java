@@ -177,21 +177,32 @@ public class MainActivity extends AppCompatActivity {
             public void onItemLongClick(View view, int position) {
                 final Object[] aTextView = GitList.getDeviceInfoFromLayoutId(view);
                 final String sRemoteUrl = ((TextView) aTextView[1]).getText().toString();
-                //    Toast.makeText(activity, "Long click position=" + position+",git name="+sRemoteUrl, Toast.LENGTH_LONG).show();
-                //Creating the instance of PopupMenu
+
                 PopupMenu popup = new PopupMenu(MainActivity.this, view);
-                //Inflating the Popup using xml file
+
                 popup.getMenuInflater()
                         .inflate(R.menu.lognclick_popup_menu, popup.getMenu());
+                if(sRemoteUrl.indexOf("local")!=-1) {
+                    for(int i=0;i< popup.getMenu().size();i++){
+                        if(popup.getMenu().getItem(i).getItemId()==R.id.Push){
+                            popup.getMenu().getItem(i).setVisible(false);
+                        }
+                    }
+                }
                 //registering popup with OnMenuItemClickListener
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     public boolean onMenuItemClick(MenuItem item) {
                         int id = item.getItemId();
                         if (id == R.id.Remove) {
-                            MyGitUtility.deleteByRemoteUrl(activity, ((TextView) aTextView[1]).getText().toString());
+                            if( ((TextView) aTextView[1]).getText().toString().indexOf("local")!=-1)
+                              MyGitUtility.deleteByRemoteUrl(activity, ((TextView) aTextView[1]).getText().toString());
                             Log.d(TAG, "try to delete local git repository");
                             MyGitUtility.deleteLocalGitRepository(activity, sRemoteUrl);
                             adapter.clear();
+                            ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(activity);
+                            for (final RemoteGit a : aList) {
+                                adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getPush_status()));
+                            }
                             return true;
                         } else if (id == R.id.Push) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -252,13 +263,15 @@ public class MainActivity extends AppCompatActivity {
             ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(activity);
             for (final RemoteGit a : aList) {
                 adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getPush_status()));
-                Log.d(TAG, "try to update remote git to local repository");
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        MyGitUtility.pull(activity, a.getUrl());
-                    }
-                }).start();
+                if(a.getUrl().indexOf("local")==-1) {
+                    Log.d(TAG, "try to update remote git to local repository");
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            MyGitUtility.pull(activity, a.getUrl());
+                        }
+                    }).start();
+                }
             }
 
     }
@@ -277,8 +290,11 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, PreferencesSettings.class);
             startActivity(intent);
             return true;
-        } else if (id == R.id.action_create) {
+        } else if (id == R.id.action_clone_git_remote) {
             Intent intent = new Intent(MainActivity.this, CloneGitActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.action_create_local_git) {
+            Intent intent = new Intent(MainActivity.this, CreateLocalGitActivity.class);
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);

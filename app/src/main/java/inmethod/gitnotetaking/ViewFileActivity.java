@@ -178,9 +178,9 @@ public class ViewFileActivity extends AppCompatActivity {
                                                         new Thread(new Runnable() {
                                                             @Override
                                                             public void run() {
-                                                                if(MyGitUtility.commit(activity, sGitRemoteUrl, "delte attachment file"))
-                                                                MyGitUtility.push(activity, sGitRemoteUrl);
-                                                                else{
+                                                                if (MyGitUtility.commit(activity, sGitRemoteUrl, "delte attachment file"))
+                                                                    MyGitUtility.push(activity, sGitRemoteUrl);
+                                                                else {
 
                                                                 }
                                                             }
@@ -250,8 +250,8 @@ public class ViewFileActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed(){
-        if(isModify){
+    public void onBackPressed() {
+        if (isModify) {
             editText.setEnabled(false);
             FileWriter fw = null;
             final EditText txtUrl = new EditText(this);
@@ -292,8 +292,8 @@ public class ViewFileActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }else
-        super.onBackPressed();
+        } else
+            super.onBackPressed();
 
     }
 
@@ -306,11 +306,12 @@ public class ViewFileActivity extends AppCompatActivity {
         } else if (id == R.id.view_file_action_edit) {
             iMode = MODE_EDIT;
             editText.setEnabled(true);
+            editText.requestFocus();
             isModify = true;
             return true;
         } else if (id == R.id.view_file_action_save) {
             iMode = MODE_READ;
-isModify = false;
+            isModify = false;
             editText.setEnabled(false);
             FileWriter fw = null;
             final EditText txtUrl = new EditText(this);
@@ -329,15 +330,17 @@ isModify = false;
                             dialogs.show();
                             boolean bCommitStatus = MyGitUtility.commit(activity, sGitRemoteUrl, txtUrl.getText().toString());
                             dialogs.dismiss();
-                            if (bCommitStatus) {
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
+                            if (sGitRemoteUrl.indexOf("local") == -1) {
+                                if (bCommitStatus) {
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
 
-                                        MyGitUtility.push(activity, sGitRemoteUrl);
+                                            MyGitUtility.push(activity, sGitRemoteUrl);
 
-                                    }
-                                }).start();
+                                        }
+                                    }).start();
+                                }
                             }
                         }
                     }).show();
@@ -402,12 +405,13 @@ isModify = false;
                     //     Log.d(TAG,"dest file = "+aDestFile.getCanonicalPath());
                     Files.copy(aSelectedFile.toPath(), aDestFile.toPath());
                     MyGitUtility.commit(activity, sGitRemoteUrl, "add attach file = " + aSelectedFile.getName().trim());
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            MyGitUtility.push(activity, sGitRemoteUrl);
-                        }
-                    }).start();
+                    if (sGitRemoteUrl.indexOf("local") == -1)
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                MyGitUtility.push(activity, sGitRemoteUrl);
+                            }
+                        }).start();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

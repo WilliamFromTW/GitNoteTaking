@@ -193,6 +193,15 @@ public class MyGitUtility {
         return false;
     }
 
+    public static boolean createLocalGitRepository(Activity activity,String sLocalGitName){
+        try {
+            GitUtil aGitUtil = new GitUtil( "localhost://local"+File.separator+sLocalGitName+".git", getLocalGitDirectory(activity,"localhost://local"+File.separator+sLocalGitName+".git"));
+            return aGitUtil.createLocalRepository();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     private static String getLocalGitDir(String sRemoteUrl) {
         String sReturn = "";

@@ -99,19 +99,23 @@ public class FileExplorerActivity extends AppCompatActivity {
         if (adapter.m_selectedItem.size() == 0) {
             Toast.makeText(FileExplorerActivity.this, getResources().getString(R.string.select_file_or_directory), Toast.LENGTH_SHORT).show();
         } else {
+            String sDeleteFilesName="";
             for (int m_delItem : adapter.m_selectedItem) {
                 File m_delFile = new File(m_path.get(m_delItem));
+                sDeleteFilesName = m_delFile.getName()+"\n"+sDeleteFilesName;
                 Log.d("file", m_path.get(m_delItem));
                 boolean m_isDelete = m_delFile.delete();
             }
             getDirFromRoot(m_curDir);
-            if (MyGitUtility.commit(activity, sGitRemoteUrl, "delete files"))
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        MyGitUtility.push(activity, sGitRemoteUrl);
-                    }
-                }).start();
+            if (MyGitUtility.commit(activity, sGitRemoteUrl, "delete files  = \n"+sDeleteFilesName)) {
+                if (sGitRemoteUrl.indexOf("local") == -1)
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            MyGitUtility.push(activity, sGitRemoteUrl);
+                        }
+                    }).start();
+            }
         }
     }
 
@@ -223,8 +227,7 @@ public class FileExplorerActivity extends AppCompatActivity {
         if (p_opt == 1) {
             builder.setTitle(getResources().getString(R.string.create_folder));
             m_edtinput.setText("NewFolder");
-        }
-        else {
+        } else {
             builder.setTitle(getResources().getString(R.string.create_file));
             m_edtinput.setText("NewFile.txt");
         }
@@ -243,6 +246,11 @@ public class FileExplorerActivity extends AppCompatActivity {
                         m_newPath.mkdirs();
                     }
                 } else {
+                    File m_newPath = new File(m_curDir, m_text);
+                    if(  m_newPath.exists() ){
+                        Log.d(TAG,"file exists!");
+                        return;
+                    }
                     try {
                         FileOutputStream m_Output = new FileOutputStream((m_curDir + File.separator + m_text), false);
                         m_Output.close();
