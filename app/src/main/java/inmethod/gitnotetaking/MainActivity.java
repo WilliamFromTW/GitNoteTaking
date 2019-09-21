@@ -2,6 +2,7 @@ package inmethod.gitnotetaking;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Application;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -52,46 +53,46 @@ public class MainActivity extends AppCompatActivity {
     private RemoteGitDAO aRemoteGitDAO = null;
 
     public boolean isInternetPermissionGranted() {
-            if (checkSelfPermission(Manifest.permission.INTERNET)
-                    == PackageManager.PERMISSION_GRANTED) {
-                Log.v(TAG, "Permission is granted1");
-                return true;
-            } else {
+        if (checkSelfPermission(Manifest.permission.INTERNET)
+                == PackageManager.PERMISSION_GRANTED) {
+            Log.v(TAG, "Permission is granted1");
+            return true;
+        } else {
 
-                Log.v(TAG, "Permission is revoked1");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, 1);
-                return false;
-            }
+            Log.v(TAG, "Permission is revoked1");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, 1);
+            return false;
+        }
 
     }
 
     public boolean isReadStoragePermissionGranted() {
 
-            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                Log.v(TAG, "Permission is granted1");
-                return true;
-            } else {
+        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+            Log.v(TAG, "Permission is granted1");
+            return true;
+        } else {
 
-                Log.v(TAG, "Permission is revoked1");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 3);
-                return false;
-            }
+            Log.v(TAG, "Permission is revoked1");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 3);
+            return false;
+        }
 
     }
 
     public boolean isWriteStoragePermissionGranted() {
 
-            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                Log.v(TAG, "Permission is granted2");
-                return true;
-            } else {
+        if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+            Log.v(TAG, "Permission is granted2");
+            return true;
+        } else {
 
-                Log.v(TAG, "Permission is revoked2");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
-                return false;
-            }
+            Log.v(TAG, "Permission is revoked2");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+            return false;
+        }
 
     }
 
@@ -136,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        }
+    }
 
 
     @Override
@@ -172,9 +173,9 @@ public class MainActivity extends AppCompatActivity {
 
                 popup.getMenuInflater()
                         .inflate(R.menu.lognclick_popup_menu, popup.getMenu());
-                if(sRemoteUrl.indexOf("local")!=-1) {
-                    for(int i=0;i< popup.getMenu().size();i++){
-                        if(popup.getMenu().getItem(i).getItemId()==R.id.Push){
+                if (sRemoteUrl.indexOf("local") != -1) {
+                    for (int i = 0; i < popup.getMenu().size(); i++) {
+                        if (popup.getMenu().getItem(i).getItemId() == R.id.Push) {
                             popup.getMenu().getItem(i).setVisible(false);
                         }
                     }
@@ -246,22 +247,57 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-            adapter.clear();
-            //if (aList.size() > 0)
-            //Toast.makeText(activity, "pull from remote to local will run in backupgroud", Toast.LENGTH_LONG).show();
-            ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(MyApplication.getAppContext());
-            for (final RemoteGit a : aList) {
-                adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getPush_status()));
-                if(a.getUrl().indexOf("local")==-1) {
-                    Log.d(TAG, "try to update remote git to local repository");
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            MyGitUtility.pull(MyApplication.getAppContext(), a.getUrl());
-                        }
-                    }).start();
-                }
+        adapter.clear();
+        ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(MyApplication.getAppContext());
+        boolean bCloning = false;
+        for (final RemoteGit a : aList) {
+            adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getPush_status()));
+            if (a.getUrl().indexOf("local") == -1 && a.getPush_status() == GitList.PUSH_SUCCESS) {
+                Log.d(TAG, "try to pull from remote git to local repository");
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MyGitUtility.pull(MyApplication.getAppContext(), a.getUrl());
+                    }
+                }).start();
             }
+            if (a.getPush_status() == GitList.CLONING)
+                bCloning = true;
+
+        }
+        if (bCloning) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    boolean bCloning = true;
+                    // 3 min
+                    for (int i = 0; i < 60; i++) {
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        if (!bCloning) {
+                            finish();
+                            startActivity(getIntent());
+                            break;
+                        }
+                        ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(MyApplication.getAppContext());
+                        bCloning = false;
+                        for (final RemoteGit a : aList) {
+                            if (a.getPush_status() == GitList.CLONING) bCloning = true;
+                        }
+                    }
+                    if (bCloning) {
+                        ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(MyApplication.getAppContext());
+                        for (final RemoteGit a : aList) {
+                            if (a.getPush_status() == GitList.CLONING)
+                                MyGitUtility.deleteByRemoteUrl(MyApplication.getAppContext(), a.getUrl());
+                        }
+                    }
+                }
+            }).start();
+        }
 
     }
 

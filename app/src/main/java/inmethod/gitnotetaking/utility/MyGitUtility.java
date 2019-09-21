@@ -92,10 +92,11 @@ public class MyGitUtility {
             String sAuthorEmail = aRemoteGit.getAuthor_email();
             aRemoteGitDAO.close();
             if (aGitUtil.commit(sCommitMessages, sAuthorName, sAuthorEmail)) {
-                aRemoteGit.setPush_status(GitList.PUSH_FAIL);
+                aRemoteGit.setPush_status(GitList.PUSH_SUCCESS);
                 Log.d(TAG,"commit finished!");
                 return true;
             } else {
+                aRemoteGit.setPush_status(GitList.PUSH_FAIL);
                 Log.d(TAG,"commit failed!");
                 return false;
             }
@@ -105,8 +106,8 @@ public class MyGitUtility {
         return false;
     }
 
-    public static boolean deleteByRemoteUrl(Activity activity,String sRemoteUrl){
-        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
+    public static boolean deleteByRemoteUrl(Context context,String sRemoteUrl){
+        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(context);
         boolean sReturn = aRemoteGitDAO.delete(sRemoteUrl);
         aRemoteGitDAO.close();
         return sReturn;
@@ -157,10 +158,10 @@ public class MyGitUtility {
     }
 
 
-    public static boolean cloneGit(Activity activity,String sRemoteUrl,String sUserName,String sUserPassword) {
-        String sLocalDirectory = getLocalGitDirectory(activity,sRemoteUrl);
+    public static boolean cloneGit(Context context,String sRemoteUrl,String sUserName,String sUserPassword) {
+        String sLocalDirectory = getLocalGitDirectory(context,sRemoteUrl);
 
-        if (checkLocalGitRepository(activity,sRemoteUrl)) {
+        if (checkLocalGitRepository(context,sRemoteUrl)) {
             return false;
         }
         boolean bIsRemoteRepositoryExist = false;
@@ -223,8 +224,8 @@ public class MyGitUtility {
                 File.separator +  PreferenceManager.getDefaultSharedPreferences(context).getString("GitLocalDirName", "gitnotetaking")  + File.separator + getLocalGitDir(sRemoteUrl);
     }
 
-    public static boolean checkLocalGitRepository(Activity activity,String sRemoteUrl) {
-        String sLocalDirectory = getLocalGitDirectory(activity,sRemoteUrl);
+    public static boolean checkLocalGitRepository(Context context ,String sRemoteUrl) {
+        String sLocalDirectory = getLocalGitDirectory(context,sRemoteUrl);
         Log.d(TAG, "default local directory = " + sLocalDirectory);
         boolean bIsLocalRepositoryExist = false;
         try {

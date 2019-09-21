@@ -13,6 +13,7 @@ public class GitList {
     private int iPushStatus = PUSH_SUCCESS;
     public static final int PUSH_SUCCESS = 0;
     public static final int PUSH_FAIL = -1;
+    public static final int CLONING = -3;
     private GitList(){
 
     }
@@ -47,10 +48,19 @@ public class GitList {
         GitList aGitList = (GitList)aGitListObject;
         TextView layout0 = ((TextView)layoutData[0]);
 
-        layout0.setText(aGitList.getGitName());
-        if( aGitList.getRemoteUrl().indexOf("local")==-1)
-            if( aGitList.getPushStatus()==PUSH_FAIL )
+        if( aGitList.getRemoteUrl().indexOf("local")==-1) {
+            if (aGitList.getPushStatus() == PUSH_FAIL) {
                 layout0.setTextColor(Color.RED);
+                layout0.setText(aGitList.getGitName()+"(long click to push)");
+            }
+            else  if (aGitList.getPushStatus() == CLONING) {
+                layout0.setTextColor(Color.RED);
+                layout0.setText(aGitList.getGitName()+" is cloning ...");
+            }else
+                layout0.setText(aGitList.getGitName());
+
+
+        }
         ((TextView)layoutData[1]).setText( aGitList.getRemoteUrl());
 
     }

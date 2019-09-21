@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">簡單GIT筆記</string>
+    <string name="app_name">簡單文字筆記</string>
     <string name="action_settings">設定</string>
     <string name="view_file_action_edit">編輯</string>
     <string name="view_file_action_save">存檔</string>
@@ -9,7 +9,7 @@
     <string name="action_create_folder">新增目錄</string>
     <string name="action_delete">刪除</string>
     <string name="title_remove">移除</string>
-    <string name="title_push">同步到遠端Git</string>
+    <string name="title_push">同步到遠端</string>
 
     // Preference
     <string name="GitEditTextSize">筆記字型大小</string>
@@ -18,9 +18,9 @@
     <string name="GitCheckBoxCommitMessage">是否要求輸入修改理由</string>
 
     // MainActivity
-    <string name="tv_title_first_time">首次執行</string>
-    <string name="tv_first_time">請先設定您的名字與郵箱</string>
-    <string name="action_clone">新增筆記(從遠端)</string>
+    <string name="tv_title_first_time">設定</string>
+    <string name="tv_first_time">請先設定您的名字與郵件</string>
+    <string name="action_clone">複製筆記(遠端)</string>
     <string name="action_create_local_git">新增筆記(本地端)</string>
     <string name="tv_localhost">本地端</string>
 

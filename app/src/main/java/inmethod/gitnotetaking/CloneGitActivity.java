@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -43,10 +44,10 @@ public class CloneGitActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (sRemoteName.equals("")||editRemoteURL.getText().toString().equals("") || editUserName.getText().toString().equals("") || editUserPassword.getText().toString().equals("") || editNickName.getText().toString().equals("")) {
+                if (sRemoteName.equals("") || editRemoteURL.getText().toString().equals("") || editUserName.getText().toString().equals("") || editUserPassword.getText().toString().equals("") || editNickName.getText().toString().equals("")) {
                     AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
                     MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_remote_git_clone));
-                    MyAlertDialog.setMessage(getResources().getString (R.string.tv_all_parametes_must_be_set));
+                    MyAlertDialog.setMessage(getResources().getString(R.string.tv_all_parametes_must_be_set));
                     DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                         }
@@ -56,17 +57,17 @@ public class CloneGitActivity extends AppCompatActivity {
                     return;
                 }
 
-                final RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
+                RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
                 RemoteGit aValue = aRemoteGitDAO.getByURL(editRemoteURL.getText().toString());
 
 
                 if (aValue == null) {
                     try {
-                        if (MyGitUtility.checkLocalGitRepository(activity,editRemoteURL.getText().toString())) {
+                        if (MyGitUtility.checkLocalGitRepository(activity, editRemoteURL.getText().toString())) {
 
                             AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
                             MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_remote_git_clone));
-                            MyAlertDialog.setMessage(getResources().getString(R.string.tv_local_git_already_exists)+"\nLocation = "+MyGitUtility.getLocalGitDirectory(activity,editRemoteURL.getText().toString()));
+                            MyAlertDialog.setMessage(getResources().getString(R.string.tv_local_git_already_exists) + "\nLocation = " + MyGitUtility.getLocalGitDirectory(activity, editRemoteURL.getText().toString()));
                             DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                 }
@@ -77,63 +78,55 @@ public class CloneGitActivity extends AppCompatActivity {
                         } else {
 
                             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                            builder.setCancelable(false); // if you want user to wait for some process to finish,
+                            builder.setCancelable(false);
                             builder.setView(R.layout.loading_dialog);
                             final AlertDialog dialog = builder.create();
                             dialog.show();
-                            try{
-                                new Thread(new Runnable(){
+                            aValue = new RemoteGit();
+                            aValue.setId(0);
+                            aValue.setRemoteName(sRemoteName);
+                            aValue.setUrl(editRemoteURL.getText().toString());
+                            aValue.setUid(editUserName.getText().toString());
+                            aValue.setPwd(editUserPassword.getText().toString());
+                            aValue.setNickname(editNickName.getText().toString());
+                            aValue.setPush_status(GitList.CLONING);
+                            aValue.setAuthor_name(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", "root"));
+                            aValue.setAuthor_email(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", "root@your.email.com"));
+                            aRemoteGitDAO.insert(aValue);
+                            aRemoteGitDAO.close();
+                            dialog.dismiss();
+                            onBackPressed();
+                            try {
+                                new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        if (MyGitUtility.cloneGit(activity,editRemoteURL.getText().toString(), editUserName.getText().toString(), editUserPassword.getText().toString())) {
-                                            RemoteGit aValue = new RemoteGit();
-                                            aValue.setId(0);
-                                            aValue.setRemoteName(sRemoteName);
-                                            aValue.setUrl(editRemoteURL.getText().toString());
-                                            aValue.setUid(editUserName.getText().toString());
-                                            aValue.setPwd(editUserPassword.getText().toString());
-                                            aValue.setNickname(editNickName.getText().toString());
+                                        RemoteGit aValue = new RemoteGit();
+                                        aValue.setId(0);
+                                        aValue.setRemoteName(sRemoteName);
+                                        aValue.setUrl(editRemoteURL.getText().toString());
+                                        aValue.setUid(editUserName.getText().toString());
+                                        aValue.setPwd(editUserPassword.getText().toString());
+                                        aValue.setNickname(editNickName.getText().toString());
+                                        aValue.setAuthor_name(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", "root"));
+                                        aValue.setAuthor_email(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", "root@your.email.com"));
+                                        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(MyApplication.getAppContext());
+                                        if (MyGitUtility.cloneGit(MyApplication.getAppContext(), editRemoteURL.getText().toString(), editUserName.getText().toString(), editUserPassword.getText().toString())) {
                                             aValue.setPush_status(GitList.PUSH_SUCCESS);
-                                            aValue.setAuthor_name(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", "root"));
-                                            aValue.setAuthor_email(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", "root@your.email.com"));
-                                            aRemoteGitDAO.insert(aValue);
+                                            if( aRemoteGitDAO.updateByRemoteUrl(aValue) )
+                                                Log.d("CloneGitActivity",aValue.getNickname() +"cloning success");
+                                            else
+                                                Log.d("CloneGitActivity",aValue.getNickname() +"cloning fail");
+
                                             aRemoteGitDAO.close();
-                                            dialog.dismiss();
-                                            Looper.prepare();
-                                            final AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
-                                            MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_remote_git_clone));
-                                            MyAlertDialog.setMessage(getResources().getString(R.string.tv_clone_success));
-                                            DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            onBackPressed();
-                                                        }
-                                                    });
-                                                }
-                                            };
-                                            MyAlertDialog.setNeutralButton("OK", OkClick);
-                                            MyAlertDialog.show();
-                                            Looper.loop();
                                         } else {
-                                            dialog.dismiss();
-                                            Looper.prepare();
-                                            final AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
-                                            MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_remote_git_clone));
-                                            MyAlertDialog.setMessage(getResources().getString(R.string.tv_clone_fail));
-                                            DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                }
-                                            };
-                                            MyAlertDialog.setNeutralButton("OK", OkClick);
-                                            MyAlertDialog.show();
-                                            Looper.loop();
+                                            aRemoteGitDAO.delete(aValue.getUrl());
+                                            aRemoteGitDAO.close();
                                         }
+
                                     }
                                 }).start();
 
-                            }catch(Exception ee){
+                            } catch (Exception ee) {
                                 ee.printStackTrace();
                             }
 
@@ -153,7 +146,7 @@ public class CloneGitActivity extends AppCompatActivity {
                     MyAlertDialog.setNeutralButton("OK", OkClick);
                     MyAlertDialog.show();
                 }
-              //  Log.d("asdf", "count=" + aRemoteGitDAO.getCount());
+                //  Log.d("asdf", "count=" + aRemoteGitDAO.getCount());
             }
         });
     }
