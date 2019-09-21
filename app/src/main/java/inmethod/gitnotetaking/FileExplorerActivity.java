@@ -33,6 +33,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,6 +48,7 @@ import java.util.List;
 
 import inmethod.gitnotetaking.db.RemoteGit;
 import inmethod.gitnotetaking.db.RemoteGitDAO;
+import inmethod.gitnotetaking.utility.FileUtility;
 import inmethod.gitnotetaking.utility.MyGitUtility;
 import inmethod.gitnotetaking.view.FileExplorerListAdapter;
 import inmethod.gitnotetaking.view.GitList;
@@ -99,23 +102,40 @@ public class FileExplorerActivity extends AppCompatActivity {
         if (adapter.m_selectedItem.size() == 0) {
             Toast.makeText(FileExplorerActivity.this, getResources().getString(R.string.select_file_or_directory), Toast.LENGTH_SHORT).show();
         } else {
-            String sDeleteFilesName="";
+            String sTemp = "";
             for (int m_delItem : adapter.m_selectedItem) {
                 File m_delFile = new File(m_path.get(m_delItem));
-                sDeleteFilesName = m_delFile.getName()+"\n"+sDeleteFilesName;
+                sTemp = m_delFile.getName()+"\n"+sTemp;
                 Log.d("file", m_path.get(m_delItem));
-                boolean m_isDelete = m_delFile.delete();
+                if( m_delFile.isDirectory()) {
+                    try {
+                        FileUtils.deleteDirectory(m_delFile);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    try {
+                        File fileAttach = new File(m_delFile.getCanonicalPath()+"_attach");
+                        if( fileAttach.exists() && fileAttach.isDirectory()){
+                            FileUtils.deleteDirectory(fileAttach);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    boolean m_isDelete = m_delFile.delete();
+                }
             }
+            final String sDeleteFilesName = sTemp;
             getDirFromRoot(m_curDir);
-            if (MyGitUtility.commit(activity, sGitRemoteUrl, "delete files  = \n"+sDeleteFilesName)) {
                 if (sGitRemoteUrl.indexOf("local") == -1)
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            MyGitUtility.push(activity, sGitRemoteUrl);
+                            if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, "delete files  = \n"+sDeleteFilesName)) {
+                            MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
                         }
-                    }).start();
-            }
+                    }
+            }).start();
         }
     }
 

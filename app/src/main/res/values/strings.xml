@@ -8,11 +8,15 @@
     <string name="action_create_file">Create File</string>
     <string name="action_create_folder">Create Folder</string>
     <string name="action_delete">Delete</string>
+    <string name="title_remove">Remove</string>
+    <string name="title_push">Push</string>
+
+    // Preference
     <string name="GitEditTextSize">Notes Text Size</string>
     <string name="GitLocalDirName">Local Git root directory(default)</string>
     <string name="GitRemoteName">Remote GIT Name(default)</string>
-    <string name="title_remove">Remove</string>
-    <string name="title_push">Push</string>
+    <string name="GitCheckBoxCommitMessage">Show Commit Dialog</string>
+
 
     // MainActivity
     <string name="tv_title_first_time">First Launch</string>
@@ -33,6 +37,8 @@
     <string name="view_title_remove_attach">Delete</string>
     <string name="view_remove_attach">Delete attach file</string>
     <string name="view_file_action_select_file">Add attach file(s)</string>
+    <string name="dialog_title_modify">Modify</string>
+    <string name="dialog_file_name">File Name</string>
 
     // GitCloneActivity
     // Layout

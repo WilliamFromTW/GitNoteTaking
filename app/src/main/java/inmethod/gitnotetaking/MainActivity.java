@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
     private RemoteGitDAO aRemoteGitDAO = null;
 
     public boolean isInternetPermissionGranted() {
-        if (Build.VERSION.SDK_INT >= 23) {
             if (checkSelfPermission(Manifest.permission.INTERNET)
                     == PackageManager.PERMISSION_GRANTED) {
                 Log.v(TAG, "Permission is granted1");
@@ -63,14 +62,11 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, 1);
                 return false;
             }
-        } else { //permission is automatically granted on sdk<23 upon installation
-            Log.v(TAG, "Permission is granted1");
-            return true;
-        }
+
     }
 
     public boolean isReadStoragePermissionGranted() {
-        if (Build.VERSION.SDK_INT >= 23) {
+
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
                 Log.v(TAG, "Permission is granted1");
@@ -81,14 +77,11 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 3);
                 return false;
             }
-        } else { //permission is automatically granted on sdk<23 upon installation
-            Log.v(TAG, "Permission is granted1");
-            return true;
-        }
+
     }
 
     public boolean isWriteStoragePermissionGranted() {
-        if (Build.VERSION.SDK_INT >= 23) {
+
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
                 Log.v(TAG, "Permission is granted2");
@@ -99,10 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
                 return false;
             }
-        } else { //permission is automatically granted on sdk<23 upon installation
-            Log.v(TAG, "Permission is granted2");
-            return true;
-        }
+
     }
 
     @Override
@@ -212,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if (MyGitUtility.push(activity, ((TextView) aTextView[1]).getText().toString())) {
+                                    if (MyGitUtility.push(MyApplication.getAppContext(), ((TextView) aTextView[1]).getText().toString())) {
                                         ((TextView) aTextView[0]).setTextColor(Color.BLACK);
                                         dialog.dismiss();
                                     } else {
@@ -259,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
             adapter.clear();
             //if (aList.size() > 0)
             //Toast.makeText(activity, "pull from remote to local will run in backupgroud", Toast.LENGTH_LONG).show();
-            ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(activity);
+            ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(MyApplication.getAppContext());
             for (final RemoteGit a : aList) {
                 adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getPush_status()));
                 if(a.getUrl().indexOf("local")==-1) {
@@ -267,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            MyGitUtility.pull(activity, a.getUrl());
+                            MyGitUtility.pull(MyApplication.getAppContext(), a.getUrl());
                         }
                     }).start();
                 }

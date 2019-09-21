@@ -23,6 +23,12 @@
         app:allowDividerBelow="true"
         app:title="@string/GitEditTextSize">
     </androidx.preference.EditTextPreference>
+    <androidx.preference.CheckBoxPreference
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:defaultValue="true"
+        app:key="GitCheckBox"
+        app:title="@string/GitCheckBoxCommitMessage"></androidx.preference.CheckBoxPreference>
     <androidx.preference.EditTextPreference
         app:defaultValue="gitnotetaking"
         app:key="GitLocalDirName"

@@ -1,6 +1,7 @@
 package inmethod.gitnotetaking.utility;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
@@ -36,11 +37,11 @@ public class MyGitUtility {
         return false;
     }
 
-    public static boolean push(Activity activity, String sRemoteUrl) {
-        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
+    public static boolean push(Context context, String sRemoteUrl) {
+        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(context);
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
         if (aRemoteGit == null) return false;
-        String sLocalDirectory = getLocalGitDirectory(activity,sRemoteUrl);
+        String sLocalDirectory = getLocalGitDirectory(context,sRemoteUrl);
 
         boolean bIsRemoteRepositoryExist = false;
         GitUtil aGitUtil;
@@ -78,18 +79,18 @@ public class MyGitUtility {
         return false;
     }
 
-    public static boolean commit(Activity activity, String sRemoteUrl, String sCommitMessages) {
+    public static boolean commit(Context context, String sRemoteUrl, String sCommitMessages) {
 
-        String sLocalDirectory = getLocalGitDirectory(activity,sRemoteUrl);
+        String sLocalDirectory = getLocalGitDirectory(context,sRemoteUrl);
         GitUtil aGitUtil;
-        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
+        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(context);
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
-        aRemoteGitDAO.close();
         try {
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
 
             String sAuthorName = aRemoteGit.getAuthor_name();
             String sAuthorEmail = aRemoteGit.getAuthor_email();
+            aRemoteGitDAO.close();
             if (aGitUtil.commit(sCommitMessages, sAuthorName, sAuthorEmail)) {
                 aRemoteGit.setPush_status(GitList.PUSH_FAIL);
                 Log.d(TAG,"commit finished!");
@@ -112,21 +113,21 @@ public class MyGitUtility {
 
     }
 
-    public static ArrayList<RemoteGit> getRemoteGitList(Activity activity){
-        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
+    public static ArrayList<RemoteGit> getRemoteGitList(Context context){
+        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(context);
         ArrayList<RemoteGit> aList =  aRemoteGitDAO.getAll();
         aRemoteGitDAO.close();
         return aList;
 
     }
-    public static boolean pull(Activity activity,String sRemoteUrl) {
-        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
+    public static boolean pull(Context context,String sRemoteUrl) {
+        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(context);
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
         if (aRemoteGit == null) return false;
         String sUserName = aRemoteGit.getUid();
         String sUserPassword = aRemoteGit.getPwd();
         aRemoteGitDAO.close();
-        String sLocalDirectory = getLocalGitDirectory(activity,sRemoteUrl);
+        String sLocalDirectory = getLocalGitDirectory(context,sRemoteUrl);
         boolean bIsRemoteRepositoryExist = false;
         GitUtil aGitUtil;
         try {
@@ -217,9 +218,9 @@ public class MyGitUtility {
     }
 
 
-    public static String getLocalGitDirectory(Activity activity,String sRemoteUrl) {
+    public static String getLocalGitDirectory(Context context,String sRemoteUrl) {
         return Environment.getExternalStorageDirectory() +
-                File.separator +  PreferenceManager.getDefaultSharedPreferences(activity).getString("GitLocalDirName", "gitnotetaking")  + File.separator + getLocalGitDir(sRemoteUrl);
+                File.separator +  PreferenceManager.getDefaultSharedPreferences(context).getString("GitLocalDirName", "gitnotetaking")  + File.separator + getLocalGitDir(sRemoteUrl);
     }
 
     public static boolean checkLocalGitRepository(Activity activity,String sRemoteUrl) {

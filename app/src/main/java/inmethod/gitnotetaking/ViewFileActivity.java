@@ -15,6 +15,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.MediaStore;
+import android.text.InputType;
+import android.text.method.BaseKeyListener;
+import android.text.method.KeyListener;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -79,6 +82,7 @@ public class ViewFileActivity extends AppCompatActivity {
     LinearLayout layoutAttachment;
     public static int READ_REQUEST_CODE = 2;
     private boolean isModify = false;
+    KeyListener listener = null;
     //  TextView tvCountFiles;
 
 
@@ -97,23 +101,36 @@ public class ViewFileActivity extends AppCompatActivity {
             toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        editText = findViewById(R.id.editFile);
+        editText.setText("");
+        listener = editText.getKeyListener();
+    }
+
+
+    private void disable() {
+        editText.setKeyListener(null);
 
     }
 
+
+    private void enable() {
+        editText.setKeyListener(listener);
+        editText.setFocusableInTouchMode(true);
+        editText.setFocusable(true);
+    }
 
     @Override
     public void onStart() {
         super.onStart();
         try {
-            editText = findViewById(R.id.editFile);
-            editText.setEnabled(false);
-            editText.setText("");
+            disable();
             layoutAttachment = findViewById(R.id.layoutAttachment);
             layoutAttachment.removeAllViews();
 
             int iTextSize = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitEditTextSize", "16"));
             editText.setTextSize(iTextSize);
             editText.setTextColor(Color.BLACK);
+
             if (file.exists()) {
                 FileReader fr = new FileReader(file);
                 BufferedReader br = new BufferedReader(fr);
@@ -145,11 +162,14 @@ public class ViewFileActivity extends AppCompatActivity {
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.doc20, 0, 0, 0);
                             else if (getMimeType(filuri, activity).toLowerCase().indexOf("pdf") != -1)
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.pdf20, 0, 0, 0);
+                            else if (getMimeType(filuri, activity).toLowerCase().indexOf("powerpoint") != -1)
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt20, 0, 0, 0);
+                            else if (getMimeType(filuri, activity).toLowerCase().indexOf("presentation") != -1)
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt20, 0, 0, 0);
                             else
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.unknown20, 0, 0, 0);
 
-
-                            aTV.setTextSize(16);
+                            aTV.setTextSize(22);
                             aTV.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
@@ -178,8 +198,8 @@ public class ViewFileActivity extends AppCompatActivity {
                                                         new Thread(new Runnable() {
                                                             @Override
                                                             public void run() {
-                                                                if (MyGitUtility.commit(activity, sGitRemoteUrl, "delte attachment file"))
-                                                                    MyGitUtility.push(activity, sGitRemoteUrl);
+                                                                if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, "delte attachment file"))
+                                                                    MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
                                                                 else {
 
                                                                 }
@@ -226,7 +246,6 @@ public class ViewFileActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // menu.getItem(1).setEnabled(false);
         getMenuInflater().inflate(R.menu.menu_view_file, menu);
         return true;
     }
@@ -252,38 +271,50 @@ public class ViewFileActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (isModify) {
-            editText.setEnabled(false);
+            disable();
             FileWriter fw = null;
             final EditText txtUrl = new EditText(this);
-            //  txtUrl.setHint("your hint");
-
-            new AlertDialog.Builder(this)
-                    .setTitle(getResources().getString(R.string.commit))
-                    .setMessage(getResources().getString(R.string.commit_messages))
-                    .setView(txtUrl)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                            builder.setCancelable(false);
-                            builder.setView(R.layout.loading_dialog);
-                            final AlertDialog dialogs = builder.create();
-                            dialogs.show();
-                            boolean bCommitStatus = MyGitUtility.commit(activity, sGitRemoteUrl, txtUrl.getText().toString());
-                            isModify = false;
-                            dialogs.dismiss();
-                            if (bCommitStatus) {
+            txtUrl.setText("commit file(" + file.getName() + ")");
+            if (PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("GitCheckBoxCommitMessage", false)) {
+                new AlertDialog.Builder(this)
+                        .setTitle(getResources().getString(R.string.commit))
+                        .setMessage(getResources().getString(R.string.commit_messages))
+                        .setView(txtUrl)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-
-                                        MyGitUtility.push(activity, sGitRemoteUrl);
-
+                                        boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
+                                        isModify = false;
+                                        if (sGitRemoteUrl.indexOf("local") == -1) {
+                                            if (bCommitStatus) {
+                                                MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+                                            }
+                                        }
                                     }
                                 }).start();
                             }
+                        }).show();
+            } else {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-                    }).show();
-
+                        boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
+                        isModify = false;
+                        if (sGitRemoteUrl.indexOf("local") == -1) {
+                            if (bCommitStatus) {
+                                MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+                            }
+                        }
+                    }
+                }).start();
+            }
             try {
                 fw = new FileWriter(new File(sFilePath));
                 BufferedWriter bw = new BufferedWriter(fw);
@@ -305,46 +336,58 @@ public class ViewFileActivity extends AppCompatActivity {
             return true;
         } else if (id == R.id.view_file_action_edit) {
             iMode = MODE_EDIT;
-            editText.setEnabled(true);
+            enable();
             editText.requestFocus();
             isModify = true;
             return true;
         } else if (id == R.id.view_file_action_save) {
             iMode = MODE_READ;
             isModify = false;
-            editText.setEnabled(false);
+            disable();
             FileWriter fw = null;
             final EditText txtUrl = new EditText(this);
             //  txtUrl.setHint("your hint");
+            txtUrl.setText("commit file(" + file.getName() + ")");
+            if (PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("GitCheckBoxCommitMessage", false)) {
 
-            new AlertDialog.Builder(this)
-                    .setTitle(getResources().getString(R.string.commit))
-                    .setMessage(getResources().getString(R.string.commit_messages))
-                    .setView(txtUrl)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                            builder.setCancelable(false);
-                            builder.setView(R.layout.loading_dialog);
-                            final AlertDialog dialogs = builder.create();
-                            dialogs.show();
-                            boolean bCommitStatus = MyGitUtility.commit(activity, sGitRemoteUrl, txtUrl.getText().toString());
-                            dialogs.dismiss();
-                            if (sGitRemoteUrl.indexOf("local") == -1) {
-                                if (bCommitStatus) {
-                                    new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-
-                                            MyGitUtility.push(activity, sGitRemoteUrl);
-
+                new AlertDialog.Builder(this)
+                        .setTitle(getResources().getString(R.string.commit))
+                        .setMessage(getResources().getString(R.string.commit_messages))
+                        .setView(txtUrl)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
+                                        if (sGitRemoteUrl.indexOf("local") == -1) {
+                                            if (bCommitStatus) {
+                                                MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+                                            }
                                         }
-                                    }).start();
-                                }
+                                    }
+                                }).start();
+                            }
+                        }).show();
+            }
+            {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
+                        if (sGitRemoteUrl.indexOf("local") == -1) {
+                            if (bCommitStatus) {
+                                MyGitUtility.push(activity, sGitRemoteUrl);
                             }
                         }
-                    }).show();
-
+                    }
+                }).start();
+            }
             try {
                 fw = new FileWriter(new File(sFilePath));
                 BufferedWriter bw = new BufferedWriter(fw);
@@ -383,35 +426,62 @@ public class ViewFileActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent resultData) {
         super.onActivityResult(requestCode, resultCode, resultData);
-        // The ACTION_OPEN_DOCUMENT intent was sent with the request code
-        // READ_REQUEST_CODE. If the request code seen here doesn't match, it's the
-        // response to some other intent, and the code below shouldn't run at all.
 
         if (requestCode == READ_REQUEST_CODE) {
-            // The document selected by the user won't be returned in the intent.
-            // Instead, a URI to that document will be contained in the return intent
-            // provided to this method as a parameter.
-            // Pull that URI using resultData.getData().
             Uri uri = null;
             if (resultData != null) {
                 uri = resultData.getData();
-                File aSelectedFile = new File(FileUtility.getPath(activity, uri));
+                final File aSelectedFile = new File(FileUtility.getPath(activity, uri));
                 try {
-                    File aDestFileDirectory = new File(file.getCanonicalPath().toString() + "_attach".trim());
+                    final File aDestFileDirectory = new File(file.getCanonicalPath().toString() + "_attach".trim());
                     //  Log.d(TAG,"aDestFileDirectory file = "+aDestFileDirectory.getCanonicalPath());
                     if (!aDestFileDirectory.isDirectory())
                         aDestFileDirectory.mkdir();
-                    File aDestFile = new File(aDestFileDirectory.getCanonicalPath() + File.separator + aSelectedFile.getName().trim());
-                    //     Log.d(TAG,"dest file = "+aDestFile.getCanonicalPath());
-                    Files.copy(aSelectedFile.toPath(), aDestFile.toPath());
-                    MyGitUtility.commit(activity, sGitRemoteUrl, "add attach file = " + aSelectedFile.getName().trim());
-                    if (sGitRemoteUrl.indexOf("local") == -1)
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                MyGitUtility.push(activity, sGitRemoteUrl);
-                            }
-                        }).start();
+
+                    final EditText txtUrl = new EditText(this);
+                    txtUrl.setText(aSelectedFile.getName());
+                    new AlertDialog.Builder(this)
+                            .setTitle(getResources().getString(R.string.dialog_title_modify))
+                            .setMessage(getResources().getString(R.string.dialog_file_name))
+                            .setView(txtUrl)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            File aDestFile = null;
+                                            try {
+                                                aDestFile = new File(aDestFileDirectory.getCanonicalPath() + File.separator + txtUrl.getText().toString().trim());
+                                                //     Log.d(TAG,"dest file = "+aDestFile.getCanonicalPath());
+                                                Files.copy(aSelectedFile.toPath(), aDestFile.toPath());
+                                                new Thread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        try {
+                                                            Thread.sleep(1000);
+                                                        } catch (InterruptedException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                        boolean bCommit = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, "add attach file = " + aSelectedFile.getName().trim());
+                                                        if (sGitRemoteUrl.indexOf("local") == -1 && bCommit)
+                                                            MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+
+                                                    }
+                                                }).start();
+
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+
+                                        }
+                                    }).start();
+                                    finish();
+                                    startActivity(getIntent());
+
+                                }
+                            }).show();
+
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
