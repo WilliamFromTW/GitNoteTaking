@@ -4,6 +4,8 @@ import android.app.Application;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.TextView;
+
+import inmethod.gitnotetaking.MyApplication;
 import inmethod.gitnotetaking.R;
 
 public class GitList {
@@ -51,11 +53,11 @@ public class GitList {
         if( aGitList.getRemoteUrl().indexOf("local")==-1) {
             if (aGitList.getPushStatus() == PUSH_FAIL) {
                 layout0.setTextColor(Color.RED);
-                layout0.setText(aGitList.getGitName()+"(long click to push)");
+                layout0.setText(aGitList.getGitName()+MyApplication.getAppContext().getResources().getString(R.string.main_notes_need_push));
             }
             else  if (aGitList.getPushStatus() == CLONING) {
                 layout0.setTextColor(Color.RED);
-                layout0.setText(aGitList.getGitName()+" is cloning ...");
+                layout0.setText(aGitList.getGitName()+ " "+MyApplication.getAppContext().getResources().getString(R.string.main_notes_cloning) );
             }else
                 layout0.setText(aGitList.getGitName());
 

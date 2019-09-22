@@ -108,7 +108,9 @@ public class FileExplorerListAdapter extends BaseAdapter {
             return R.mipmap.folderopened_yellow;
         else
         {
-            if(m_filepath.substring(m_lastIndex).equalsIgnoreCase(".pdf"))
+            if(m_lastIndex==-1){
+                return R.mipmap.unknown;
+            }else if(m_filepath.substring(m_lastIndex).equalsIgnoreCase(".pdf"))
             {
                 return R.mipmap.pdf;
             }

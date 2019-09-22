@@ -9,7 +9,7 @@
     <string name="action_create_folder">新增目錄</string>
     <string name="action_delete">刪除</string>
     <string name="title_remove">移除</string>
-    <string name="title_push">同步到遠端</string>
+    <string name="title_push">手動同步到遠端</string>
 
     // Preference
     <string name="GitEditTextSize">筆記字型大小</string>
@@ -24,6 +24,8 @@
     <string name="action_create_local_git">新增筆記(本地)</string>
     <string name="tv_localhost">本地</string>
     <string name="main_menu_add">增加</string>
+    <string name="main_notes_need_push">(長按與遠端同步)</string>
+    <string name="main_notes_cloning"> 同步中 ... </string>
 
     // FileExplorerActivity
     <string name="create_folder">新增目錄</string>

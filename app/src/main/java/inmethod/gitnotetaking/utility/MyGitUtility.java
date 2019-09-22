@@ -71,6 +71,7 @@ public class MyGitUtility {
                     return false;
                 }
             }
+            aRemoteGitDAO.close();
             return false;
 
         } catch (Exception e) {

@@ -13,6 +13,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import org.eclipse.jgit.util.FileUtils;
+
+import java.io.File;
+
 import inmethod.gitnotetaking.db.RemoteGit;
 import inmethod.gitnotetaking.db.RemoteGitDAO;
 import inmethod.gitnotetaking.utility.MyGitUtility;
@@ -64,18 +68,10 @@ public class CloneGitActivity extends AppCompatActivity {
                 if (aValue == null) {
                     try {
                         if (MyGitUtility.checkLocalGitRepository(activity, editRemoteURL.getText().toString())) {
+                            String sLocalDirectory = MyGitUtility.getLocalGitDirectory(activity,editRemoteURL.getText().toString());
+                            FileUtils.delete(new File(sLocalDirectory),FileUtils.RECURSIVE);
+                        }
 
-                            AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
-                            MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_remote_git_clone));
-                            MyAlertDialog.setMessage(getResources().getString(R.string.tv_local_git_already_exists) + "\nLocation = " + MyGitUtility.getLocalGitDirectory(activity, editRemoteURL.getText().toString()));
-                            DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            };
-                            MyAlertDialog.setNeutralButton("OK", OkClick);
-                            MyAlertDialog.show();
-                            return;
-                        } else {
 
                             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                             builder.setCancelable(false);
@@ -130,7 +126,7 @@ public class CloneGitActivity extends AppCompatActivity {
                                 ee.printStackTrace();
                             }
 
-                        }
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

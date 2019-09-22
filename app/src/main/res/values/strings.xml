@@ -9,7 +9,7 @@
     <string name="action_create_folder">Create Folder</string>
     <string name="action_delete">Delete</string>
     <string name="title_remove">Remove</string>
-    <string name="title_push">Push</string>
+    <string name="title_push">Push Manually</string>
 
     // Preference
     <string name="GitEditTextSize">Notes Text Size</string>
@@ -25,6 +25,8 @@
     <string name="action_create_local_git">Create Notes(local)</string>
     <string name="tv_localhost">Local</string>
     <string name="main_menu_add">Add</string>
+    <string name="main_notes_need_push">(long click to push)</string>
+    <string name="main_notes_cloning"> is cloning ...</string>
 
     // FileExplorerActivity
     <string name="create_folder">Create Folder</string>

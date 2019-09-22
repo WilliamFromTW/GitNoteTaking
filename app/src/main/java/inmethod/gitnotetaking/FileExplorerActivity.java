@@ -33,7 +33,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.apache.commons.io.FileUtils;
+import org.eclipse.jgit.util.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -109,7 +109,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                 Log.d("file", m_path.get(m_delItem));
                 if( m_delFile.isDirectory()) {
                     try {
-                        FileUtils.deleteDirectory(m_delFile);
+                        FileUtils.delete(m_delFile,FileUtils.RECURSIVE);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -117,7 +117,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                     try {
                         File fileAttach = new File(m_delFile.getCanonicalPath()+"_attach");
                         if( fileAttach.exists() && fileAttach.isDirectory()){
-                            FileUtils.deleteDirectory(fileAttach);
+                            FileUtils.delete(fileAttach,FileUtils.RECURSIVE);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();

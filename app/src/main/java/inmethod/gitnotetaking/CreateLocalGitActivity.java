@@ -61,15 +61,19 @@ public class CreateLocalGitActivity extends AppCompatActivity {
                 if (aValue == null) {
                     try {
                         if (MyGitUtility.checkLocalGitRepository(activity,sRemoteURL)) {
-                            AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
-                            MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_create_local_git));
-                            MyAlertDialog.setMessage(getResources().getString(R.string.tv_local_git_already_exists)+"\nLocation = "+MyGitUtility.getLocalGitDirectory(activity,sRemoteURL));
-                            DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            };
-                            MyAlertDialog.setNeutralButton("OK", OkClick);
-                            MyAlertDialog.show();
+                            aValue = new RemoteGit();
+                            aValue.setId(0);
+                            aValue.setRemoteName(sRemoteName);
+                            aValue.setUrl(sRemoteURL);
+                            aValue.setUid("UID");
+                            aValue.setPwd("PWD");
+                            aValue.setNickname(editLocalGitName.getText().toString());
+                            aValue.setPush_status(GitList.PUSH_SUCCESS);
+                            aValue.setAuthor_name(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", "root"));
+                            aValue.setAuthor_email(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", "root@your.email.com"));
+                            aRemoteGitDAO.insert(aValue);
+                            aRemoteGitDAO.close();
+                            onBackPressed();
                             return;
                         } else {
                             try{
