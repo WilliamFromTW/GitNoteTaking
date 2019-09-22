@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/backgroup"
+    android:backgroundTint="#f0FFFFFF"
+    android:backgroundTintMode="src_over"
+
     >
 
     <com.google.android.material.appbar.AppBarLayout

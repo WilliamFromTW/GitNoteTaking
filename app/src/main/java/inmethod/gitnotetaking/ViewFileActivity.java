@@ -153,21 +153,21 @@ public class ViewFileActivity extends AppCompatActivity {
                             aTV.setLayoutParams(lp);
                             final Uri filuri = Uri.fromFile(file);
                             if (getMimeType(filuri, activity).toLowerCase().indexOf("image") != -1)
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.image20, 0, 0, 0);
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.image24, 0, 0, 0);
                             else if (getMimeType(filuri, activity).toLowerCase().indexOf("plain") != -1)
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.txt20, 0, 0, 0);
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.txt24, 0, 0, 0);
                             else if (getMimeType(filuri, activity).toLowerCase().indexOf("excel") != -1)
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.xls20, 0, 0, 0);
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.xls24, 0, 0, 0);
                             else if (getMimeType(filuri, activity).toLowerCase().indexOf("word") != -1)
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.doc20, 0, 0, 0);
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.doc24, 0, 0, 0);
                             else if (getMimeType(filuri, activity).toLowerCase().indexOf("pdf") != -1)
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.pdf20, 0, 0, 0);
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.pdf24, 0, 0, 0);
                             else if (getMimeType(filuri, activity).toLowerCase().indexOf("powerpoint") != -1)
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt20, 0, 0, 0);
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt24, 0, 0, 0);
                             else if (getMimeType(filuri, activity).toLowerCase().indexOf("presentation") != -1)
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt20, 0, 0, 0);
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt24, 0, 0, 0);
                             else
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.unknown20, 0, 0, 0);
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.unknown24, 0, 0, 0);
 
                             aTV.setTextSize(22);
                             aTV.setOnClickListener(new View.OnClickListener() {

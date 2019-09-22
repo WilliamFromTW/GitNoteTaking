@@ -61,6 +61,8 @@ public class GitList {
 
 
         }
+        else layout0.setText(aGitList.getGitName());
+
         ((TextView)layoutData[1]).setText( aGitList.getRemoteUrl());
 
     }
