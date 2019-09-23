@@ -6,12 +6,16 @@ import androidx.preference.PreferenceManager;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import org.eclipse.jgit.util.FileUtils;
 
@@ -41,7 +45,27 @@ public class CloneGitActivity extends AppCompatActivity {
         editUserName = (EditText) findViewById(R.id.editUserName);
         editUserPassword = (EditText) findViewById(R.id.editUserPassword);
         editNickName = (EditText) findViewById(R.id.editLocalGitName);
+        ImageButton aSearchButton = (ImageButton)findViewById(R.id.searchButton);
+        TextView tvRegistration = (TextView)findViewById(R.id.tvRegistration);
+        tvRegistration.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String url = "https://github.com/join?source=header-home";
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
 
+            }
+        });
+        aSearchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String url = "https://github.com/join?source=header-home";
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+        });
         Button buttonOK = (Button) findViewById(R.id.buttonOK);
 
         buttonOK.setOnClickListener(new View.OnClickListener() {

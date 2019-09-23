@@ -5,127 +5,148 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".CloneGitActivity">
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textTitle"
-        android:layout_width="172dp"
-        android:layout_height="23dp"
-        android:layout_marginStart="159dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="150dp"
-        android:text="@string/tv_clone_git_repository"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.336"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/editRemoteURL"
-        android:layout_width="239dp"
-        android:layout_height="60dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:gravity="top|left"
-        android:inputType="textUri|textMultiLine|textImeMultiLine"
-        android:singleLine="false"
-        android:text="https://"
-        android:textSize="14dp"
-        app:layout_constraintStart_toEndOf="@+id/textRemoteUrl"
-        app:layout_constraintTop_toBottomOf="@+id/textTitle" />
+        <Button
+            android:id="@+id/buttonOK"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="OK"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editLocalGitName" />
 
-    <TextView
-        android:id="@+id/textRemoteUrl"
-        android:layout_width="80dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:gravity="center|left"
-        android:text="@string/tv_remote_url"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textTitle" />
+        <EditText
+            android:id="@+id/editRemoteURL"
+            android:layout_width="239dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:gravity="top|left"
+            android:inputType="textUri|textMultiLine|textImeMultiLine"
+            android:singleLine="false"
+            android:text="https://"
+            android:textSize="14sp"
+            app:layout_constraintStart_toEndOf="@+id/textRemoteUrl"
+            app:layout_constraintTop_toBottomOf="@+id/textTitle" />
 
-    <EditText
-        android:id="@+id/editUserName"
-        android:layout_width="140dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="text"
-        android:textSize="14dp"
-        app:layout_constraintStart_toEndOf="@+id/textUserName"
-        app:layout_constraintTop_toBottomOf="@+id/editRemoteURL" />
+        <EditText
+            android:id="@+id/editUserName"
+            android:layout_width="140dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:inputType="text"
+            android:textSize="14dp"
+            app:layout_constraintStart_toEndOf="@+id/textUserName"
+            app:layout_constraintTop_toBottomOf="@+id/editRemoteURL" />
 
-    <EditText
-        android:id="@+id/editUserPassword"
-        android:layout_width="240dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="12dp"
-        android:ems="10"
-        android:inputType="textPassword"
-        android:textSize="14dp"
-        app:layout_constraintStart_toEndOf="@+id/textPassword"
-        app:layout_constraintTop_toBottomOf="@+id/editUserName" />
+        <EditText
+            android:id="@+id/editUserPassword"
+            android:layout_width="240dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="12dp"
+            android:inputType="textPassword"
+            android:textSize="14dp"
+            app:layout_constraintStart_toEndOf="@+id/textPassword"
+            app:layout_constraintTop_toBottomOf="@+id/editUserName" />
 
-    <EditText
-        android:id="@+id/editLocalGitName"
-        android:layout_width="137dp"
-        android:layout_height="39dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:textSize="14dp"
-        app:layout_constraintStart_toEndOf="@+id/textNickName"
-        app:layout_constraintTop_toBottomOf="@+id/editUserPassword" />
+        <EditText
+            android:id="@+id/editLocalGitName"
+            android:layout_width="137dp"
+            android:layout_height="39dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:textSize="14dp"
+            app:layout_constraintStart_toEndOf="@+id/textNickName"
+            app:layout_constraintTop_toBottomOf="@+id/editUserPassword" />
 
-    <TextView
-        android:id="@+id/textUserName"
-        android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:gravity="center|left"
-        android:text="@string/tv_user_name"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editRemoteURL" />
+        <TextView
+            android:id="@+id/textTitle"
+            android:layout_width="172dp"
+            android:layout_height="23dp"
+            android:layout_marginStart="150dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="150dp"
+            android:text="@string/tv_clone_git_repository"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.336"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/buttonOK"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:text="OK"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editLocalGitName" />
+        <TextView
+            android:id="@+id/textRemoteUrl"
+            android:layout_width="80dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center|left"
+            android:text="@string/tv_remote_url"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textTitle" />
 
-    <TextView
-        android:id="@+id/textNickName"
-        android:layout_width="115dp"
-        android:layout_height="37dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:gravity="center|left"
-        android:text="@string/tv_git_nick_name"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editUserPassword" />
+        <TextView
+            android:id="@+id/textUserName"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center|left"
+            android:text="@string/tv_user_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editRemoteURL" />
 
-    <TextView
-        android:id="@+id/textPassword"
-        android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
-        android:gravity="center|left"
-        android:text="@string/tv_password"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editUserName" />
+        <TextView
+            android:id="@+id/textNickName"
+            android:layout_width="115dp"
+            android:layout_height="37dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center|left"
+            android:text="@string/tv_git_nick_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editUserPassword" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/textPassword"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:gravity="center|left"
+            android:text="@string/tv_password"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editUserName" />
+
+        <ImageButton
+            android:id="@+id/searchButton"
+            android:layout_width="wrap_content"
+            android:layout_height="23sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="24dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintEnd_toStartOf="@+id/textTitle"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/registration24" />
+
+        <TextView
+            android:id="@+id/tvRegistration"
+            android:layout_width="40sp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Click to Sign Up"
+            android:textAlignment="viewStart"
+            android:textColor="#009688"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toStartOf="@+id/searchButton"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
