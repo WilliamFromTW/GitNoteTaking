@@ -13,14 +13,14 @@
 
     // Preference
     <string name="GitEditTextSize">筆記字型大小</string>
-    <string name="GitLocalDirName">本地端主要根目錄(修改後需重新刪除所有筆記本)</string>
+    <string name="GitLocalDirName">本地端根目錄(修改後需重新刪除所有筆記本)</string>
     <string name="GitRemoteName">遠端GIT名稱(預設)</string>
     <string name="GitCheckBoxCommitMessage">是否要求輸入修改理由</string>
 
     // MainActivity
     <string name="tv_title_first_time">設定</string>
     <string name="tv_first_time">請先設定您的名字與郵件</string>
-    <string name="action_clone">複製筆記(遠端)</string>
+    <string name="action_clone">複製筆記(遠端GIT)</string>
     <string name="action_create_local_git">新增筆記(本地)</string>
     <string name="tv_localhost">本地</string>
     <string name="main_menu_add">增加</string>
@@ -43,16 +43,16 @@
     <string name="dialog_file_name">檔案名稱</string>
 
     // GitCloneActivity Layout
-    <string name="tv_clone_git_repository">複製筆記資料(遠端)</string>
-    <string name="tv_remote_name">遠端GIT代號</string>
-    <string name="tv_remote_url">遠端URL</string>
+    <string name="tv_clone_git_repository">複製筆記(遠端GIT)</string>
+    <string name="tv_remote_name">遠端GIT名稱</string>
+    <string name="tv_remote_url">遠端GIT URL</string>
     <string name="tv_user_name">帳號</string>
     <string name="tv_git_nick_name">筆記本名稱</string>
     <string name="tv_password">密碼</string>
     <string name="tv_please_wait">請稍等</string>
     // activity
     <string name="tv_all_parametes_must_be_set">所有參數必須都輸入</string>
-    <string name="tv_title_remote_git_clone">複製筆記本(遠端)</string>
+    <string name="tv_title_remote_git_clone">複製筆記本(遠端GIT)</string>
     <string name="tv_local_git_already_exists">本地筆記本已存在!</string>
     <string name="tv_clone_success">複製成功!</string>
     <string name="tv_clone_fail">複製失敗!</string>

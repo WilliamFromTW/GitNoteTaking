@@ -19,9 +19,9 @@
 
 
     // MainActivity
-    <string name="tv_title_first_time">First Launch</string>
+    <string name="tv_title_first_time">Starting</string>
     <string name="tv_first_time">Please Setup your name and email</string>
-    <string name="action_clone">Clone Notes(Remote)</string>
+    <string name="action_clone">Clone Notes(Remote GIT)</string>
     <string name="action_create_local_git">Create Notes(local)</string>
     <string name="tv_localhost">Local</string>
     <string name="main_menu_add">Add</string>
@@ -45,9 +45,9 @@
 
     // GitCloneActivity
     // Layout
-    <string name="tv_clone_git_repository">Clone Git Repository</string>
+    <string name="tv_clone_git_repository">Clone GIT Repository</string>
     <string name="tv_remote_name">Remote Name</string>
-    <string name="tv_remote_url">Remote URL</string>
+    <string name="tv_remote_url">Remote GIT URL</string>
     <string name="tv_user_name">User Name</string>
     <string name="tv_git_nick_name">Notes Name</string>
     <string name="tv_password">Password</string>
