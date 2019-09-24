@@ -2,7 +2,7 @@
     <string name="app_name">簡單文字筆記</string>
     <string name="action_settings">設定</string>
     <string name="view_file_action_edit">編輯</string>
-    <string name="view_file_action_save">存檔</string>
+    <string name="view_file_action_save">儲存</string>
     <string name="GitAuthorName">名字</string>
     <string name="GitAuthorEmail">電子郵件</string>
     <string name="action_create_file">新增檔案</string>
@@ -45,6 +45,8 @@
     <string name="view_file_action_select_file">新增附件</string>
     <string name="dialog_title_modify">修改</string>
     <string name="dialog_file_name">檔案名稱</string>
+    <string name="view_file_delete_attachment_file_commit">刪除檔案 : </string>
+    <string name="view_file_add_attachment_file_commit">新增檔案 : </string>
 
     // GitCloneActivity Layout
     <string name="tv_clone_git_repository">複製筆記(遠端GIT)</string>

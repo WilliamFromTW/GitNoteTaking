@@ -46,6 +46,8 @@
     <string name="view_file_action_select_file">Add attach file(s)</string>
     <string name="dialog_title_modify">Modify</string>
     <string name="dialog_file_name">File Name</string>
+    <string name="view_file_delete_attachment_file_commit">delete attachment file : </string>
+    <string name="view_file_add_attachment_file_commit">add attachment file : </string>
 
     // GitCloneActivity
     // Layout

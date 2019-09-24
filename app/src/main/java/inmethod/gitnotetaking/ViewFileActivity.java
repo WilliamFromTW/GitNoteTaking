@@ -187,9 +187,18 @@ public class ViewFileActivity extends AppCompatActivity {
                             aTV.setOnLongClickListener(new View.OnLongClickListener() {
                                 @Override
                                 public boolean onLongClick(View view) {
+
+
+                                    final String sFileName ;
+                                    try {
+                                        sFileName = file.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                        return false;
+                                    }
                                     new AlertDialog.Builder(activity)
                                             .setTitle(getResources().getString(R.string.view_title_remove_attach))
-                                            .setMessage(file.getName())
+                                            .setMessage(sFileName)
                                             .setCancelable(true)
                                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int whichButton) {
@@ -199,7 +208,7 @@ public class ViewFileActivity extends AppCompatActivity {
                                                         new Thread(new Runnable() {
                                                             @Override
                                                             public void run() {
-                                                                if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, "delte attachment file"))
+                                                                if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_delete_attachment_file_commit)  +"\n"+sFileName))
                                                                     MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
                                                                 else {
 
@@ -449,10 +458,12 @@ public class ViewFileActivity extends AppCompatActivity {
                                     new Thread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            File aDestFile = null;
+                                            final File aDestFile;
                                             try {
                                                 aDestFile = new File(aDestFileDirectory.getCanonicalPath() + File.separator + txtUrl.getText().toString().trim());
                                                 //     Log.d(TAG,"dest file = "+aDestFile.getCanonicalPath());
+                                                final String sDestFileNameString;
+                                                sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(  MyGitUtility.getLocalGitDirectory(activity,sGitRemoteUrl).length()  );
                                                 Files.copy(aSelectedFile.toPath(), aDestFile.toPath());
                                                 new Thread(new Runnable() {
                                                     @Override
@@ -462,7 +473,8 @@ public class ViewFileActivity extends AppCompatActivity {
                                                         } catch (InterruptedException e) {
                                                             e.printStackTrace();
                                                         }
-                                                        boolean bCommit = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, "add attach file = " + aSelectedFile.getName().trim());
+                                                        boolean bCommit = false;
+                                                        bCommit = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_add_attachment_file_commit) +"\n"+ sDestFileNameString);
                                                         if (sGitRemoteUrl.indexOf("local") == -1 && bCommit)
                                                             MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
 
