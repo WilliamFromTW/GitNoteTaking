@@ -24,7 +24,7 @@ class RemoteGitDAO(context: Context) {
         val UID_COLUMN = "UID"
         val PWD_COLUMN = "PWD"
         val NICKNAME_COLUMN = "NICKNAME"
-        val PUSH_STATUS_COLUMN = "PUSH_STATUS"
+        val STATUS_COLUMN = "STATUS"
         val BRANCH_COLUMN = "BRANCH"
         var AUTHOR_NAME = "AUTHOR_NAME"
         var AUTHOR_EMAIL = "AUTHOR_EMAIL"
@@ -37,7 +37,7 @@ class RemoteGitDAO(context: Context) {
                 UID_COLUMN + " TEXT NOT NULL, " +
                 PWD_COLUMN + " TEXT NOT NULL, " +
                 NICKNAME_COLUMN + " TEXT NOT NULL, "+
-                PUSH_STATUS_COLUMN + " INTEGER DEFAULT 0," +
+                STATUS_COLUMN + " INTEGER DEFAULT 0," +
                 BRANCH_COLUMN +" TEXT NOT NULL, " +
                 AUTHOR_NAME +" TEXT NOT NULL, " +
                 AUTHOR_EMAIL + " TEXT NOT NULL) ";
@@ -138,7 +138,7 @@ class RemoteGitDAO(context: Context) {
         cv.put(UID_COLUMN, item.uid)
         cv.put(PWD_COLUMN,item.pwd)
         cv.put(NICKNAME_COLUMN,item.nickname)
-        cv.put(PUSH_STATUS_COLUMN,item.push_status)
+        cv.put(STATUS_COLUMN,item.status)
         cv.put(BRANCH_COLUMN,item.branch)
         cv.put(AUTHOR_NAME,item.author_name)
         cv.put(AUTHOR_EMAIL,item.author_email)
@@ -214,7 +214,7 @@ class RemoteGitDAO(context: Context) {
         result.uid = cursor.getString(3)
         result.pwd = cursor.getString(4)
         result.nickname = cursor.getString(5)
-        result.push_status = cursor.getLong(6)
+        result.status = cursor.getLong(6)
         result.branch = cursor.getString(7)
         result.author_name = cursor.getString(8)
         result.author_email = cursor.getString(9)

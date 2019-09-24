@@ -27,6 +27,10 @@
     <string name="main_menu_add">Add</string>
     <string name="main_notes_need_push">(long click to push)</string>
     <string name="main_notes_cloning"> is cloning ...</string>
+    <string name="main_notes_title_modify">Modify Settings</string>
+    <string name="main_notes_not_found">Notes not found!</string>
+    <string name="main_notes_author_name">Name</string>
+    <string name="main_notes_author_email">Email</string>
 
     // FileExplorerActivity
     <string name="create_folder">Create Folder</string>
@@ -48,7 +52,7 @@
     <string name="tv_clone_git_repository">Clone GIT Repository</string>
     <string name="tv_remote_name">Remote Name</string>
     <string name="tv_remote_url">Remote GIT URL</string>
-    <string name="tv_user_name">User Name</string>
+    <string name="tv_user_account">Account</string>
     <string name="tv_git_nick_name">Notes Name</string>
     <string name="tv_password">Password</string>
     <string name="tv_please_wait">Please wait! This may take a moment.</string>

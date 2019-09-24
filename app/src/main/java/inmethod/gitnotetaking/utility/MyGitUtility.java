@@ -50,7 +50,7 @@ public class MyGitUtility {
             bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(aRemoteGit.getUid(), aRemoteGit.getPwd());
             if (!bIsRemoteRepositoryExist) {
                 Log.e(TAG, "check remote url failed");
-                aRemoteGit.setPush_status(GitList.PUSH_FAIL);
+                aRemoteGit.setStatus(GitList.PUSH_FAIL);
                 aRemoteGitDAO.update(aRemoteGit);
                 return false;
             }
@@ -59,12 +59,12 @@ public class MyGitUtility {
                 Log.d(TAG,"try to push \n");
                 if (aGitUtil.push(aRemoteGit.getRemoteName(), aRemoteGit.getUid(), aRemoteGit.getPwd())) {
                     Log.d(TAG,"push finished!");
-                    aRemoteGit.setPush_status(GitList.PUSH_SUCCESS);
+                    aRemoteGit.setStatus(GitList.PUSH_SUCCESS);
                     aRemoteGitDAO.update(aRemoteGit);
                     aRemoteGitDAO.close();
                     return true;
                 } else {
-                    aRemoteGit.setPush_status(GitList.PUSH_FAIL);
+                    aRemoteGit.setStatus(GitList.PUSH_FAIL);
                     aRemoteGitDAO.update(aRemoteGit);
                     Log.d(TAG,"push failed!");
                     aRemoteGitDAO.close();
@@ -93,11 +93,11 @@ public class MyGitUtility {
             String sAuthorEmail = aRemoteGit.getAuthor_email();
             aRemoteGitDAO.close();
             if (aGitUtil.commit(sCommitMessages, sAuthorName, sAuthorEmail)) {
-                aRemoteGit.setPush_status(GitList.PUSH_SUCCESS);
+                aRemoteGit.setStatus(GitList.PUSH_SUCCESS);
                 Log.d(TAG,"commit finished!");
                 return true;
             } else {
-                aRemoteGit.setPush_status(GitList.PUSH_FAIL);
+                aRemoteGit.setStatus(GitList.PUSH_FAIL);
                 Log.d(TAG,"commit failed!");
                 return false;
             }

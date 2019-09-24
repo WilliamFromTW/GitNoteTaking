@@ -16,6 +16,8 @@ public class GitList {
     public static final int PUSH_SUCCESS = 0;
     public static final int PUSH_FAIL = -1;
     public static final int CLONING = -3;
+    public static final int CLONE_FAIL = -5;
+
     private GitList(){
 
     }

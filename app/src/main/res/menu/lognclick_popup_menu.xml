@@ -5,4 +5,7 @@
     <item
         android:id="@+id/Push"
         android:title="@string/title_push"/>
+    <item
+        android:id="@+id/Modify"
+        android:title="@string/main_notes_title_modify"/>
 </menu>

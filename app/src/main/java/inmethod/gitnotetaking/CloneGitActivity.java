@@ -9,7 +9,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -30,7 +29,7 @@ public class CloneGitActivity extends AppCompatActivity {
 
     private String sRemoteName = "";
     private EditText editRemoteURL = null;
-    private EditText editUserName = null;
+    private EditText editUserAccount = null;
     private EditText editUserPassword = null;
     private EditText editNickName = null;
 
@@ -42,7 +41,7 @@ public class CloneGitActivity extends AppCompatActivity {
 
         sRemoteName = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitRemoteName", "origin");
         editRemoteURL = (EditText) findViewById(R.id.editRemoteURL);
-        editUserName = (EditText) findViewById(R.id.editUserName);
+        editUserAccount = (EditText) findViewById(R.id.editUserAccount);
         editUserPassword = (EditText) findViewById(R.id.editUserPassword);
         editNickName = (EditText) findViewById(R.id.editLocalGitName);
         ImageButton aSearchButton = (ImageButton)findViewById(R.id.searchButton);
@@ -72,7 +71,7 @@ public class CloneGitActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (sRemoteName.equals("") || editRemoteURL.getText().toString().equals("") || editUserName.getText().toString().equals("") || editUserPassword.getText().toString().equals("") || editNickName.getText().toString().equals("")) {
+                if (sRemoteName.equals("") || editRemoteURL.getText().toString().equals("") || editUserAccount.getText().toString().equals("") || editUserPassword.getText().toString().equals("") || editNickName.getText().toString().equals("")) {
                     AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
                     MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_remote_git_clone));
                     MyAlertDialog.setMessage(getResources().getString(R.string.tv_all_parametes_must_be_set));
@@ -106,10 +105,10 @@ public class CloneGitActivity extends AppCompatActivity {
                             aValue.setId(0);
                             aValue.setRemoteName(sRemoteName);
                             aValue.setUrl(editRemoteURL.getText().toString());
-                            aValue.setUid(editUserName.getText().toString());
+                            aValue.setUid(editUserAccount.getText().toString());
                             aValue.setPwd(editUserPassword.getText().toString());
                             aValue.setNickname(editNickName.getText().toString());
-                            aValue.setPush_status(GitList.CLONING);
+                            aValue.setStatus(GitList.CLONING);
                             aValue.setAuthor_name(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", "root"));
                             aValue.setAuthor_email(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", "root@your.email.com"));
                             aRemoteGitDAO.insert(aValue);
@@ -124,14 +123,14 @@ public class CloneGitActivity extends AppCompatActivity {
                                         aValue.setId(0);
                                         aValue.setRemoteName(sRemoteName);
                                         aValue.setUrl(editRemoteURL.getText().toString());
-                                        aValue.setUid(editUserName.getText().toString());
+                                        aValue.setUid(editUserAccount.getText().toString());
                                         aValue.setPwd(editUserPassword.getText().toString());
                                         aValue.setNickname(editNickName.getText().toString());
                                         aValue.setAuthor_name(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", "root"));
                                         aValue.setAuthor_email(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", "root@your.email.com"));
                                         RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(MyApplication.getAppContext());
-                                        if (MyGitUtility.cloneGit(MyApplication.getAppContext(), editRemoteURL.getText().toString(), editUserName.getText().toString(), editUserPassword.getText().toString())) {
-                                            aValue.setPush_status(GitList.PUSH_SUCCESS);
+                                        if (MyGitUtility.cloneGit(MyApplication.getAppContext(), editRemoteURL.getText().toString(), editUserAccount.getText().toString(), editUserPassword.getText().toString())) {
+                                            aValue.setStatus(GitList.PUSH_SUCCESS);
                                             if( aRemoteGitDAO.updateByRemoteUrl(aValue) )
                                                 Log.d("CloneGitActivity",aValue.getNickname() +"cloning success");
                                             else
@@ -139,18 +138,19 @@ public class CloneGitActivity extends AppCompatActivity {
 
                                             aRemoteGitDAO.close();
                                         } else {
-                                            aRemoteGitDAO.delete(aValue.getUrl());
+                                            aValue.setStatus(GitList.CLONE_FAIL);
+                                            aRemoteGitDAO.updateByRemoteUrl(aValue);
                                             aRemoteGitDAO.close();
                                         }
-
                                     }
                                 }).start();
 
                             } catch (Exception ee) {
+                                aValue.setStatus(GitList.CLONE_FAIL);
+                                aRemoteGitDAO.updateByRemoteUrl(aValue);
+                                aRemoteGitDAO.close();
                                 ee.printStackTrace();
                             }
-
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

@@ -4,7 +4,7 @@
     <string name="view_file_action_edit">編輯</string>
     <string name="view_file_action_save">存檔</string>
     <string name="GitAuthorName">名字</string>
-    <string name="GitAuthorEmail">郵件</string>
+    <string name="GitAuthorEmail">電子郵件</string>
     <string name="action_create_file">新增檔案</string>
     <string name="action_create_folder">新增目錄</string>
     <string name="action_delete">刪除</string>
@@ -26,6 +26,10 @@
     <string name="main_menu_add">增加</string>
     <string name="main_notes_need_push">(長按與遠端同步)</string>
     <string name="main_notes_cloning"> 同步中 ... </string>
+    <string name="main_notes_title_modify">修改設定</string>
+    <string name="main_notes_not_found">找不到筆記本</string>
+    <string name="main_notes_author_name">名字</string>
+    <string name="main_notes_author_email">電子郵件</string>
 
     // FileExplorerActivity
     <string name="create_folder">新增目錄</string>
@@ -46,7 +50,7 @@
     <string name="tv_clone_git_repository">複製筆記(遠端GIT)</string>
     <string name="tv_remote_name">遠端GIT名稱</string>
     <string name="tv_remote_url">遠端GIT URL</string>
-    <string name="tv_user_name">帳號</string>
+    <string name="tv_user_account">帳號</string>
     <string name="tv_git_nick_name">筆記本名稱</string>
     <string name="tv_password">密碼</string>
     <string name="tv_please_wait">請稍等</string>

@@ -88,12 +88,10 @@ public class MainActivity extends AppCompatActivity {
             Log.v(TAG, "Permission is granted2");
             return true;
         } else {
-
             Log.v(TAG, "Permission is revoked2");
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
             return false;
         }
-
     }
 
     @Override
@@ -191,12 +189,12 @@ public class MainActivity extends AppCompatActivity {
                             adapter.clear();
                             ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(activity);
                             for (final RemoteGit a : aList) {
-                                adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getPush_status()));
+                                adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus()));
                             }
                             return true;
                         } else if (id == R.id.Push) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                            builder.setCancelable(false); // if you want user to wait for some process to finish,
+                            builder.setCancelable(false);
                             builder.setView(R.layout.loading_dialog);
                             final AlertDialog dialog = builder.create();
                             dialog.show();
@@ -209,11 +207,19 @@ public class MainActivity extends AppCompatActivity {
                                     } else {
                                         dialog.dismiss();
                                     }
-
                                 }
                             }).start();
 
 
+                        } else if (id==R.id.Modify){
+                            Intent intent = null;
+                            if( sRemoteUrl.indexOf("local")==-1)
+                                intent = new Intent(MainActivity.this, ModifyRemoteGitActivity.class);
+                            else
+                            intent = new Intent(MainActivity.this, ModifyLocalGitActivity.class);
+                            String sRemoteUrl = ((TextView) aTextView[1]).getText().toString();
+                            intent.putExtra("GIT_REMOTE_URL", sRemoteUrl);
+                            startActivity(intent);
                         }
                         return true;
                     }
@@ -239,7 +245,6 @@ public class MainActivity extends AppCompatActivity {
             };
             MyAlertDialog.setNeutralButton("OK", OkClick);
             MyAlertDialog.show();
-
         }
 
     }
@@ -251,8 +256,8 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(MyApplication.getAppContext());
         boolean bCloning = false;
         for (final RemoteGit a : aList) {
-            adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getPush_status()));
-            if (a.getUrl().indexOf("local") == -1 && a.getPush_status() == GitList.PUSH_SUCCESS) {
+            adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus()));
+            if (a.getUrl().indexOf("local") == -1 && a.getStatus() == GitList.PUSH_SUCCESS) {
                 Log.d(TAG, "try to pull from remote git to local repository");
                 new Thread(new Runnable() {
                     @Override
@@ -261,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }).start();
             }
-            if (a.getPush_status() == GitList.CLONING)
+            if (a.getStatus() == GitList.CLONING)
                 bCloning = true;
 
         }
@@ -271,9 +276,9 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     boolean bCloning = true;
                     // 3 min
-                    for (int i = 0; i < 60; i++) {
+                    for (int i = 0; i < 100; i++) {
                         try {
-                            Thread.sleep(5000);
+                            Thread.sleep(3000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -285,20 +290,31 @@ public class MainActivity extends AppCompatActivity {
                         ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(MyApplication.getAppContext());
                         bCloning = false;
                         for (final RemoteGit a : aList) {
-                            if (a.getPush_status() == GitList.CLONING) bCloning = true;
+                            if (a.getStatus() == GitList.CLONING) bCloning = true;
+                            else if (a.getStatus()==GitList.CLONE_FAIL){
+                                RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
+                                aRemoteGitDAO.delete (a.getUrl());
+                                aRemoteGitDAO.close();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MainActivity.this, a.getNickname() +" " + MyApplication.getAppContext().getResources().getString(R.string.tv_clone_fail), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                break;
+                            }
                         }
                     }
                     if (bCloning) {
                         ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(MyApplication.getAppContext());
                         for (final RemoteGit a : aList) {
-                            if (a.getPush_status() == GitList.CLONING)
+                            if (a.getStatus() == GitList.CLONING)
                                 MyGitUtility.deleteByRemoteUrl(MyApplication.getAppContext(), a.getUrl());
                         }
                     }
                 }
             }).start();
         }
-
     }
 
     @Override

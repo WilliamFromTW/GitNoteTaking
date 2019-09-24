@@ -68,7 +68,7 @@ public class CreateLocalGitActivity extends AppCompatActivity {
                             aValue.setUid("UID");
                             aValue.setPwd("PWD");
                             aValue.setNickname(editLocalGitName.getText().toString());
-                            aValue.setPush_status(GitList.PUSH_SUCCESS);
+                            aValue.setStatus(GitList.PUSH_SUCCESS);
                             aValue.setAuthor_name(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", "root"));
                             aValue.setAuthor_email(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", "root@your.email.com"));
                             aRemoteGitDAO.insert(aValue);
@@ -88,7 +88,7 @@ public class CreateLocalGitActivity extends AppCompatActivity {
                                             aValue.setUid("UID");
                                             aValue.setPwd("PWD");
                                             aValue.setNickname(editLocalGitName.getText().toString());
-                                            aValue.setPush_status(GitList.PUSH_SUCCESS);
+                                            aValue.setStatus(GitList.PUSH_SUCCESS);
                                             aValue.setAuthor_name(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", "root"));
                                             aValue.setAuthor_email(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", "root@your.email.com"));
                                             aRemoteGitDAO.insert(aValue);

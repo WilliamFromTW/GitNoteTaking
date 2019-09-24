@@ -124,6 +124,7 @@ public class ViewFileActivity extends AppCompatActivity {
         super.onStart();
         try {
             disable();
+            editText.setText("");
             layoutAttachment = findViewById(R.id.layoutAttachment);
             layoutAttachment.removeAllViews();
 
