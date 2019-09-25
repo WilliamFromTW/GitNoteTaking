@@ -16,8 +16,10 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.text.InputType;
+import android.text.SpannableString;
 import android.text.method.BaseKeyListener;
 import android.text.method.KeyListener;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -272,6 +274,9 @@ public class ViewFileActivity extends AppCompatActivity {
         } else if (iMode == MODE_EDIT) {
             itemEdit.setVisible(false);
             itemSave.setVisible(true);
+            SpannableString s = new SpannableString(itemSave.getTitle());
+            s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
+            itemSave.setTitle(s);
             return true;
 
         } else return super.onPrepareOptionsMenu(menu);
