@@ -10,6 +10,10 @@
     <string name="action_delete">Delete</string>
     <string name="title_remove">Remove</string>
     <string name="title_push">Push Manually</string>
+    <string name="action_cut">Cut</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_paste">Paste</string>
+    <string name="no_file_or_dir_selected">No file or directory be selected</string>
 
     // Preference
     <string name="GitEditTextSize">Notes Text Size</string>

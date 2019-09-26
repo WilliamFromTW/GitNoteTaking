@@ -289,7 +289,7 @@ public class ViewFileActivity extends AppCompatActivity {
             disable();
             FileWriter fw = null;
             final EditText txtUrl = new EditText(this);
-            txtUrl.setText("commit file(" + file.getName() + ")");
+            txtUrl.setText("modify " + file.getName() );
             if (PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("GitCheckBoxCommitMessage", false)) {
                 new AlertDialog.Builder(this)
                         .setTitle(getResources().getString(R.string.commit))
@@ -362,7 +362,7 @@ public class ViewFileActivity extends AppCompatActivity {
             FileWriter fw = null;
             final EditText txtUrl = new EditText(this);
             //  txtUrl.setHint("your hint");
-            txtUrl.setText("commit file(" + file.getName() + ")");
+            txtUrl.setText("modify " + file.getName() );
             if (PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("GitCheckBoxCommitMessage", false)) {
 
                 new AlertDialog.Builder(this)

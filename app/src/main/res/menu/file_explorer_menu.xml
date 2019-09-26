@@ -18,6 +18,21 @@
         android:orderInCategory="102"
         android:title="@string/action_delete"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_cut"
+        android:orderInCategory="103"
+        android:title="@string/action_cut"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_copy"
+        android:orderInCategory="104"
+        android:title="@string/action_copy"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_paste"
+        android:orderInCategory="105"
+        android:title="@string/action_paste"
+        app:showAsAction="never" />
 
 
 </menu>

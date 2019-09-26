@@ -50,12 +50,12 @@ public class FileExplorerListAdapter extends BaseAdapter {
     public View getView(final int p_position, View p_convertView, ViewGroup p_parent)
     {
         View m_view = null;
-        ViewHolder m_viewHolder = null;
+        FileExplorerViewHolder m_viewHolder = null;
         if (p_convertView == null)
         {
             LayoutInflater m_inflater = LayoutInflater.from(m_context);
             m_view = m_inflater.inflate(R.layout.activity_file_explorer_content, null);
-            m_viewHolder = new ViewHolder();
+            m_viewHolder = new FileExplorerViewHolder();
             m_viewHolder.m_tvFileName = (TextView) m_view.findViewById(R.id.lr_tvFileName);
             m_viewHolder.m_tvDate = (TextView) m_view.findViewById(R.id.lr_tvdate);
             m_viewHolder.m_ivIcon = (ImageView) m_view.findViewById(R.id.lr_ivFileIcon);
@@ -65,7 +65,7 @@ public class FileExplorerListAdapter extends BaseAdapter {
         else
         {
             m_view = p_convertView;
-            m_viewHolder = ((ViewHolder) m_view.getTag());
+            m_viewHolder = ((FileExplorerViewHolder) m_view.getTag());
         }
         if(!m_isRoot && p_position == 0)
         {
@@ -92,13 +92,6 @@ public class FileExplorerListAdapter extends BaseAdapter {
         return m_view;
     }
 
-    class ViewHolder
-    {
-        CheckBox m_cbCheck;
-        ImageView m_ivIcon;
-        TextView m_tvFileName;
-        TextView m_tvDate;
-    }
 
     private int setFileImageType(File m_file)
     {

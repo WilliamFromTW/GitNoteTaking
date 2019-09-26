@@ -253,6 +253,7 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         adapter.clear();
+        MyApplication.resetFiles();
         ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(MyApplication.getAppContext());
         boolean bCloning = false;
         for (final RemoteGit a : aList) {

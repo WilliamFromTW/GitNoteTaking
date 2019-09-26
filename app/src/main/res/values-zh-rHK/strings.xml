@@ -10,6 +10,10 @@
     <string name="action_delete">刪除</string>
     <string name="title_remove">移除</string>
     <string name="title_push">手動同步到遠端</string>
+    <string name="action_cut">剪下</string>
+    <string name="action_copy">複製</string>
+    <string name="action_paste">貼上</string>
+    <string name="no_file_or_dir_selected">沒有選擇檔案或目錄</string>
 
     // Preference
     <string name="GitEditTextSize">筆記字型大小</string>

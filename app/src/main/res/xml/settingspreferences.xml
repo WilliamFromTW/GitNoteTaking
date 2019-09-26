@@ -26,8 +26,8 @@
     <androidx.preference.CheckBoxPreference
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
-        app:defaultValue="true"
-        app:key="GitCheckBox"
+        app:defaultValue="false"
+        app:key="GitCheckBoxCommitMessage"
         app:title="@string/GitCheckBoxCommitMessage"></androidx.preference.CheckBoxPreference>
     <androidx.preference.EditTextPreference
         app:defaultValue="gitnotetaking"
