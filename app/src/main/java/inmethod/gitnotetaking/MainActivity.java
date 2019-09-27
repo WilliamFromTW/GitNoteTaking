@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case 2:
                 Log.d(TAG, "External storage2");
+                if(grantResults.length>0)
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
                     //resume tasks needing this permission
@@ -109,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
             case 3:
                 Log.d(TAG, "External storage1");
+                if(grantResults.length>0)
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
                     //resume tasks needing this permission
