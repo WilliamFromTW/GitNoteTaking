@@ -89,7 +89,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                 List<File> aCutFileList = MyApplication.getStoreFiles();
                 for (File aFile : aCutFileList) {
                     if (aFile.isDirectory()) {
-                        Files.move(aFile.toPath(), new File(m_curDir).toPath());
+                        Files.move(aFile.toPath(), new File(m_curDir + File.separator + aFile.getName()).toPath());
                     } else {
                         Files.move(aFile.toPath(), new File(m_curDir + File.separator + aFile.getName()).toPath());
                     }
