@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.icu.text.SimpleDateFormat;
+import android.icu.util.TimeZone;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -21,19 +23,28 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Environment;
 import android.os.StrictMode;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.util.TimeUtils;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.io.File;
 import java.io.FileDescriptor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import inmethod.gitnotetaking.db.RemoteGit;
@@ -100,22 +111,22 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case 2:
                 Log.d(TAG, "External storage2");
-                if(grantResults.length>0)
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
-                    //resume tasks needing this permission
-                } else {
-                }
+                if (grantResults.length > 0)
+                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
+                        //resume tasks needing this permission
+                    } else {
+                    }
                 break;
 
             case 3:
                 Log.d(TAG, "External storage1");
-                if(grantResults.length>0)
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
-                    //resume tasks needing this permission
-                } else {
-                }
+                if (grantResults.length > 0)
+                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
+                        //resume tasks needing this permission
+                    } else {
+                    }
                 break;
         }
     }
@@ -213,15 +224,55 @@ public class MainActivity extends AppCompatActivity {
                             }).start();
 
 
-                        } else if (id==R.id.Modify){
+                        } else if (id == R.id.Modify) {
                             Intent intent = null;
-                            if( sRemoteUrl.indexOf("local")==-1)
+                            if (sRemoteUrl.indexOf("local") == -1)
                                 intent = new Intent(MainActivity.this, ModifyRemoteGitActivity.class);
                             else
-                            intent = new Intent(MainActivity.this, ModifyLocalGitActivity.class);
+                                intent = new Intent(MainActivity.this, ModifyLocalGitActivity.class);
                             String sRemoteUrl = ((TextView) aTextView[1]).getText().toString();
                             intent.putExtra("GIT_REMOTE_URL", sRemoteUrl);
                             startActivity(intent);
+                        } else if (id == R.id.show_commit_short_log) {
+                            String sNoteName = ((TextView) aTextView[0]).getText().toString();
+                            String sRemoteUrl = ((TextView) aTextView[1]).getText().toString();
+                            AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(activity, android.R.style.Theme_Material_Light_Dialog_NoActionBar_MinWidth);
+                            dialogbuilder.setMessage(sNoteName + "'s Log :");
+                            TextView txtUrl = new TextView(activity);
+                            String sListMessages = "";
+                            txtUrl.setMaxLines(10);
+                            txtUrl.setMovementMethod(new ScrollingMovementMethod());
+                            //    txtUrl.setCompoundDrawablesWithIntrinsicBounds(R.drawable.list24, 0, 0, 0);
+                            int i = 0;
+
+
+                            FrameLayout container = new FrameLayout(activity);
+                            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            params.leftMargin = 20;
+                            params.rightMargin = 20;
+                            txtUrl.setLayoutParams(params);
+                            container.addView(txtUrl);
+
+
+                            for (RevCommit aRev : MyGitUtility.getLocalCommiLogtList(activity, sRemoteUrl)) {
+                                i++;
+
+                                sListMessages = sListMessages + "\n" + getDate(aRev.getCommitTime()) + "\n--\n" + aRev.getFullMessage() + "\n";
+                                if (i == 50) break;
+
+                            }
+                            txtUrl.setText(sListMessages);
+                            dialogbuilder.setView(container).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+
+                                        }
+                                    }).start();
+                                }
+                            });
+                            dialogbuilder.create().show();
                         }
                         return true;
                     }
@@ -294,14 +345,14 @@ public class MainActivity extends AppCompatActivity {
                         bCloning = false;
                         for (final RemoteGit a : aList) {
                             if (a.getStatus() == GitList.CLONING) bCloning = true;
-                            else if (a.getStatus()==GitList.CLONE_FAIL){
+                            else if (a.getStatus() == GitList.CLONE_FAIL) {
                                 RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
-                                aRemoteGitDAO.delete (a.getUrl());
+                                aRemoteGitDAO.delete(a.getUrl());
                                 aRemoteGitDAO.close();
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        Toast.makeText(MainActivity.this, a.getNickname() +" " + MyApplication.getAppContext().getResources().getString(R.string.tv_clone_fail), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(MainActivity.this, a.getNickname() + " " + MyApplication.getAppContext().getResources().getString(R.string.tv_clone_fail), Toast.LENGTH_SHORT).show();
                                     }
                                 });
                                 break;
@@ -344,4 +395,11 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private String getDate(long time) {
+        Date date = new Date(time * 1000L); // *1000 is to convert seconds to milliseconds
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd  HH:mm:ss"); // the format of your date
+        // sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+
+        return sdf.format(date);
+    }
 }

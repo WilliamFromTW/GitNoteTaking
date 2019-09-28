@@ -7,8 +7,11 @@ import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
+import org.eclipse.jgit.revwalk.RevCommit;
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import inmethod.gitnotetaking.db.RemoteGit;
 import inmethod.gitnotetaking.db.RemoteGitDAO;
@@ -122,6 +125,20 @@ public class MyGitUtility {
         return aList;
 
     }
+
+    public static List<RevCommit> getLocalCommiLogtList(Context context, String sRemoteUrl){
+        GitUtil aGitUtil;
+        List<RevCommit> aList = null;
+        try {
+            String sLocalDirectory = getLocalGitDirectory(context,sRemoteUrl);
+            aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
+            aList = aGitUtil.getLocalCommitIdList();
+        }catch (Exception ee){
+            ee.printStackTrace();
+        }
+        return aList;
+    }
+
     public static boolean pull(Context context,String sRemoteUrl) {
         RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(context);
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);

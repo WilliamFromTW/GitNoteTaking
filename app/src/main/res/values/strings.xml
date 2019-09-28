@@ -35,6 +35,7 @@
     <string name="main_notes_not_found">Notes not found!</string>
     <string name="main_notes_author_name">Name</string>
     <string name="main_notes_author_email">Email</string>
+    <string name="main_notes_show_changelog">Show changelog</string>
 
     // FileExplorerActivity
     <string name="create_folder">Create Folder</string>
@@ -47,7 +48,7 @@
     <string name="view_attach_files"> attachment(s). Click to list files</string>
     <string name="view_title_remove_attach">Delete</string>
     <string name="view_remove_attach">Delete attach file</string>
-    <string name="view_file_action_select_file">Add attach file(s)</string>
+    <string name="view_file_action_select_file">Add file</string>
     <string name="dialog_title_modify">Modify</string>
     <string name="dialog_file_name">File Name</string>
     <string name="view_file_delete_attachment_file_commit">delete attachment file : </string>

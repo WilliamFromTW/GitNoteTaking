@@ -191,7 +191,7 @@ public class ViewFileActivity extends AppCompatActivity {
                                 public boolean onLongClick(View view) {
 
 
-                                    final String sFileName ;
+                                    final String sFileName;
                                     try {
                                         sFileName = file.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
                                     } catch (IOException e) {
@@ -210,7 +210,7 @@ public class ViewFileActivity extends AppCompatActivity {
                                                         new Thread(new Runnable() {
                                                             @Override
                                                             public void run() {
-                                                                if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_delete_attachment_file_commit)  +"\n"+sFileName))
+                                                                if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_delete_attachment_file_commit) + "\n" + sFileName))
                                                                     MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
                                                                 else {
 
@@ -289,7 +289,9 @@ public class ViewFileActivity extends AppCompatActivity {
             disable();
             FileWriter fw = null;
             final EditText txtUrl = new EditText(this);
-            txtUrl.setText("modify " + file.getName() );
+            txtUrl.setMaxLines(3);
+            txtUrl.setLines(3);
+            txtUrl.setText("modify " + file.getName());
             if (PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("GitCheckBoxCommitMessage", false)) {
                 new AlertDialog.Builder(this)
                         .setTitle(getResources().getString(R.string.commit))
@@ -300,6 +302,9 @@ public class ViewFileActivity extends AppCompatActivity {
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        iMode = MODE_READ;
+                                        isModify = false;
+                                        disable();
                                         boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
                                         isModify = false;
                                         if (sGitRemoteUrl.indexOf("local") == -1) {
@@ -356,13 +361,12 @@ public class ViewFileActivity extends AppCompatActivity {
             isModify = true;
             return true;
         } else if (id == R.id.view_file_action_save) {
-            iMode = MODE_READ;
-            isModify = false;
-            disable();
             FileWriter fw = null;
             final EditText txtUrl = new EditText(this);
             //  txtUrl.setHint("your hint");
-            txtUrl.setText("modify " + file.getName() );
+            txtUrl.setMaxLines(3);
+            txtUrl.setLines(3);
+            txtUrl.setText("modify " + file.getName());
             if (PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("GitCheckBoxCommitMessage", false)) {
 
                 new AlertDialog.Builder(this)
@@ -374,6 +378,10 @@ public class ViewFileActivity extends AppCompatActivity {
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        iMode = MODE_READ;
+                                        isModify = false;
+                                        disable();
+
                                         boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
                                         if (sGitRemoteUrl.indexOf("local") == -1) {
                                             if (bCommitStatus) {
@@ -454,12 +462,18 @@ public class ViewFileActivity extends AppCompatActivity {
 
                     final EditText txtUrl = new EditText(this);
                     txtUrl.setText(aSelectedFile.getName());
+                    txtUrl.setMaxLines(3);
+                    txtUrl.setLines(3);
                     new AlertDialog.Builder(this)
                             .setTitle(getResources().getString(R.string.dialog_title_modify))
                             .setMessage(getResources().getString(R.string.dialog_file_name))
                             .setView(txtUrl)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
+                                    iMode = MODE_READ;
+                                    isModify = false;
+                                    disable();
+
                                     new Thread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -468,7 +482,7 @@ public class ViewFileActivity extends AppCompatActivity {
                                                 aDestFile = new File(aDestFileDirectory.getCanonicalPath() + File.separator + txtUrl.getText().toString().trim());
                                                 //     Log.d(TAG,"dest file = "+aDestFile.getCanonicalPath());
                                                 final String sDestFileNameString;
-                                                sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(  MyGitUtility.getLocalGitDirectory(activity,sGitRemoteUrl).length()  );
+                                                sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
                                                 Files.copy(aSelectedFile.toPath(), aDestFile.toPath());
                                                 new Thread(new Runnable() {
                                                     @Override
@@ -479,7 +493,7 @@ public class ViewFileActivity extends AppCompatActivity {
                                                             e.printStackTrace();
                                                         }
                                                         boolean bCommit = false;
-                                                        bCommit = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_add_attachment_file_commit) +"\n"+ sDestFileNameString);
+                                                        bCommit = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_add_attachment_file_commit) + "\n" + sDestFileNameString);
                                                         if (sGitRemoteUrl.indexOf("local") == -1 && bCommit)
                                                             MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
 
