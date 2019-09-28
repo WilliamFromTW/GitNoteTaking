@@ -13,6 +13,7 @@
         android:id="@+id/view_file_action_save"
         android:orderInCategory="101"
         android:title="@string/view_file_action_save"
+        android:visible="false"
         app:showAsAction="always" />
     <item
         android:id="@+id/view_file_action_select_file"

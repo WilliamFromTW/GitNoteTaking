@@ -321,6 +321,12 @@ public class FileExplorerActivity extends AppCompatActivity {
                     File m_newPath = new File(m_curDir, m_text);
                     if (m_newPath.exists()) {
                         Log.d(TAG, "file exists!");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MyApplication.getAppContext(),MyApplication.getAppContext().getResources().getText(R.string.file_exists),Toast.LENGTH_SHORT);
+                            }
+                        });
                         return;
                     }
                     try {
@@ -328,6 +334,12 @@ public class FileExplorerActivity extends AppCompatActivity {
                         m_Output.close();
 
                     } catch (FileNotFoundException e) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MyApplication.getAppContext(),MyApplication.getAppContext().getResources().getText(R.string.file_create_failed),Toast.LENGTH_SHORT);
+                            }
+                        });
                         e.printStackTrace();
                     } catch (IOException e) {
                         e.printStackTrace();

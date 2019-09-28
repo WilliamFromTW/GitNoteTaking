@@ -37,7 +37,7 @@
         app:title="@string/GitLocalDirName">
     </androidx.preference.EditTextPreference>
     <androidx.preference.EditTextPreference
-        app:defaultValue="origin"
+        app:defaultValue="master"
         app:key="GitRemoteName"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"

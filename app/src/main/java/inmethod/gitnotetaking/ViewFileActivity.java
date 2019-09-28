@@ -75,9 +75,6 @@ public class ViewFileActivity extends AppCompatActivity {
     private String sGitRemoteUrl;
 
     private File file = null;
-    public static final int MODE_EDIT = 1;
-    public static final int MODE_READ = 0;
-    private int iMode = MODE_READ;
     private MenuItem itemEdit;
     private MenuItem itemSave;
     EditText editText;
@@ -89,8 +86,26 @@ public class ViewFileActivity extends AppCompatActivity {
 
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+    /*Save your data to be restored here
+    Example : outState.putLong("time_state", time); , time is a long variable*/
+        outState.putBoolean("isModify", isModify);
+        outState.putString("editText", editText.getText().toString());
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+       /*When rotation occurs
+        Example : time = savedInstanceState.getLong("time_state", 0); */
+            isModify = savedInstanceState.getBoolean("isModify");
+        } else {
+            isModify = false;
+            //When onCreate is called for the first time
+        }
+
         setContentView(R.layout.activity_view_file_main);
         Intent myIntent = getIntent(); // gets the previously created intent
         sFilePath = myIntent.getStringExtra("FILE_PATH");
@@ -106,27 +121,8 @@ public class ViewFileActivity extends AppCompatActivity {
         editText = findViewById(R.id.editFile);
         editText.setText("");
         listener = editText.getKeyListener();
-    }
 
-
-    private void disable() {
-        editText.setKeyListener(null);
-
-    }
-
-
-    private void enable() {
-        editText.setKeyListener(listener);
-        editText.setFocusableInTouchMode(true);
-        editText.setFocusable(true);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
         try {
-            disable();
-            editText.setText("");
             layoutAttachment = findViewById(R.id.layoutAttachment);
             layoutAttachment.removeAllViews();
 
@@ -135,12 +131,18 @@ public class ViewFileActivity extends AppCompatActivity {
             editText.setTextColor(Color.BLACK);
 
             if (file.exists()) {
-                FileReader fr = new FileReader(file);
-                BufferedReader br = new BufferedReader(fr);
-                while (br.ready()) {
-                    editText.append(br.readLine() + "\n");
+                if (isModify) {
+                    editText.setText(savedInstanceState.getString("editText"));
+                } else {
+                    editText.setText("");
+                    FileReader fr = new FileReader(file);
+                    BufferedReader br = new BufferedReader(fr);
+                    while (br.ready()) {
+                        editText.append(br.readLine() + "\n");
+                    }
+                    fr.close();
+
                 }
-                fr.close();
                 Log.d(TAG, "file = " + file.getCanonicalPath());
                 File attachDirectory = new File(file.getAbsolutePath() + "_attach");
                 if (attachDirectory.isDirectory()) {
@@ -249,6 +251,36 @@ public class ViewFileActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+
+    }
+
+
+    private void disable() {
+        editText.setKeyListener(null);
+        editText.requestFocus();
+        itemEdit.setVisible(true);
+        itemSave.setVisible(false);
+
+
+    }
+
+
+    private void enable() {
+        editText.setKeyListener(listener);
+        editText.setFocusableInTouchMode(true);
+        editText.setFocusable(true);
+        itemEdit.setVisible(false);
+        itemSave.setVisible(true);
+        SpannableString s = new SpannableString(itemSave.getTitle());
+        s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
+        itemSave.setTitle(s);
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
     }
 
     @Override
@@ -264,77 +296,24 @@ public class ViewFileActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        invalidateOptionsMenu();
         itemEdit = menu.findItem(R.id.view_file_action_edit);
         itemSave = menu.findItem(R.id.view_file_action_save);
-        if (iMode == MODE_READ) {
-            itemEdit.setVisible(true);
-            itemSave.setVisible(false);
-            return true;
-        } else if (iMode == MODE_EDIT) {
-            itemEdit.setVisible(false);
-            itemSave.setVisible(true);
-            SpannableString s = new SpannableString(itemSave.getTitle());
-            s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
-            itemSave.setTitle(s);
-            return true;
-
-        } else return super.onPrepareOptionsMenu(menu);
+        if (isModify)
+            enable();
+        else
+            disable();
+        return super.onPrepareOptionsMenu(menu);
 
     }
 
     @Override
     public void onBackPressed() {
         if (isModify) {
-            disable();
             FileWriter fw = null;
             final EditText txtUrl = new EditText(this);
             txtUrl.setMaxLines(3);
             txtUrl.setLines(3);
-            txtUrl.setText("modify " + file.getName());
-            if (PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("GitCheckBoxCommitMessage", false)) {
-                new AlertDialog.Builder(this)
-                        .setTitle(getResources().getString(R.string.commit))
-                        .setMessage(getResources().getString(R.string.commit_messages))
-                        .setView(txtUrl)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        iMode = MODE_READ;
-                                        isModify = false;
-                                        disable();
-                                        boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
-                                        isModify = false;
-                                        if (sGitRemoteUrl.indexOf("local") == -1) {
-                                            if (bCommitStatus) {
-                                                MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
-                                            }
-                                        }
-                                    }
-                                }).start();
-                            }
-                        }).show();
-            } else {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
-                        isModify = false;
-                        if (sGitRemoteUrl.indexOf("local") == -1) {
-                            if (bCommitStatus) {
-                                MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
-                            }
-                        }
-                    }
-                }).start();
-            }
+            txtUrl.setText("");
             try {
                 fw = new FileWriter(new File(sFilePath));
                 BufferedWriter bw = new BufferedWriter(fw);
@@ -343,7 +322,59 @@ public class ViewFileActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else
+
+            if (PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("GitCheckBoxCommitMessage", false)) {
+                new AlertDialog.Builder(this)
+                        .setTitle(getResources().getString(R.string.commit))
+                        .setMessage(getResources().getString(R.string.commit_messages))
+                        .setView(txtUrl)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                isModify = false;
+                                disable();
+                                txtUrl.setText(txtUrl.getText() + "\n" + file.getName() + " modified");
+                                boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
+
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (bCommitStatus) {
+                                            if (sGitRemoteUrl.indexOf("local") == -1) {
+                                                MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+                                            }
+                                        }
+                                    }
+                                }).start();
+                            }
+                        }).show();
+            } else {
+                Log.d(TAG, "onback");
+                txtUrl.setText(txtUrl.getText() + "\n" + file.getName() + " modified");
+                boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
+                isModify = false;
+                disable();
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        if (bCommitStatus) {
+                            if (sGitRemoteUrl.indexOf("local") == -1) {
+                                if (bCommitStatus) {
+                                    MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+                                }
+                            }
+
+                        }
+                    }
+                }).start();
+            }
+        }
             super.onBackPressed();
 
     }
@@ -355,9 +386,8 @@ public class ViewFileActivity extends AppCompatActivity {
             onBackPressed();
             return true;
         } else if (id == R.id.view_file_action_edit) {
-            iMode = MODE_EDIT;
             enable();
-            editText.requestFocus();
+            Log.d(TAG, "asdfdddddd");
             isModify = true;
             return true;
         } else if (id == R.id.view_file_action_save) {
@@ -366,7 +396,15 @@ public class ViewFileActivity extends AppCompatActivity {
             //  txtUrl.setHint("your hint");
             txtUrl.setMaxLines(3);
             txtUrl.setLines(3);
-            txtUrl.setText("modify " + file.getName());
+            try {
+                fw = new FileWriter(new File(sFilePath));
+                BufferedWriter bw = new BufferedWriter(fw);
+                fw.write(editText.getText().toString());
+                fw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             if (PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("GitCheckBoxCommitMessage", false)) {
 
                 new AlertDialog.Builder(this)
@@ -375,16 +413,20 @@ public class ViewFileActivity extends AppCompatActivity {
                         .setView(txtUrl)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+
+                                txtUrl.setText(txtUrl.getText() + "\n" + file.getName() + " modified");
+                                boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
+                                if (bCommitStatus) {
+                                    isModify = false;
+                                    disable();
+                                    Log.d(TAG, "asdf");
+                                }
+
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        iMode = MODE_READ;
-                                        isModify = false;
-                                        disable();
-
-                                        boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
-                                        if (sGitRemoteUrl.indexOf("local") == -1) {
-                                            if (bCommitStatus) {
+                                        if (bCommitStatus) {
+                                            if (sGitRemoteUrl.indexOf("local") == -1) {
                                                 MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
                                             }
                                         }
@@ -392,8 +434,13 @@ public class ViewFileActivity extends AppCompatActivity {
                                 }).start();
                             }
                         }).show();
-            }
-            {
+            } else {
+                txtUrl.setText(txtUrl.getText() + "\n" + file.getName() + " modified");
+                boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
+                if (bCommitStatus) {
+                    isModify = false;
+                    disable();
+                }
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -402,22 +449,13 @@ public class ViewFileActivity extends AppCompatActivity {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
-                        if (sGitRemoteUrl.indexOf("local") == -1) {
-                            if (bCommitStatus) {
+                        if (bCommitStatus) {
+                            if (sGitRemoteUrl.indexOf("local") == -1) {
                                 MyGitUtility.push(activity, sGitRemoteUrl);
                             }
                         }
                     }
                 }).start();
-            }
-            try {
-                fw = new FileWriter(new File(sFilePath));
-                BufferedWriter bw = new BufferedWriter(fw);
-                fw.write(editText.getText().toString());
-                fw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
             return true;
         } else if (id == R.id.view_file_action_select_file) {
@@ -470,7 +508,6 @@ public class ViewFileActivity extends AppCompatActivity {
                             .setView(txtUrl)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    iMode = MODE_READ;
                                     isModify = false;
                                     disable();
 

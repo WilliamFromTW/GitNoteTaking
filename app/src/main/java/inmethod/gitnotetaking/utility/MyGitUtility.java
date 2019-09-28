@@ -31,7 +31,7 @@ public class MyGitUtility {
             try {
                 aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
                 aGitUtil.removeLocalGitRepository();
-
+if(aGitUtil!=null) aGitUtil.close();
                 return true;
             } catch (Exception ee) {
                 ee.printStackTrace();
@@ -55,26 +55,30 @@ public class MyGitUtility {
                 Log.e(TAG, "check remote url failed");
                 aRemoteGit.setStatus(GitList.PUSH_FAIL);
                 aRemoteGitDAO.update(aRemoteGit);
+                if(aGitUtil!=null) aGitUtil.close();
                 return false;
             }
             Log.d(TAG,"Remote repository exists ? " + bIsRemoteRepositoryExist);
             if (bIsRemoteRepositoryExist) {
                 Log.d(TAG,"try to push \n");
-                if (aGitUtil.push(aRemoteGit.getRemoteName(), aRemoteGit.getUid(), aRemoteGit.getPwd())) {
+                if (aGitUtil.push("origin", aRemoteGit.getUid(), aRemoteGit.getPwd())) {
                     Log.d(TAG,"push finished!");
                     aRemoteGit.setStatus(GitList.PUSH_SUCCESS);
                     aRemoteGitDAO.update(aRemoteGit);
                     aRemoteGitDAO.close();
+                    if(aGitUtil!=null) aGitUtil.close();
                     return true;
                 } else {
                     aRemoteGit.setStatus(GitList.PUSH_FAIL);
                     aRemoteGitDAO.update(aRemoteGit);
                     Log.d(TAG,"push failed!");
                     aRemoteGitDAO.close();
+                    if(aGitUtil!=null) aGitUtil.close();
                     return false;
                 }
             }
             aRemoteGitDAO.close();
+            if(aGitUtil!=null) aGitUtil.close();
             return false;
 
         } catch (Exception e) {
@@ -98,10 +102,12 @@ public class MyGitUtility {
             if (aGitUtil.commit(sCommitMessages, sAuthorName, sAuthorEmail)) {
                 aRemoteGit.setStatus(GitList.PUSH_SUCCESS);
                 Log.d(TAG,"commit finished!");
+                if(aGitUtil!=null) aGitUtil.close();
                 return true;
             } else {
                 aRemoteGit.setStatus(GitList.PUSH_FAIL);
                 Log.d(TAG,"commit failed!");
+                if(aGitUtil!=null) aGitUtil.close();
                 return false;
             }
         } catch (Exception e) {
@@ -133,6 +139,7 @@ public class MyGitUtility {
             String sLocalDirectory = getLocalGitDirectory(context,sRemoteUrl);
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
             aList = aGitUtil.getLocalCommitIdList();
+            if(aGitUtil!=null) aGitUtil.close();
         }catch (Exception ee){
             ee.printStackTrace();
         }
@@ -154,19 +161,23 @@ public class MyGitUtility {
             bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(sUserName, sUserPassword);
             if (!bIsRemoteRepositoryExist) {
                 Log.e(TAG, "check remote url failed");
+                if(aGitUtil!=null) aGitUtil.close();
                 return false;
             }
             Log.d(TAG,"Remote repository exists ? " + bIsRemoteRepositoryExist);
             if (bIsRemoteRepositoryExist) {
                 Log.d(TAG,"try to update remote repository if local repository is not exists \n");
-                if (aGitUtil.pull(sUserName, sUserPassword)) {
+                if (aGitUtil.pull( aRemoteGit.getRemoteName(), sUserName, sUserPassword)) {
                     Log.d(TAG,"pull finished!");
+                    if(aGitUtil!=null) aGitUtil.close();
                     return true;
                 } else {
                     Log.d(TAG,"pull failed!");
+                    if(aGitUtil!=null) aGitUtil.close();
                     return false;
                 }
             }
+            if(aGitUtil!=null) aGitUtil.close();
             return false;
 
         } catch (Exception e) {
@@ -176,7 +187,7 @@ public class MyGitUtility {
     }
 
 
-    public static boolean cloneGit(Context context,String sRemoteUrl,String sUserName,String sUserPassword) {
+    public static boolean cloneGit(Context context,String sRemoteUrl,String sRemoteName,String sUserName,String sUserPassword) {
         String sLocalDirectory = getLocalGitDirectory(context,sRemoteUrl);
 
         if (checkLocalGitRepository(context,sRemoteUrl)) {
@@ -189,6 +200,7 @@ public class MyGitUtility {
             bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(sUserName, sUserPassword);
             if (!bIsRemoteRepositoryExist) {
                 Log.e(TAG, "check remote url failed");
+                if(aGitUtil!=null) aGitUtil.close();
                 return false;
             }
             Log.d(TAG,"Remote repository exists ? " + bIsRemoteRepositoryExist);
@@ -196,14 +208,17 @@ public class MyGitUtility {
                 Log.d(TAG,"try to clone remote repository if local repository is not exists \n");
                 if (aGitUtil.clone(sUserName, sUserPassword)) {
                     Log.d(TAG,"clone finished!");
+                    if(aGitUtil!=null) aGitUtil.close();
                     return true;
                 } else {
                     Log.d(TAG,"clone failed!");
+                    if(aGitUtil!=null) aGitUtil.close();
                     return false;
                 }
             } else if (bIsRemoteRepositoryExist && aGitUtil.checkLocalRepository()) {
                 Log.d(TAG,"pull branch = " + aGitUtil.getDefaultBranch() + " , status : "
-                        + aGitUtil.pull(sUserName, sUserPassword));
+                        + aGitUtil.pull( sRemoteName,sUserName, sUserPassword));
+                if(aGitUtil!=null) aGitUtil.close();
                 return true;
             }
             return false;
@@ -216,7 +231,9 @@ public class MyGitUtility {
     public static boolean createLocalGitRepository(Activity activity,String sLocalGitName){
         try {
             GitUtil aGitUtil = new GitUtil( "localhost://local"+File.separator+sLocalGitName+".git", getLocalGitDirectory(activity,"localhost://local"+File.separator+sLocalGitName+".git"));
-            return aGitUtil.createLocalRepository();
+            boolean bReturn = aGitUtil.createLocalRepository();
+            if(aGitUtil!=null) aGitUtil.close();
+            return bReturn;
         } catch (Exception e) {
             e.printStackTrace();
         }

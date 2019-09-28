@@ -74,9 +74,12 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, 1);
             return false;
         }
-
     }
 
+    /**
+     * No need to use any more after  android 4.1
+     * @return
+     */
     public boolean isReadStoragePermissionGranted() {
 
         if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -138,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         isInternetPermissionGranted();
-        isReadStoragePermissionGranted();
+        //isReadStoragePermissionGranted();
         isWriteStoragePermissionGranted();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);

@@ -18,7 +18,7 @@
     // Preference
     <string name="GitEditTextSize">Notes Text Size</string>
     <string name="GitLocalDirName">Local Git root directory(default)</string>
-    <string name="GitRemoteName">Remote GIT Name(default)</string>
+    <string name="GitRemoteName">Remote GIT Branch</string>
     <string name="GitCheckBoxCommitMessage">Show Commit Dialog</string>
 
 
@@ -41,6 +41,8 @@
     <string name="create_folder">Create Folder</string>
     <string name="create_file">Create File</string>
     <string name="select_file_or_directory">Select File or Directory</string>
+    <string name="file_exists">File exists!</string>
+    <string name="file_create_failed">File create failed!</string>
 
     // ViewFileActivity
     <string name="commit">Commit</string>

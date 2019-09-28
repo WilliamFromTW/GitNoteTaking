@@ -31,9 +31,6 @@ public class CreateLocalGitActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_local_git);
         final Activity activity = this;
 
-        sRemoteName = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitRemoteName", "origin");
-        sRemoteURL = "localhost://local";
-        editLocalGitName = (EditText) findViewById(R.id.editLocalGitName);
 
         Button buttonOK = (Button) findViewById(R.id.buttonOK);
 
@@ -41,6 +38,9 @@ public class CreateLocalGitActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                sRemoteName = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitRemoteName", "origin");
+                sRemoteURL = "localhost://local";
+                editLocalGitName = (EditText) findViewById(R.id.editLocalGitName);
                 if (editLocalGitName.getText().toString().equals("")) {
                     AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
                     MyAlertDialog.setTitle(getResources().getString(R.string.tv_title_create_local_git));

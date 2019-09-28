@@ -129,7 +129,7 @@ public class CloneGitActivity extends AppCompatActivity {
                                         aValue.setAuthor_name(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", "root"));
                                         aValue.setAuthor_email(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", "root@your.email.com"));
                                         RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(MyApplication.getAppContext());
-                                        if (MyGitUtility.cloneGit(MyApplication.getAppContext(), editRemoteURL.getText().toString(), editUserAccount.getText().toString(), editUserPassword.getText().toString())) {
+                                        if (MyGitUtility.cloneGit(MyApplication.getAppContext(), editRemoteURL.getText().toString(),sRemoteName, editUserAccount.getText().toString(), editUserPassword.getText().toString())) {
                                             aValue.setStatus(GitList.PUSH_SUCCESS);
                                             if( aRemoteGitDAO.updateByRemoteUrl(aValue) )
                                                 Log.d("CloneGitActivity",aValue.getNickname() +"cloning success");
