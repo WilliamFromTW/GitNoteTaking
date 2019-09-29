@@ -10,9 +10,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.text.InputType;
@@ -36,6 +38,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import androidx.preference.PreferenceManager;
 
 import org.w3c.dom.Text;
@@ -48,10 +51,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import inmethod.gitnotetaking.db.RemoteGit;
@@ -80,6 +86,8 @@ public class ViewFileActivity extends AppCompatActivity {
     EditText editText;
     LinearLayout layoutAttachment;
     public static int READ_REQUEST_CODE = 2;
+    public static final int REQUEST_TAKE_PHOTO = 100;
+    private File photoFile;
     private boolean isModify = false;
     KeyListener listener = null;
     //  TextView tvCountFiles;
@@ -333,7 +341,11 @@ public class ViewFileActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 isModify = false;
                                 disable();
-                                txtUrl.setText(txtUrl.getText() + "\n" + file.getName() + " modified");
+                                if( txtUrl.getText().toString().trim().equals(""))
+                                txtUrl.setText("<" + file.getName() + ">");
+                                else
+                                    txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
+
                                 boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
 
                                 new Thread(new Runnable() {
@@ -350,7 +362,11 @@ public class ViewFileActivity extends AppCompatActivity {
                         }).show();
             } else {
                 Log.d(TAG, "onback");
-                txtUrl.setText(txtUrl.getText() + "\n" + file.getName() + " modified");
+                if( txtUrl.getText().toString().trim().equals(""))
+                    txtUrl.setText("<" + file.getName() + ">");
+                else
+                    txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
+
                 boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
                 isModify = false;
                 disable();
@@ -374,9 +390,27 @@ public class ViewFileActivity extends AppCompatActivity {
                     }
                 }).start();
             }
-        }
-            super.onBackPressed();
+        }else super.onBackPressed();
 
+    }
+
+    String currentPhotoPath;
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        Log.d(TAG, "temp picture = " + storageDir);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 
     @Override
@@ -390,6 +424,28 @@ public class ViewFileActivity extends AppCompatActivity {
             Log.d(TAG, "asdfdddddd");
             isModify = true;
             return true;
+        } else if (id == R.id.view_file_action_camera_picture) {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            // Ensure that there's a camera activity to handle the intent
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                // Create the File where the photo should go
+                photoFile = null;
+                try {
+                    photoFile = createImageFile();
+                } catch (IOException ex) {
+
+                }
+                // Continue only if the File was successfully created
+                if (photoFile != null) {
+                    Uri photoURI = FileProvider.getUriForFile(this,
+                            "inmethod.gitnotetaking.provider",
+                            photoFile);
+                    Log.d(TAG, "photoURI" + photoURI.toString());
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+
+                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                }
+            }
         } else if (id == R.id.view_file_action_save) {
             FileWriter fw = null;
             final EditText txtUrl = new EditText(this);
@@ -413,8 +469,11 @@ public class ViewFileActivity extends AppCompatActivity {
                         .setView(txtUrl)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+                                if( txtUrl.getText().toString().trim().equals(""))
+                                    txtUrl.setText("<" + file.getName() + ">");
+                                else
+                                    txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
 
-                                txtUrl.setText(txtUrl.getText() + "\n" + file.getName() + " modified");
                                 boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
                                 if (bCommitStatus) {
                                     isModify = false;
@@ -435,7 +494,11 @@ public class ViewFileActivity extends AppCompatActivity {
                             }
                         }).show();
             } else {
-                txtUrl.setText(txtUrl.getText() + "\n" + file.getName() + " modified");
+
+                if( txtUrl.getText().toString().trim().equals(""))
+                    txtUrl.setText("<" + file.getName() + ">");
+                else
+                    txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
                 boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
                 if (bCommitStatus) {
                     isModify = false;
@@ -550,20 +613,89 @@ public class ViewFileActivity extends AppCompatActivity {
                             }).show();
 
 
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
-                }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MyApplication.getAppContext(), "Add Failed!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
-
-                try {
-                    Log.d(TAG, "selected file name = " + aSelectedFile.getCanonicalPath());
-
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
 
 
             }
+        } else if (requestCode == REQUEST_TAKE_PHOTO) {
+            try {
+
+                final File aDestFileDirectory = new File(file.getCanonicalPath().toString() + "_attach".trim());
+                //  Log.d(TAG,"aDestFileDirectory file = "+aDestFileDirectory.getCanonicalPath());
+                if (!aDestFileDirectory.isDirectory())
+                    aDestFileDirectory.mkdir();
+                final EditText txtUrl = new EditText(this);
+                txtUrl.setText(photoFile.getName());
+                txtUrl.setMaxLines(3);
+                txtUrl.setLines(3);
+                new AlertDialog.Builder(this)
+                        .setTitle(getResources().getString(R.string.dialog_title_modify))
+                        .setMessage(getResources().getString(R.string.dialog_file_name))
+                        .setView(txtUrl)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                isModify = false;
+                                disable();
+
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        final File aDestFile;
+                                        try {
+                                            aDestFile = new File(aDestFileDirectory.getCanonicalPath() + File.separator + txtUrl.getText().toString().trim());
+                                            //     Log.d(TAG,"dest file = "+aDestFile.getCanonicalPath());
+                                            final String sDestFileNameString;
+                                            sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
+                                            Files.copy(photoFile.toPath(), aDestFile.toPath());
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    try {
+                                                        Thread.sleep(1000);
+                                                    } catch (InterruptedException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    boolean bCommit = false;
+                                                    bCommit = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_add_attachment_file_commit) + "\n" + sDestFileNameString);
+                                                    if (sGitRemoteUrl.indexOf("local") == -1 && bCommit)
+                                                        MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+
+                                                }
+                                            }).start();
+
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                    }
+                                }).start();
+                                finish();
+                                startActivity(getIntent());
+
+                            }
+                        }).show();
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MyApplication.getAppContext(), "Add Failed!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+
         }
     }
 

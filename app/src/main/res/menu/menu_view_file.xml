@@ -16,9 +16,14 @@
         android:visible="false"
         app:showAsAction="always" />
     <item
+        android:id="@+id/view_file_action_camera_picture"
+        android:orderInCategory="102"
+        android:title="@string/view_file_action_camera_picture"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/view_file_action_select_file"
         android:orderInCategory="102"
         android:title="@string/view_file_action_select_file"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
 
 </menu>
