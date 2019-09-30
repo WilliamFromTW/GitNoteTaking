@@ -383,7 +383,7 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     boolean bCloning = true;
                     // 3 min
-                    for (int i = 0; i < 100; i++) {
+                    for (int i = 0; i < 1000; i++) {
                         try {
                             Thread.sleep(3000);
                         } catch (InterruptedException e) {
