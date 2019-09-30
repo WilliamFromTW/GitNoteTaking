@@ -1,8 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <item
-        android:id="@+id/show_commit_short_log"
-        android:title="@string/main_notes_show_changelog"/>
-    <item
         android:id="@+id/Remove"
         android:title="@string/title_remove"/>
     <item
@@ -11,4 +8,11 @@
     <item
         android:id="@+id/Modify"
         android:title="@string/main_notes_title_modify"/>
+    <item
+        android:id="@+id/show_commit_short_log"
+        android:title="@string/main_notes_show_changelog"/>
+    <item
+        android:id="@+id/show_all_remote_branches"
+        android:title="@string/main_notes_show_all_remote_branches"/>
+
 </menu>

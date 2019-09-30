@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Simple Git Note</string>
+    <string name="app_name">GIT Text Note</string>
     <string name="action_settings">Settings</string>
     <string name="view_file_action_edit">Edit</string>
     <string name="view_file_action_save">Save</string>
@@ -31,11 +31,12 @@
     <string name="main_menu_add">Add</string>
     <string name="main_notes_need_push">(long click to push)</string>
     <string name="main_notes_cloning"> is cloning ...</string>
-    <string name="main_notes_title_modify">Modify Settings</string>
+    <string name="main_notes_title_modify">Settings</string>
     <string name="main_notes_not_found">Notes not found!</string>
     <string name="main_notes_author_name">Name</string>
     <string name="main_notes_author_email">Email</string>
     <string name="main_notes_show_changelog">Show changelog</string>
+    <string name="main_notes_show_all_remote_branches">Show remote branch</string>
 
     // FileExplorerActivity
     <string name="create_folder">Create Folder</string>
@@ -60,7 +61,7 @@
     // GitCloneActivity
     // Layout
     <string name="tv_clone_git_repository">Clone GIT Repository</string>
-    <string name="tv_remote_name">Remote Name</string>
+    <string name="tv_remote_name">Branch</string>
     <string name="tv_remote_url">Remote GIT URL</string>
     <string name="tv_user_account">Account</string>
     <string name="tv_git_nick_name">Notes Name</string>

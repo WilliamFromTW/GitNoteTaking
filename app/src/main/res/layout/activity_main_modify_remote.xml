@@ -11,6 +11,28 @@
         android:layout_height="match_parent">
 
         <TextView
+            android:id="@+id/textDefaultBrahch"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center|left"
+            android:text="@string/tv_remote_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textAuthorEmail" />
+
+        <EditText
+            android:id="@+id/editRemoteBranch"
+            android:layout_width="165sp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:inputType="text"
+            android:textSize="14dp"
+            app:layout_constraintStart_toEndOf="@+id/textDefaultBrahch"
+            app:layout_constraintTop_toBottomOf="@+id/editAuthorEmail" />
+
+        <TextView
             android:id="@+id/textAuthorEmail"
             android:layout_width="80dp"
             android:layout_height="40dp"
@@ -62,7 +84,7 @@
             android:layout_marginTop="8dp"
             android:text="OK"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textAuthorEmail" />
+            app:layout_constraintTop_toBottomOf="@+id/textDefaultBrahch" />
 
         <EditText
             android:id="@+id/editUserAccount"

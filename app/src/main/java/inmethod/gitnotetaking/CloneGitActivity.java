@@ -39,7 +39,7 @@ public class CloneGitActivity extends AppCompatActivity {
         setContentView(R.layout.activity_clone_git);
         final Activity activity = this;
 
-        sRemoteName = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitRemoteName", "origin");
+        sRemoteName = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitRemoteName", "master");
         editRemoteURL = (EditText) findViewById(R.id.editRemoteURL);
         editUserAccount = (EditText) findViewById(R.id.editUserAccount);
         editUserPassword = (EditText) findViewById(R.id.editUserPassword);
@@ -104,6 +104,7 @@ public class CloneGitActivity extends AppCompatActivity {
                             aValue = new RemoteGit();
                             aValue.setId(0);
                             aValue.setRemoteName(sRemoteName);
+                            aValue.setBranch(sRemoteName);
                             aValue.setUrl(editRemoteURL.getText().toString());
                             aValue.setUid(editUserAccount.getText().toString());
                             aValue.setPwd(editUserPassword.getText().toString());

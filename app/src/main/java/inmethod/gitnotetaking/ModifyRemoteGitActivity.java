@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import inmethod.gitnotetaking.db.RemoteGit;
 import inmethod.gitnotetaking.db.RemoteGitDAO;
+import inmethod.gitnotetaking.utility.MyGitUtility;
 
 public class ModifyRemoteGitActivity extends AppCompatActivity {
 
@@ -24,6 +26,7 @@ public class ModifyRemoteGitActivity extends AppCompatActivity {
     private EditText editNickName = null;
     private EditText editAuthorName = null;
     private EditText editAuthorEmail = null;
+    private EditText editRemoteBranch = null;
     private Activity activity;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +40,7 @@ public class ModifyRemoteGitActivity extends AppCompatActivity {
         editNickName = (EditText) findViewById(R.id.editLocalGitName);
         editAuthorName = (EditText)findViewById(R.id.editAuthorName);
         editAuthorEmail = (EditText)findViewById(R.id.editAuthorEmail);
+        editRemoteBranch = (EditText)findViewById(R.id.editRemoteBranch);
         ImageButton aSearchButton = (ImageButton)findViewById(R.id.searchButton);
 
         Button buttonOK = (Button) findViewById(R.id.buttonOK);
@@ -68,7 +72,12 @@ public class ModifyRemoteGitActivity extends AppCompatActivity {
                             aValue.setNickname(editNickName.getText().toString());
                             aValue.setAuthor_name(editAuthorName.getText().toString());
                             aValue.setAuthor_email(editAuthorEmail.getText().toString());
+                            aValue.setBranch(editRemoteBranch.getText().toString());
+                            aValue.setRemoteName(editRemoteBranch.getText().toString());
                             aRemoteGitDAO.update(aValue);
+                            aRemoteGitDAO.close();
+boolean bCheck = MyGitUtility.checkout(MyApplication.getAppContext(),sRemoteURL);
+Log.d("adsf","bCheckout="+bCheck);
                         } catch (Exception ex) {
 
                         }
@@ -80,7 +89,7 @@ public class ModifyRemoteGitActivity extends AppCompatActivity {
                             }
                         });
                     }
-                    aRemoteGitDAO.close();
+
                     onBackPressed();
                     finish();
                 }
@@ -102,6 +111,7 @@ public class ModifyRemoteGitActivity extends AppCompatActivity {
                 editNickName.setText(aValue.getNickname());
                 editAuthorName.setText(aValue.getAuthor_name());
                 editAuthorEmail.setText(aValue.getAuthor_email());
+                editRemoteBranch.setText(aValue.getRemoteName());
             } catch (Exception ex) {
 
             }

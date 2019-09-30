@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">簡單文字筆記</string>
+    <string name="app_name">GIT文字筆記</string>
     <string name="action_settings">設定</string>
     <string name="view_file_action_edit">編輯</string>
     <string name="view_file_action_save">儲存</string>
@@ -18,7 +18,7 @@
     // Preference
     <string name="GitEditTextSize">筆記字型大小</string>
     <string name="GitLocalDirName">本地端根目錄(修改後需重新刪除所有筆記本)</string>
-    <string name="GitRemoteName">遠端GIT分支</string>
+    <string name="GitRemoteName">遠端分支名稱</string>
     <string name="GitCheckBoxCommitMessage">是否要求輸入修改理由</string>
 
     // MainActivity
@@ -35,6 +35,7 @@
     <string name="main_notes_author_name">名字</string>
     <string name="main_notes_author_email">電子郵件</string>
     <string name="main_notes_show_changelog">查看修改紀錄</string>
+    <string name="main_notes_show_all_remote_branches">列出遠端分支</string>
 
     // FileExplorerActivity
     <string name="create_folder">新增目錄</string>
@@ -58,7 +59,7 @@
 
     // GitCloneActivity Layout
     <string name="tv_clone_git_repository">複製筆記(遠端GIT)</string>
-    <string name="tv_remote_name">遠端GIT名稱</string>
+    <string name="tv_remote_name">分支名稱</string>
     <string name="tv_remote_url">遠端GIT URL</string>
     <string name="tv_user_account">帳號</string>
     <string name="tv_git_nick_name">筆記本名稱</string>

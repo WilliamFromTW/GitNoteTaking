@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * No need to use any more after  android 4.1
+     *
      * @return
      */
     public boolean isReadStoragePermissionGranted() {
@@ -192,6 +193,9 @@ public class MainActivity extends AppCompatActivity {
                         if (popup.getMenu().getItem(i).getItemId() == R.id.Push) {
                             popup.getMenu().getItem(i).setVisible(false);
                         }
+                        if (popup.getMenu().getItem(i).getItemId() == R.id.show_all_remote_branches) {
+                            popup.getMenu().getItem(i).setVisible(false);
+                        }
                     }
                 }
                 //registering popup with OnMenuItemClickListener
@@ -240,7 +244,6 @@ public class MainActivity extends AppCompatActivity {
                             String sNoteName = ((TextView) aTextView[0]).getText().toString();
                             String sRemoteUrl = ((TextView) aTextView[1]).getText().toString();
                             AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(activity, android.R.style.Theme_Material_Light_Dialog_NoActionBar_MinWidth);
-                            dialogbuilder.setMessage(sNoteName + "'s Log :");
                             TextView txtUrl = new TextView(activity);
                             String sListMessages = "";
                             txtUrl.setMaxLines(10);
@@ -261,6 +264,45 @@ public class MainActivity extends AppCompatActivity {
                                 i++;
 
                                 sListMessages = sListMessages + "\n" + getDate(aRev.getCommitTime()) + "\n--\n" + aRev.getFullMessage() + "\n";
+                                if (i == 50) break;
+
+                            }
+                            txtUrl.setText(sListMessages);
+                            dialogbuilder.setView(container).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+
+                                        }
+                                    }).start();
+                                }
+                            });
+                            dialogbuilder.create().show();
+                        } else if (id == R.id.show_all_remote_branches) {
+                            String sNoteName = ((TextView) aTextView[0]).getText().toString();
+                            String sRemoteUrl = ((TextView) aTextView[1]).getText().toString();
+                            AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(activity, android.R.style.Theme_Material_Light_Dialog_NoActionBar_MinWidth);
+                            TextView txtUrl = new TextView(activity);
+                            String sListMessages = "";
+                            txtUrl.setMaxLines(10);
+                            txtUrl.setMovementMethod(new ScrollingMovementMethod());
+                            //    txtUrl.setCompoundDrawablesWithIntrinsicBounds(R.drawable.list24, 0, 0, 0);
+                            int i = 0;
+
+
+                            FrameLayout container = new FrameLayout(activity);
+                            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            params.leftMargin = 20;
+                            params.rightMargin = 20;
+                            txtUrl.setLayoutParams(params);
+                            container.addView(txtUrl);
+
+                            List<String> aBranchesList = MyGitUtility.fetchGitBranches(activity, sRemoteUrl);
+                            for (String sBranch : aBranchesList) {
+                                i++;
+
+                                sListMessages = sListMessages + "\n" + sBranch;
                                 if (i == 50) break;
 
                             }
@@ -319,7 +361,10 @@ public class MainActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        MyGitUtility.pull(MyApplication.getAppContext(), a.getUrl());
+                        String sBranchName = MyGitUtility.getLocalBranchName(MyApplication.getAppContext(), a.getUrl());
+                        Log.d(TAG, "local branch name = " + sBranchName + ", setting's branch name = " + a.getRemoteName());
+                        if (sBranchName != null && sBranchName.equalsIgnoreCase(a.getRemoteName()))
+                            MyGitUtility.pull(MyApplication.getAppContext(), a.getUrl());
                     }
                 }).start();
             }
