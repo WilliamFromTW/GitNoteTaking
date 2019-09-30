@@ -21,17 +21,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textAuthorEmail" />
 
-        <EditText
-            android:id="@+id/editRemoteBranch"
-            android:layout_width="165sp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:inputType="text"
-            android:textSize="14dp"
-            app:layout_constraintStart_toEndOf="@+id/textDefaultBrahch"
-            app:layout_constraintTop_toBottomOf="@+id/editAuthorEmail" />
-
         <TextView
             android:id="@+id/textAuthorEmail"
             android:layout_width="80dp"
@@ -165,6 +154,15 @@
             android:text="@string/tv_password"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editUserAccount" />
+
+        <Spinner
+            android:id="@+id/spinnerBranch"
+            android:layout_width="240dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toEndOf="@+id/textDefaultBrahch"
+            app:layout_constraintTop_toBottomOf="@+id/editAuthorEmail" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

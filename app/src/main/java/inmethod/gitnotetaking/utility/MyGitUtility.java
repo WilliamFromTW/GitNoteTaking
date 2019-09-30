@@ -178,7 +178,7 @@ public class MyGitUtility {
                 bReturn = aGitUtil.checkout(aRemoteGit.getBranch());
             aGitUtil.close();
         }catch (Exception ee){
-            ee.printStackTrace();
+            Log.d(TAG,ee.getLocalizedMessage());
         }
         return bReturn;
     }

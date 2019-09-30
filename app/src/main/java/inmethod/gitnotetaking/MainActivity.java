@@ -152,6 +152,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
     }
 
 
@@ -209,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
                             adapter.clear();
                             ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(activity);
                             for (final RemoteGit a : aList) {
-                                adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus()));
+                                adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus(),a.getBranch()));
                             }
                             return true;
                         } else if (id == R.id.Push) {
@@ -223,10 +225,13 @@ public class MainActivity extends AppCompatActivity {
                                 public void run() {
                                     if (MyGitUtility.push(MyApplication.getAppContext(), ((TextView) aTextView[1]).getText().toString())) {
                                         ((TextView) aTextView[0]).setTextColor(Color.BLACK);
-                                        dialog.dismiss();
-                                    } else {
-                                        dialog.dismiss();
+                                        adapter.clear();
+                                        ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(activity);
+                                        for (final RemoteGit a : aList) {
+                                            adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus(),a.getBranch()));
+                                        }
                                     }
+                                    dialog.dismiss();
                                 }
                             }).start();
 
@@ -355,7 +360,7 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(MyApplication.getAppContext());
         boolean bCloning = false;
         for (final RemoteGit a : aList) {
-            adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus()));
+            adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus(),a.getBranch()));
             if (a.getUrl().indexOf("local") == -1 && a.getStatus() == GitList.PUSH_SUCCESS) {
                 Log.d(TAG, "try to pull from remote git to local repository");
                 new Thread(new Runnable() {
@@ -385,8 +390,16 @@ public class MainActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                         if (!bCloning) {
-                            finish();
-                            startActivity(getIntent());
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.clear();
+                                    ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(activity);
+                                    for (final RemoteGit a : aList) {
+                                        adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus(),a.getBranch()));
+                                    }
+                                }
+                            });
                             break;
                         }
                         ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(MyApplication.getAppContext());

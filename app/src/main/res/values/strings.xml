@@ -14,6 +14,7 @@
     <string name="action_copy">Copy</string>
     <string name="action_paste">Paste</string>
     <string name="no_file_or_dir_selected">No file or directory be selected</string>
+    <string name="modify_remote_settings_branches_fetched">new branches fetched</string>
 
     // Preference
     <string name="GitEditTextSize">Notes Text Size</string>

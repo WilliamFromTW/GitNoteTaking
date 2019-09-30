@@ -3,16 +3,21 @@ package inmethod.gitnotetaking;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.List;
 
 import inmethod.gitnotetaking.db.RemoteGit;
 import inmethod.gitnotetaking.db.RemoteGitDAO;
@@ -26,22 +31,27 @@ public class ModifyRemoteGitActivity extends AppCompatActivity {
     private EditText editNickName = null;
     private EditText editAuthorName = null;
     private EditText editAuthorEmail = null;
-    private EditText editRemoteBranch = null;
+    private Spinner spinnerRemoteBranch = null;
     private Activity activity;
+    private ArrayAdapter<String> adapter = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_modify_remote);
         activity = this;
         Intent myIntent = getIntent();
-        sRemoteURL =   myIntent.getStringExtra("GIT_REMOTE_URL");
+        sRemoteURL = myIntent.getStringExtra("GIT_REMOTE_URL");
         editUserAccount = (EditText) findViewById(R.id.editUserAccount);
         editUserPassword = (EditText) findViewById(R.id.editUserPassword);
         editNickName = (EditText) findViewById(R.id.editLocalGitName);
-        editAuthorName = (EditText)findViewById(R.id.editAuthorName);
-        editAuthorEmail = (EditText)findViewById(R.id.editAuthorEmail);
-        editRemoteBranch = (EditText)findViewById(R.id.editRemoteBranch);
-        ImageButton aSearchButton = (ImageButton)findViewById(R.id.searchButton);
+        editAuthorName = (EditText) findViewById(R.id.editAuthorName);
+        editAuthorEmail = (EditText) findViewById(R.id.editAuthorEmail);
+        spinnerRemoteBranch = (Spinner) findViewById(R.id.spinnerBranch);
+        String[] items = new String[]{"master"};
+        adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, items);
+        spinnerRemoteBranch.setAdapter(adapter);
+
+        ImageButton aSearchButton = (ImageButton) findViewById(R.id.searchButton);
 
         Button buttonOK = (Button) findViewById(R.id.buttonOK);
 
@@ -60,7 +70,7 @@ public class ModifyRemoteGitActivity extends AppCompatActivity {
                     MyAlertDialog.setNeutralButton("OK", OkClick);
                     MyAlertDialog.show();
                     return;
-                }else{
+                } else {
                     RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
                     RemoteGit aValue = aRemoteGitDAO.getByURL(sRemoteURL);
 
@@ -72,16 +82,16 @@ public class ModifyRemoteGitActivity extends AppCompatActivity {
                             aValue.setNickname(editNickName.getText().toString());
                             aValue.setAuthor_name(editAuthorName.getText().toString());
                             aValue.setAuthor_email(editAuthorEmail.getText().toString());
-                            aValue.setBranch(editRemoteBranch.getText().toString());
-                            aValue.setRemoteName(editRemoteBranch.getText().toString());
+                            aValue.setBranch(spinnerRemoteBranch.getSelectedItem().toString());
+                            aValue.setRemoteName(spinnerRemoteBranch.getSelectedItem().toString());
                             aRemoteGitDAO.update(aValue);
                             aRemoteGitDAO.close();
-boolean bCheck = MyGitUtility.checkout(MyApplication.getAppContext(),sRemoteURL);
-Log.d("adsf","bCheckout="+bCheck);
+                            boolean bCheck = MyGitUtility.checkout(MyApplication.getAppContext(), sRemoteURL);
+                            Log.d("gitnotetaking", "bCheckout=" + bCheck);
                         } catch (Exception ex) {
 
                         }
-                    }else{
+                    } else {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -102,7 +112,8 @@ Log.d("adsf","bCheckout="+bCheck);
         super.onStart();
         RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
         RemoteGit aValue = aRemoteGitDAO.getByURL(sRemoteURL);
-
+        fetchBranches afetchBranches = new fetchBranches();//.execute();
+        afetchBranches.execute();
 
         if (aValue != null) {
             try {
@@ -111,11 +122,11 @@ Log.d("adsf","bCheckout="+bCheck);
                 editNickName.setText(aValue.getNickname());
                 editAuthorName.setText(aValue.getAuthor_name());
                 editAuthorEmail.setText(aValue.getAuthor_email());
-                editRemoteBranch.setText(aValue.getRemoteName());
+              //  editRemoteBranch.setText(aValue.getRemoteName());
             } catch (Exception ex) {
 
             }
-        }else{
+        } else {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -124,5 +135,37 @@ Log.d("adsf","bCheckout="+bCheck);
             });
         }
         aRemoteGitDAO.close();
+    }
+    class fetchBranches extends AsyncTask<Void, Void, Void>{
+        String[] items = new String[]{"master"};
+        int iPosition = 0;
+        boolean bGet = false;
+        @Override
+        protected Void doInBackground(Void... params) {
+          List<String> aRemoteBranchList = MyGitUtility.fetchGitBranches(activity,sRemoteURL);
+          if( aRemoteBranchList.size()>1) {
+              bGet = true;
+              items = new String[aRemoteBranchList.size()];
+              int i = 0;
+              for (String sBranch : aRemoteBranchList) {
+                  if( sBranch.equalsIgnoreCase("master"))
+                      iPosition = i;
+                  items[i] = sBranch;
+                  i++;
+              }
+          }
+          return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            if( bGet) {
+                adapter = new ArrayAdapter(activity, android.R.layout.simple_spinner_dropdown_item, items);
+                spinnerRemoteBranch.setAdapter(adapter);
+                spinnerRemoteBranch.setSelection(iPosition);
+                Toast.makeText(activity,MyApplication.getAppContext().getResources().getText(R.string.modify_remote_settings_branches_fetched),Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }
