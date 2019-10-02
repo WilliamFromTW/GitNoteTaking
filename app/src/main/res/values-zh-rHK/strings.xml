@@ -9,7 +9,8 @@
     <string name="action_create_folder">新增目錄</string>
     <string name="action_delete">刪除</string>
     <string name="title_remove">移除</string>
-    <string name="title_push">手動同步到遠端</string>
+    <string name="title_push">手動同步至遠端</string>
+    <string name="title_pull">手動同步至本地端</string>
     <string name="action_cut">剪下</string>
     <string name="action_copy">複製</string>
     <string name="action_paste">貼上</string>

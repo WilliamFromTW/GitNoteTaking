@@ -167,7 +167,10 @@ public class FileExplorerListAdapter extends BaseAdapter {
             {
                 return R.mipmap.html;
             }
-            else
+            else if(m_filepath.substring(m_lastIndex).equalsIgnoreCase(".apk"))
+            {
+                return R.mipmap.apk;
+            } else
             {
                 return R.mipmap.unknown;
             }

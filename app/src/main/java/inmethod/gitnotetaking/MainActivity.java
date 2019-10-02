@@ -225,11 +225,23 @@ public class MainActivity extends AppCompatActivity {
                                 public void run() {
                                     if (MyGitUtility.push(MyApplication.getAppContext(), ((TextView) aTextView[1]).getText().toString())) {
                                         ((TextView) aTextView[0]).setTextColor(Color.BLACK);
-                                        adapter.clear();
-                                        ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(activity);
-                                        for (final RemoteGit a : aList) {
-                                            adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus(),a.getBranch()));
-                                        }
+                                    }
+                                    dialog.dismiss();
+                                }
+                            }).start();
+
+
+                        } else if (id == R.id.Pull) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                            builder.setCancelable(false);
+                            builder.setView(R.layout.loading_dialog);
+                            final AlertDialog dialog = builder.create();
+                            dialog.show();
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (MyGitUtility.pull(MyApplication.getAppContext(), ((TextView) aTextView[1]).getText().toString())) {
+
                                     }
                                     dialog.dismiss();
                                 }

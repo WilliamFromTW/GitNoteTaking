@@ -253,31 +253,18 @@ public class FileExplorerActivity extends AppCompatActivity {
                 } else {
                     String sFileName = m_isFile.getName().toLowerCase();
                     //Log.d(TAG,"file name = "+ sFileName);
-                    if (sFileName.indexOf(".txt") != -1 ||
-                            sFileName.indexOf(".xml") != -1 ||
-                            sFileName.indexOf(".kt") != -1 ||
-                            sFileName.indexOf(".java") != -1 ||
-                            sFileName.indexOf(".html") != -1 ||
-                            sFileName.indexOf(".py") != -1 ||
-                            sFileName.indexOf(".sql") != -1 ||
-                            sFileName.indexOf(".md") != -1
-                    ) {
+                    if ( MyApplication.isText(sFileName)) {
                         // Toast.makeText(FileExplorerActivity.this, "File Name = "+m_isFile.getAbsoluteFile()+",uri="+Uri.fromFile(m_isFile), Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(FileExplorerActivity.this, ViewFileActivity.class);
                         intent.putExtra("FILE_PATH", m_isFile.getAbsoluteFile().toString());
                         intent.putExtra("GIT_REMOTE_URL", sGitRemoteUrl);
                         startActivity(intent);
-                    } else if (sFileName.indexOf(".png") != -1 ||
-                            sFileName.indexOf(".gif") != -1 ||
-                            sFileName.indexOf(".jpg") != -1 ||
-                            sFileName.indexOf(".jpeg") != -1 ||
-                            sFileName.indexOf(".bmp") != -1
-                    ) {
+                    } else {
                         Uri path = Uri.fromFile(m_isFile);
                         if (m_isFile.exists()) {
                             Intent intent = new Intent();
                             intent.setAction(android.content.Intent.ACTION_VIEW);
-                            //Log.d(TAG, "file type = " + getMimeType(Uri.fromFile(m_isFile), activity));
+                            Log.d(TAG, "file type = " + getMimeType(Uri.fromFile(m_isFile), activity));
                             intent.setDataAndType(path, getMimeType(path, activity));
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             try {
@@ -285,8 +272,6 @@ public class FileExplorerActivity extends AppCompatActivity {
                             } catch (ActivityNotFoundException e) {
                             }
                         }
-                    } else {
-
                     }
                 }
             }
