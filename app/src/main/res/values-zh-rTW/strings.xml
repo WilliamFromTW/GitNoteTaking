@@ -40,11 +40,12 @@
     <string name="main_notes_show_all_remote_branches">列出遠端分支</string>
 
     // FileExplorerActivity
-    <string name="create_folder">新增目錄</string>
-    <string name="create_file">新增檔案</string>
+    <string name="create_folder">建立目錄</string>
+    <string name="create_file">建立檔案</string>
     <string name="select_file_or_directory">必須選擇檔案或目錄</string>
     <string name="file_exists">檔案已存在!</string>
-    <string name="file_create_failed">檔案新增失敗!</string>
+    <string name="file_create_failed">檔案建立失敗!</string>
+    <string name="file_add_external_file">新增檔案</string>
 
     // ViewFileActivity
     <string name="commit">提交</string>

@@ -46,6 +46,7 @@
     <string name="select_file_or_directory">Select File or Directory</string>
     <string name="file_exists">File exists!</string>
     <string name="file_create_failed">File create failed!</string>
+    <string name="file_add_external_file">Add File</string>
 
     // ViewFileActivity
     <string name="commit">Commit</string>
