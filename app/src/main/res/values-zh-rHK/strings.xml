@@ -5,8 +5,8 @@
     <string name="view_file_action_save">儲存</string>
     <string name="GitAuthorName">名字</string>
     <string name="GitAuthorEmail">電子郵件</string>
-    <string name="action_create_file">新增檔案</string>
-    <string name="action_create_folder">新增目錄</string>
+    <string name="action_create_file">建立檔案</string>
+    <string name="action_create_folder">建立目錄</string>
     <string name="action_delete">刪除</string>
     <string name="title_remove">移除</string>
     <string name="title_push">手動同步至遠端</string>

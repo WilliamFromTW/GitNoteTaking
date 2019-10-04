@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import inmethod.gitnotetaking.utility.FileUtility;
 import inmethod.gitnotetaking.utility.MyGitUtility;
 import inmethod.gitnotetaking.view.FileExplorerListAdapter;
 import inmethod.gitnotetaking.view.FileExplorerViewHolder;
@@ -54,6 +55,7 @@ public class FileExplorerActivity extends AppCompatActivity {
     private String sGitName;
     private String sGitRemoteUrl;
     private String m_curDir;
+    public static int READ_REQUEST_CODE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -278,6 +280,12 @@ public class FileExplorerActivity extends AppCompatActivity {
         });
     }
 
+    void addFile(){
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        startActivityForResult(intent, READ_REQUEST_CODE);
+    }
     void createNewFolder(final int p_opt) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final EditText m_edtinput = new EditText(this);
@@ -345,8 +353,87 @@ public class FileExplorerActivity extends AppCompatActivity {
         builder.show();
     }
 
-
     @Override
+    public void onActivityResult(int requestCode, int resultCode,
+                                 Intent resultData) {
+        super.onActivityResult(requestCode, resultCode, resultData);
+
+        if (requestCode == READ_REQUEST_CODE) {
+            Uri uri = null;
+            if (resultData != null) {
+                uri = resultData.getData();
+                Log.d(TAG,"uri = "+uri.getPath()+", real path = "+FileUtility.getPath(activity, uri));
+                final File aSelectedFile = new File(FileUtility.getPathFromUri(activity, uri));
+
+                try {
+
+                    final EditText txtUrl = new EditText(this);
+                    txtUrl.setText(aSelectedFile.getName());
+                    txtUrl.setMaxLines(3);
+                    txtUrl.setLines(3);
+                    new AlertDialog.Builder(this)
+                            .setTitle(getResources().getString(R.string.dialog_title_modify))
+                            .setMessage(getResources().getString(R.string.dialog_file_name))
+                            .setView(txtUrl)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            final File aDestFile;
+                                            try {
+                                                aDestFile = new File(m_curDir,  txtUrl.getText().toString().trim());
+                                                     Log.d(TAG,"dest file = "+aDestFile.getCanonicalPath());
+                                                final String sDestFileNameString;
+                                                sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
+                                                Files.copy(aSelectedFile.toPath(), aDestFile.toPath());
+                                                new Thread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        try {
+                                                            Thread.sleep(1000);
+                                                        } catch (InterruptedException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                        boolean bCommit = false;
+                                                        bCommit = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_add_attachment_file_commit) + "\n" + sDestFileNameString);
+                                                        if (sGitRemoteUrl.indexOf("local") == -1 && bCommit)
+                                                            MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+
+                                                    }
+                                                }).start();
+
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+
+                                        }
+                                    }).start();
+                                    finish();
+                                    startActivity(getIntent());
+
+                                }
+                            }).show();
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MyApplication.getAppContext(), "Add Failed!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+
+
+            }
+        }
+    }
+
+        @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.file_explorer_menu, menu);
         return true;
@@ -358,6 +445,8 @@ public class FileExplorerActivity extends AppCompatActivity {
         if (id == android.R.id.home) {
             onBackPressed();
             return true;
+        } else if (id == R.id.action_add_file) {
+            addFile();
         } else if (id == R.id.action_delete) {
             deleteFile();
         } else if (id == R.id.action_create_folder) {

@@ -3,34 +3,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="inmethod.gitnotetaking.MainActivity">
 
+
+    <item
+        android:id="@+id/action_add_file"
+        android:orderInCategory="100"
+        android:title="@string/file_add_external_file"
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_create_folder"
-        android:orderInCategory="100"
+        android:orderInCategory="101"
         android:title="@string/action_create_folder"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_create_file"
-        android:orderInCategory="101"
+        android:orderInCategory="102"
         android:title="@string/action_create_file"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_delete"
-        android:orderInCategory="102"
+        android:orderInCategory="103"
         android:title="@string/action_delete"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_cut"
-        android:orderInCategory="103"
+        android:orderInCategory="104"
         android:title="@string/action_cut"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_copy"
-        android:orderInCategory="104"
+        android:orderInCategory="105"
         android:title="@string/action_copy"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_paste"
-        android:orderInCategory="105"
+        android:orderInCategory="106"
         android:title="@string/action_paste"
         app:showAsAction="never" />
 
