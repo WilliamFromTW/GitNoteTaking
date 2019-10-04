@@ -44,6 +44,7 @@ public class FileUtility {
             // ExternalStorageProvider
             if (isExternalStorageDocument(uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);
+                Log.d("asdf", "docId=" + docId);
                 final String[] split = docId.split(":");
                 final String type = split[0];
 
@@ -199,8 +200,15 @@ public class FileUtility {
         // don't know any API that can get the root path of that storage based on its id.
         //
         // so no "primary" type, but let the check here for other devices
+        Log.d("asdf", "type=" + type + ",relativePath=" + relativePath);
+
         if ("primary".equalsIgnoreCase(type)) {
             fullPath = Environment.getExternalStorageDirectory() + relativePath;
+            if (fileExists(fullPath)) {
+                return fullPath;
+            }
+        } else if ("home".equalsIgnoreCase(type)) {
+            fullPath = Environment.getExternalStorageDirectory() + File.separator + "Documents" + relativePath;
             if (fileExists(fullPath)) {
                 return fullPath;
             }

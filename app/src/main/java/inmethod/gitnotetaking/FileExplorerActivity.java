@@ -255,7 +255,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                 } else {
                     String sFileName = m_isFile.getName().toLowerCase();
                     //Log.d(TAG,"file name = "+ sFileName);
-                    if ( MyApplication.isText(sFileName)) {
+                    if (MyApplication.isText(sFileName)) {
                         // Toast.makeText(FileExplorerActivity.this, "File Name = "+m_isFile.getAbsoluteFile()+",uri="+Uri.fromFile(m_isFile), Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(FileExplorerActivity.this, ViewFileActivity.class);
                         intent.putExtra("FILE_PATH", m_isFile.getAbsoluteFile().toString());
@@ -280,12 +280,13 @@ public class FileExplorerActivity extends AppCompatActivity {
         });
     }
 
-    void addFile(){
+    void addFile() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
         startActivityForResult(intent, READ_REQUEST_CODE);
     }
+
     void createNewFolder(final int p_opt) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final EditText m_edtinput = new EditText(this);
@@ -317,7 +318,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(MyApplication.getAppContext(),MyApplication.getAppContext().getResources().getText(R.string.file_exists),Toast.LENGTH_SHORT);
+                                Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getResources().getText(R.string.file_exists), Toast.LENGTH_SHORT);
                             }
                         });
                         return;
@@ -330,7 +331,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(MyApplication.getAppContext(),MyApplication.getAppContext().getResources().getText(R.string.file_create_failed),Toast.LENGTH_SHORT);
+                                Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getResources().getText(R.string.file_create_failed), Toast.LENGTH_SHORT);
                             }
                         });
                         e.printStackTrace();
@@ -362,8 +363,8 @@ public class FileExplorerActivity extends AppCompatActivity {
             Uri uri = null;
             if (resultData != null) {
                 uri = resultData.getData();
-                Log.d(TAG,"uri = "+uri.getPath()+", real path = "+FileUtility.getPath(activity, uri));
-                final File aSelectedFile = new File(FileUtility.getPathFromUri(activity, uri));
+                Log.d(TAG, "uri = " + uri.getPath() + ",host = " + uri.getHost() + ", authority = " + uri.getAuthority() + ", real path = " + FileUtility.getPath(activity, uri));
+                final File aSelectedFile = new File(FileUtility.getPath(activity, uri));
 
                 try {
 
@@ -383,8 +384,8 @@ public class FileExplorerActivity extends AppCompatActivity {
                                         public void run() {
                                             final File aDestFile;
                                             try {
-                                                aDestFile = new File(m_curDir,  txtUrl.getText().toString().trim());
-                                                     Log.d(TAG,"dest file = "+aDestFile.getCanonicalPath());
+                                                aDestFile = new File(m_curDir, txtUrl.getText().toString().trim());
+                                                Log.d(TAG, "dest file = " + aDestFile.getCanonicalPath());
                                                 final String sDestFileNameString;
                                                 sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
                                                 Files.copy(aSelectedFile.toPath(), aDestFile.toPath());
@@ -433,7 +434,7 @@ public class FileExplorerActivity extends AppCompatActivity {
         }
     }
 
-        @Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.file_explorer_menu, menu);
         return true;
@@ -463,9 +464,9 @@ public class FileExplorerActivity extends AppCompatActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if(MyGitUtility.commit(MyApplication.getAppContext(),sGitRemoteUrl,"paste files")){
-                                if( MyApplication.isLocal(sGitRemoteUrl))
-                                MyGitUtility.push(MyApplication.getAppContext(),sGitRemoteUrl);
+                            if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, "paste files")) {
+                                if (MyApplication.isLocal(sGitRemoteUrl))
+                                    MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
 
                             }
 
