@@ -7,7 +7,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -30,6 +32,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,6 +59,7 @@ public class FileExplorerActivity extends AppCompatActivity {
     private String sGitRemoteUrl;
     private String m_curDir;
     public static int READ_REQUEST_CODE = 2;
+    private static boolean bFinishCopy=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +73,7 @@ public class FileExplorerActivity extends AppCompatActivity {
         toolbar.setTitle(sGitName);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        m_curDir = sGitRootDir;
     }
 
 
@@ -77,7 +81,7 @@ public class FileExplorerActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         view = (ListView) findViewById(R.id.rl_lvListRoot);
-        getDirFromRoot(sGitRootDir);
+        getDirFromRoot(m_curDir);
     }
 
     @Override
@@ -372,13 +376,14 @@ public class FileExplorerActivity extends AppCompatActivity {
                     txtUrl.setText(aSelectedFile.getName());
                     txtUrl.setMaxLines(3);
                     txtUrl.setLines(3);
+
                     new AlertDialog.Builder(this)
-                            .setTitle(getResources().getString(R.string.dialog_title_modify))
+                            .setTitle(getResources().getString(R.string.dialog_title_add))
                             .setMessage(getResources().getString(R.string.dialog_file_name))
                             .setView(txtUrl)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
-
+                                    bFinishCopy = false;
                                     new Thread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -389,6 +394,8 @@ public class FileExplorerActivity extends AppCompatActivity {
                                                 final String sDestFileNameString;
                                                 sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
                                                 Files.copy(aSelectedFile.toPath(), aDestFile.toPath());
+                                                bFinishCopy = true;
+
                                                 new Thread(new Runnable() {
                                                     @Override
                                                     public void run() {
@@ -405,17 +412,23 @@ public class FileExplorerActivity extends AppCompatActivity {
                                                     }
                                                 }).start();
 
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
+                                            }catch(FileAlreadyExistsException ee){
+
                                             }
+                                            catch (IOException e) {
+                                                e.printStackTrace();
+
+                                            }
+                                            bFinishCopy = true;
 
                                         }
                                     }).start();
-                                    finish();
-                                    startActivity(getIntent());
-
+                                    new MyAsyncTask().execute();
                                 }
-                            }).show();
+                            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                        }
+                    }).show();
 
 
                 } catch (Exception e) {
@@ -499,5 +512,22 @@ public class FileExplorerActivity extends AppCompatActivity {
                     fileExtension.toLowerCase());
         }
         return mimeType;
+    }
+
+    private class MyAsyncTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            // 這裡處理背景工作
+            while (true) {
+                if (bFinishCopy)
+                    break;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            getDirFromRoot(m_curDir);
+        }
     }
 }

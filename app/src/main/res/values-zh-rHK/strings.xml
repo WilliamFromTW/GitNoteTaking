@@ -84,5 +84,5 @@
     <string name="tv_title_create_local_git">建立本地筆記本</string>
     <string name="tv_create_local_git_success">新增成功</string>
     <string name="tv_create_local_git_fail">新增失敗</string>
-
+    <string name="dialog_title_add">新增檔案</string>
 </resources>

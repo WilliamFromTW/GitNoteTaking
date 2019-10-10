@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
                             adapter.clear();
                             ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(activity);
                             for (final RemoteGit a : aList) {
-                                adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus(),a.getBranch()));
+                                adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus(), a.getBranch()));
                             }
                             return true;
                         } else if (id == R.id.Push) {
@@ -339,9 +339,7 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     }
                 });
-
                 popup.show();
-
             }
         });
         String sGitAuthorName = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", null);
@@ -372,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(MyApplication.getAppContext());
         boolean bCloning = false;
         for (final RemoteGit a : aList) {
-            adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus(),a.getBranch()));
+            adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus(), a.getBranch()));
             if (a.getUrl().indexOf("local") == -1 && a.getStatus() == GitList.PUSH_SUCCESS) {
                 Log.d(TAG, "try to pull from remote git to local repository");
                 new Thread(new Runnable() {
@@ -408,7 +406,7 @@ public class MainActivity extends AppCompatActivity {
                                     adapter.clear();
                                     ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(activity);
                                     for (final RemoteGit a : aList) {
-                                        adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus(),a.getBranch()));
+                                        adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus(), a.getBranch()));
                                     }
                                 }
                             });

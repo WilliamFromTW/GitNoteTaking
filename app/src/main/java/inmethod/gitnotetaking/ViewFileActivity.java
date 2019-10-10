@@ -566,7 +566,7 @@ public class ViewFileActivity extends AppCompatActivity {
                     txtUrl.setMaxLines(3);
                     txtUrl.setLines(3);
                     new AlertDialog.Builder(this)
-                            .setTitle(getResources().getString(R.string.dialog_title_modify))
+                            .setTitle(getResources().getString(R.string.dialog_title_add))
                             .setMessage(getResources().getString(R.string.dialog_file_name))
                             .setView(txtUrl)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -610,7 +610,10 @@ public class ViewFileActivity extends AppCompatActivity {
                                     startActivity(getIntent());
 
                                 }
-                            }).show();
+                            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                        }
+                    }).show();
 
 
                 } catch (Exception e) {

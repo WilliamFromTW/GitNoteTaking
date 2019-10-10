@@ -65,7 +65,7 @@ public class MyGitUtility {
         String sLocalDirectory = getLocalGitDirectory(context, sRemoteUrl);
 
         boolean bIsRemoteRepositoryExist = false;
-        GitUtil aGitUtil;
+        GitUtil aGitUtil=null;
         try {
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
             bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(aRemoteGit.getUid(), aRemoteGit.getPwd());
@@ -102,13 +102,14 @@ public class MyGitUtility {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (aGitUtil != null) aGitUtil.close();
         return false;
     }
 
     public static boolean commit(Context context, String sRemoteUrl, String sCommitMessages) {
 
         String sLocalDirectory = getLocalGitDirectory(context, sRemoteUrl);
-        GitUtil aGitUtil;
+        GitUtil aGitUtil=null;
         RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(context);
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
         try {
@@ -131,6 +132,7 @@ public class MyGitUtility {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (aGitUtil != null) aGitUtil.close();
         return false;
     }
 
@@ -139,7 +141,6 @@ public class MyGitUtility {
         boolean sReturn = aRemoteGitDAO.delete(sRemoteUrl);
         aRemoteGitDAO.close();
         return sReturn;
-
     }
 
     public static ArrayList<RemoteGit> getRemoteGitList(Context context) {
