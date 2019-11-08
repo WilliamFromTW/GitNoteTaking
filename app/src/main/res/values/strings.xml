@@ -87,5 +87,7 @@
     <string name="tv_create_local_git_success">Create Local GIT success!</string>
     <string name="tv_create_local_git_fail">Create Local GIT failed!</string>
     <string name="dialog_title_add">Add File</string>
+    <string name="toast_pulling">Pulling Try later</string>
+    <string name="toast_cloning">Cloning Try later</string>
 
 </resources>

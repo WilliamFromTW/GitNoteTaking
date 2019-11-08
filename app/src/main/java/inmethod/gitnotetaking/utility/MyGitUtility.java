@@ -15,12 +15,16 @@ import java.util.List;
 
 import inmethod.gitnotetaking.db.RemoteGit;
 import inmethod.gitnotetaking.db.RemoteGitDAO;
-import inmethod.gitnotetaking.view.GitList;
 import inmethod.jakarta.vcs.GitUtil;
 
 public class MyGitUtility {
 
     public static final String TAG = "GitNoteTaking";
+    public static final int GIT_STATUS_SUCCESS = 0;
+    public static final int GIT_STATUS_FAIL = -1;
+    public static final int GIT_STATUS_CLONING = -3;
+    public static final int GIT_STATUS_PULLING = -4;
+
 
     public static boolean deleteLocalGitRepository(Context context, String sRemoteUrl) {
         String sLocalDirectory = getLocalGitDirectory(context, sRemoteUrl);
@@ -71,7 +75,7 @@ public class MyGitUtility {
             bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(aRemoteGit.getUid(), aRemoteGit.getPwd());
             if (!bIsRemoteRepositoryExist) {
                 Log.e(TAG, "check remote url failed");
-                aRemoteGit.setStatus(GitList.PUSH_FAIL);
+                aRemoteGit.setStatus( MyGitUtility.GIT_STATUS_FAIL);
                 aRemoteGitDAO.update(aRemoteGit);
                 if (aGitUtil != null) aGitUtil.close();
                 return false;
@@ -81,13 +85,13 @@ public class MyGitUtility {
                 Log.d(TAG, "try to push \n");
                 if (aGitUtil.push(sRemoteUrl, aRemoteGit.getUid(), aRemoteGit.getPwd())) {
                     Log.d(TAG, "push finished!");
-                    aRemoteGit.setStatus(GitList.PUSH_SUCCESS);
+                    aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_SUCCESS);
                     aRemoteGitDAO.update(aRemoteGit);
                     aRemoteGitDAO.close();
                     if (aGitUtil != null) aGitUtil.close();
                     return true;
                 } else {
-                    aRemoteGit.setStatus(GitList.PUSH_FAIL);
+                    aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_FAIL);
                     aRemoteGitDAO.update(aRemoteGit);
                     Log.d(TAG, "push failed!");
                     aRemoteGitDAO.close();
@@ -95,6 +99,7 @@ public class MyGitUtility {
                     return false;
                 }
             }
+            if( aRemoteGitDAO!=null)
             aRemoteGitDAO.close();
             if (aGitUtil != null) aGitUtil.close();
             return false;
@@ -119,12 +124,12 @@ public class MyGitUtility {
             String sAuthorEmail = aRemoteGit.getAuthor_email();
             aRemoteGitDAO.close();
             if (aGitUtil.commit(sCommitMessages, sAuthorName, sAuthorEmail)) {
-                aRemoteGit.setStatus(GitList.PUSH_SUCCESS);
+                aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_SUCCESS);
                 Log.d(TAG, "commit finished!");
                 if (aGitUtil != null) aGitUtil.close();
                 return true;
             } else {
-                aRemoteGit.setStatus(GitList.PUSH_FAIL);
+                aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_FAIL);
                 Log.d(TAG, "commit failed!");
                 if (aGitUtil != null) aGitUtil.close();
                 return false;
@@ -148,6 +153,14 @@ public class MyGitUtility {
         ArrayList<RemoteGit> aList = aRemoteGitDAO.getAll();
         aRemoteGitDAO.close();
         return aList;
+
+    }
+
+    public static RemoteGit getRemoteGit(Context context,String sRemoteUrl) {
+        RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(context);
+        RemoteGit aReturn = aRemoteGitDAO.getByURL(sRemoteUrl);
+        aRemoteGitDAO.close();
+        return aReturn;
 
     }
 
@@ -189,7 +202,9 @@ public class MyGitUtility {
         GitUtil aGitUtil;
         try {
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
-            return aGitUtil.getLocalDefaultBranch();
+            String sReturn = aGitUtil.getLocalDefaultBranch();
+            aGitUtil.close();
+            return sReturn;
         }catch(Exception ex){
             ex.printStackTrace();
 
@@ -202,8 +217,9 @@ public class MyGitUtility {
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
         if (aRemoteGit == null) return false;
         String sUserName = aRemoteGit.getUid();
+        aRemoteGit.setStatus(GIT_STATUS_PULLING);
+        aRemoteGitDAO.update(aRemoteGit);
         String sUserPassword = aRemoteGit.getPwd();
-        aRemoteGitDAO.close();
         String sLocalDirectory = getLocalGitDirectory(context, sRemoteUrl);
         boolean bIsRemoteRepositoryExist = false;
         GitUtil aGitUtil;
@@ -211,6 +227,8 @@ public class MyGitUtility {
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
             bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(sUserName, sUserPassword);
             if (!bIsRemoteRepositoryExist) {
+                aRemoteGit.setStatus(GIT_STATUS_FAIL);
+                aRemoteGitDAO.update(aRemoteGit);
                 Log.e(TAG, "check remote url failed");
                 if (aGitUtil != null) aGitUtil.close();
                 return false;
@@ -220,15 +238,23 @@ public class MyGitUtility {
                 Log.d(TAG, "try to update remote repository if local repository is not exists , branch="+aRemoteGit.getRemoteName());
                 if (aGitUtil.pull(aRemoteGit.getRemoteName(), sUserName, sUserPassword)) {
                     Log.d(TAG, "pull finished!");
+                    aRemoteGit.setStatus(GIT_STATUS_SUCCESS);
+                    aRemoteGitDAO.update(aRemoteGit);
                     if (aGitUtil != null) aGitUtil.close();
                     return true;
                 } else {
+                    aRemoteGit.setStatus(GIT_STATUS_FAIL);
+                    aRemoteGitDAO.update(aRemoteGit);
                     Log.d(TAG, "pull failed!");
                     if (aGitUtil != null) aGitUtil.close();
                     return false;
                 }
             }
+            aRemoteGit.setStatus(GIT_STATUS_FAIL);
+            aRemoteGitDAO.update(aRemoteGit);
             if (aGitUtil != null) aGitUtil.close();
+            if( aRemoteGit!=null )
+            aRemoteGitDAO.close();
             return false;
 
         } catch (Exception e) {

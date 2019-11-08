@@ -85,4 +85,7 @@
     <string name="tv_create_local_git_success">新增成功</string>
     <string name="tv_create_local_git_fail">新增失敗</string>
     <string name="dialog_title_add">新增檔案</string>
+    <string name="toast_pulling">同步中,請稍後</string>
+    <string name="toast_cloning">複製中,請稍後</string>
+
 </resources>

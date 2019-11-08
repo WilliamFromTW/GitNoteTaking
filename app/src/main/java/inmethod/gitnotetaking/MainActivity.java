@@ -2,14 +2,11 @@ package inmethod.gitnotetaking;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Application;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
-import android.icu.util.TimeZone;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
@@ -21,27 +18,19 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Environment;
 import android.os.StrictMode;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.util.TimeUtils;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 
-import java.io.File;
-import java.io.FileDescriptor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,7 +41,6 @@ import inmethod.gitnotetaking.db.RemoteGitDAO;
 import inmethod.gitnotetaking.utility.MyGitUtility;
 import inmethod.gitnotetaking.view.GitList;
 import inmethod.gitnotetaking.view.RecyclerAdapterForDevice;
-import inmethod.jakarta.vcs.GitUtil;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -61,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
     private Activity activity = this;
     RecyclerView rv = null;
     RecyclerAdapterForDevice adapter = null;
-    private RemoteGitDAO aRemoteGitDAO = null;
 
     public boolean isInternetPermissionGranted() {
         if (checkSelfPermission(Manifest.permission.INTERNET)
@@ -173,10 +160,28 @@ public class MainActivity extends AppCompatActivity {
                 Object[] aTextView = GitList.getDeviceInfoFromLayoutId(view);
                 String sGitName = ((TextView) aTextView[0]).getText().toString();
                 String sRemoteUrl = ((TextView) aTextView[1]).getText().toString();
-                Intent.putExtra("GIT_ROOT_DIR", MyGitUtility.getLocalGitDirectory(activity, sRemoteUrl));
-                Intent.putExtra("GIT_NAME", sGitName);
-                Intent.putExtra("GIT_REMOTE_URL", sRemoteUrl);
-                startActivity(Intent);
+                RemoteGit aRemoteGit = MyGitUtility.getRemoteGit(activity, sRemoteUrl);
+                if (aRemoteGit.getStatus() == MyGitUtility.GIT_STATUS_PULLING) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(activity, getString(R.string.toast_pulling) , Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else if (aRemoteGit.getStatus() == MyGitUtility.GIT_STATUS_CLONING) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(activity, getString(R.string.toast_cloning), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    Intent.putExtra("GIT_ROOT_DIR", MyGitUtility.getLocalGitDirectory(activity, sRemoteUrl));
+                    Intent.putExtra("GIT_NAME", sGitName);
+                    Intent.putExtra("GIT_REMOTE_URL", sRemoteUrl);
+                    startActivity(Intent);
+
+                }
             }
         });
 
@@ -215,38 +220,58 @@ public class MainActivity extends AppCompatActivity {
                             }
                             return true;
                         } else if (id == R.id.Push) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                            builder.setCancelable(false);
-                            builder.setView(R.layout.loading_dialog);
-                            final AlertDialog dialog = builder.create();
-                            dialog.show();
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (MyGitUtility.push(MyApplication.getAppContext(), ((TextView) aTextView[1]).getText().toString())) {
-                                        ((TextView) aTextView[0]).setTextColor(Color.BLACK);
-                                    }
-                                    dialog.dismiss();
-                                }
-                            }).start();
+                            if (!MyApplication.isNetworkConnected()) {
+                                Log.d(TAG, "no netework ");
 
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(activity, "No Network", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            } else {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                                builder.setCancelable(false);
+                                builder.setView(R.layout.loading_dialog);
+                                final AlertDialog dialog = builder.create();
+                                dialog.show();
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (MyGitUtility.push(MyApplication.getAppContext(), ((TextView) aTextView[1]).getText().toString())) {
+                                            ((TextView) aTextView[0]).setTextColor(Color.BLACK);
+                                        }
+                                        dialog.dismiss();
+                                    }
+                                }).start();
+                            }
 
                         } else if (id == R.id.Pull) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                            builder.setCancelable(false);
-                            builder.setView(R.layout.loading_dialog);
-                            final AlertDialog dialog = builder.create();
-                            dialog.show();
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (MyGitUtility.pull(MyApplication.getAppContext(), ((TextView) aTextView[1]).getText().toString())) {
+                            if (!MyApplication.isNetworkConnected()) {
+                                Log.d(TAG, "no netework ");
 
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(activity, "No Network", Toast.LENGTH_SHORT).show();
                                     }
-                                    dialog.dismiss();
-                                }
-                            }).start();
+                                });
+                            } else {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                                builder.setCancelable(false);
+                                builder.setView(R.layout.loading_dialog);
+                                final AlertDialog dialog = builder.create();
+                                dialog.show();
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (MyGitUtility.pull(MyApplication.getAppContext(), ((TextView) aTextView[1]).getText().toString())) {
 
+                                        }
+                                        dialog.dismiss();
+                                    }
+                                }).start();
+                            }
 
                         } else if (id == R.id.Modify) {
                             Intent intent = null;
@@ -371,19 +396,20 @@ public class MainActivity extends AppCompatActivity {
         boolean bCloning = false;
         for (final RemoteGit a : aList) {
             adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus(), a.getBranch()));
-            if (a.getUrl().indexOf("local") == -1 && a.getStatus() == GitList.PUSH_SUCCESS) {
+            if (a.getUrl().indexOf("local") == -1 && a.getStatus() != MyGitUtility.GIT_STATUS_CLONING) {
                 Log.d(TAG, "try to pull from remote git to local repository");
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         String sBranchName = MyGitUtility.getLocalBranchName(MyApplication.getAppContext(), a.getUrl());
-                        Log.d(TAG, "local branch name = " + sBranchName + ", setting's branch name = " + a.getRemoteName());
+                        Log.d(TAG, "remote url = " + a.getUrl() +",local branch name = " + sBranchName + ", setting's branch name = " + a.getRemoteName());
                         if (sBranchName != null && sBranchName.equalsIgnoreCase(a.getRemoteName()))
-                            MyGitUtility.pull(MyApplication.getAppContext(), a.getUrl());
+                            if (MyApplication.isNetworkConnected())
+                                MyGitUtility.pull(MyApplication.getAppContext(), a.getUrl());
                     }
                 }).start();
             }
-            if (a.getStatus() == GitList.CLONING)
+            if (a.getStatus() == MyGitUtility.GIT_STATUS_CLONING)
                 bCloning = true;
 
         }
@@ -415,8 +441,8 @@ public class MainActivity extends AppCompatActivity {
                         ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(MyApplication.getAppContext());
                         bCloning = false;
                         for (final RemoteGit a : aList) {
-                            if (a.getStatus() == GitList.CLONING) bCloning = true;
-                            else if (a.getStatus() == GitList.CLONE_FAIL) {
+                            if (a.getStatus() == MyGitUtility.GIT_STATUS_CLONING) bCloning = true;
+                            else if (a.getStatus() == MyGitUtility.GIT_STATUS_FAIL) {
                                 RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
                                 aRemoteGitDAO.delete(a.getUrl());
                                 aRemoteGitDAO.close();
@@ -433,7 +459,7 @@ public class MainActivity extends AppCompatActivity {
                     if (bCloning) {
                         ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(MyApplication.getAppContext());
                         for (final RemoteGit a : aList) {
-                            if (a.getStatus() == GitList.CLONING)
+                            if (a.getStatus() == MyGitUtility.GIT_STATUS_CLONING)
                                 MyGitUtility.deleteByRemoteUrl(MyApplication.getAppContext(), a.getUrl());
                         }
                     }

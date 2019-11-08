@@ -1,27 +1,22 @@
 package inmethod.gitnotetaking.view;
 
-import android.app.Application;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.TextView;
 
 import inmethod.gitnotetaking.MyApplication;
 import inmethod.gitnotetaking.R;
+import inmethod.gitnotetaking.utility.MyGitUtility;
 
 public class GitList {
 
     private String sRemoteUrl = null;
     private String sGitName = null;
-    private int iPushStatus = PUSH_SUCCESS;
+    private int iPushStatus = MyGitUtility.GIT_STATUS_SUCCESS;
     private String sBranch = BRANCH_MASTER;
     public static final String BRANCH_MASTER = "master";
-    public static final int PUSH_SUCCESS = 0;
-    public static final int PUSH_FAIL = -1;
-    public static final int CLONING = -3;
-    public static final int CLONE_FAIL = -5;
 
     private GitList() {
-
     }
 
     public GitList(String sGitName, String sRemoteUrl, int iPushStatus, String sBranch) {
@@ -68,13 +63,13 @@ public class GitList {
         TextView layout0 = ((TextView) layoutData[0]);
 
         if (aGitList.getRemoteUrl().indexOf("local") == -1) {
-            if (aGitList.getPushStatus() == PUSH_FAIL) {
+            if (aGitList.getPushStatus() ==  MyGitUtility.GIT_STATUS_FAIL) {
                 layout0.setTextColor(Color.RED);
                 if (!aGitList.getBranch().equalsIgnoreCase(BRANCH_MASTER))
                     layout0.setText( "[" + aGitList.getBranch() + "] "+aGitList.getGitName() + MyApplication.getAppContext().getResources().getString(R.string.main_notes_need_push) );
                 else
                     layout0.setText(aGitList.getGitName() + MyApplication.getAppContext().getResources().getString(R.string.main_notes_need_push));
-            } else if (aGitList.getPushStatus() == CLONING) {
+            } else if (aGitList.getPushStatus() ==  MyGitUtility.GIT_STATUS_CLONING) {
                 layout0.setTextColor(Color.RED);
                 layout0.setText(aGitList.getGitName() + " " + MyApplication.getAppContext().getResources().getString(R.string.main_notes_cloning));
             } else {

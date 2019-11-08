@@ -23,7 +23,6 @@ import java.io.File;
 import inmethod.gitnotetaking.db.RemoteGit;
 import inmethod.gitnotetaking.db.RemoteGitDAO;
 import inmethod.gitnotetaking.utility.MyGitUtility;
-import inmethod.gitnotetaking.view.GitList;
 
 public class CloneGitActivity extends AppCompatActivity {
 
@@ -84,9 +83,7 @@ public class CloneGitActivity extends AppCompatActivity {
                     return;
                 }
 
-                RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
-                RemoteGit aValue = aRemoteGitDAO.getByURL(editRemoteURL.getText().toString());
-
+                RemoteGit aValue = MyGitUtility.getRemoteGit(activity,editRemoteURL.getText().toString());
 
                 if (aValue == null) {
                     try {
@@ -109,9 +106,10 @@ public class CloneGitActivity extends AppCompatActivity {
                             aValue.setUid(editUserAccount.getText().toString());
                             aValue.setPwd(editUserPassword.getText().toString());
                             aValue.setNickname(editNickName.getText().toString());
-                            aValue.setStatus(GitList.CLONING);
+                            aValue.setStatus(MyGitUtility.GIT_STATUS_CLONING);
                             aValue.setAuthor_name(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", "root"));
                             aValue.setAuthor_email(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", "root@your.email.com"));
+                            RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(MyApplication.getAppContext());
                             aRemoteGitDAO.insert(aValue);
                             aRemoteGitDAO.close();
                             dialog.dismiss();
@@ -131,7 +129,7 @@ public class CloneGitActivity extends AppCompatActivity {
                                         aValue.setAuthor_email(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", "root@your.email.com"));
                                         RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(MyApplication.getAppContext());
                                         if (MyGitUtility.cloneGit(MyApplication.getAppContext(), editRemoteURL.getText().toString(),sRemoteName, editUserAccount.getText().toString(), editUserPassword.getText().toString())) {
-                                            aValue.setStatus(GitList.PUSH_SUCCESS);
+                                            aValue.setStatus(MyGitUtility.GIT_STATUS_SUCCESS);
                                             if( aRemoteGitDAO.updateByRemoteUrl(aValue) )
                                                 Log.d("CloneGitActivity",aValue.getNickname() +"cloning success");
                                             else
@@ -139,7 +137,7 @@ public class CloneGitActivity extends AppCompatActivity {
 
                                             aRemoteGitDAO.close();
                                         } else {
-                                            aValue.setStatus(GitList.CLONE_FAIL);
+                                            aValue.setStatus(MyGitUtility.GIT_STATUS_FAIL);
                                             aRemoteGitDAO.updateByRemoteUrl(aValue);
                                             aRemoteGitDAO.close();
                                         }
@@ -147,7 +145,7 @@ public class CloneGitActivity extends AppCompatActivity {
                                 }).start();
 
                             } catch (Exception ee) {
-                                aValue.setStatus(GitList.CLONE_FAIL);
+                                aValue.setStatus(MyGitUtility.GIT_STATUS_FAIL);
                                 aRemoteGitDAO.updateByRemoteUrl(aValue);
                                 aRemoteGitDAO.close();
                                 ee.printStackTrace();

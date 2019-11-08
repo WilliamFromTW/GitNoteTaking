@@ -17,7 +17,6 @@ import java.io.File;
 import inmethod.gitnotetaking.db.RemoteGit;
 import inmethod.gitnotetaking.db.RemoteGitDAO;
 import inmethod.gitnotetaking.utility.MyGitUtility;
-import inmethod.gitnotetaking.view.GitList;
 
 public class CreateLocalGitActivity extends AppCompatActivity {
 
@@ -68,7 +67,7 @@ public class CreateLocalGitActivity extends AppCompatActivity {
                             aValue.setUid("UID");
                             aValue.setPwd("PWD");
                             aValue.setNickname(editLocalGitName.getText().toString());
-                            aValue.setStatus(GitList.PUSH_SUCCESS);
+                            aValue.setStatus(MyGitUtility.GIT_STATUS_SUCCESS);
                             aValue.setAuthor_name(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", "root"));
                             aValue.setAuthor_email(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", "root@your.email.com"));
                             aRemoteGitDAO.insert(aValue);
@@ -88,7 +87,7 @@ public class CreateLocalGitActivity extends AppCompatActivity {
                                             aValue.setUid("UID");
                                             aValue.setPwd("PWD");
                                             aValue.setNickname(editLocalGitName.getText().toString());
-                                            aValue.setStatus(GitList.PUSH_SUCCESS);
+                                            aValue.setStatus(MyGitUtility.GIT_STATUS_SUCCESS);
                                             aValue.setAuthor_name(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorName", "root"));
                                             aValue.setAuthor_email(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitAuthorEmail", "root@your.email.com"));
                                             aRemoteGitDAO.insert(aValue);
