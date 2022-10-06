@@ -30,7 +30,6 @@ public class MyGitUtility {
         String sLocalDirectory = getLocalGitDirectory(context, sRemoteUrl);
         //   Log.d(TAG, "check local repository, status = " + checkLocalGitRepository(sRemoteUrl));
         if (checkLocalGitRepository(context, sRemoteUrl)) {
-
             GitUtil aGitUtil;
             try {
                 aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
@@ -67,7 +66,6 @@ public class MyGitUtility {
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
         if (aRemoteGit == null) return false;
         String sLocalDirectory = getLocalGitDirectory(context, sRemoteUrl);
-
         boolean bIsRemoteRepositoryExist = false;
         GitUtil aGitUtil=null;
         try {
@@ -119,7 +117,6 @@ public class MyGitUtility {
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
         try {
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
-
             String sAuthorName = aRemoteGit.getAuthor_name();
             String sAuthorEmail = aRemoteGit.getAuthor_email();
             aRemoteGitDAO.close();
@@ -153,7 +150,6 @@ public class MyGitUtility {
         ArrayList<RemoteGit> aList = aRemoteGitDAO.getAll();
         aRemoteGitDAO.close();
         return aList;
-
     }
 
     public static RemoteGit getRemoteGit(Context context,String sRemoteUrl) {
@@ -161,7 +157,6 @@ public class MyGitUtility {
         RemoteGit aReturn = aRemoteGitDAO.getByURL(sRemoteUrl);
         aRemoteGitDAO.close();
         return aReturn;
-
     }
 
     public static List<RevCommit> getLocalCommiLogtList(Context context, String sRemoteUrl) {
@@ -177,6 +172,7 @@ public class MyGitUtility {
         }
         return aList;
     }
+
     public static boolean checkout(Context context,String sRemoteUrl){
         RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(context);
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
@@ -207,7 +203,6 @@ public class MyGitUtility {
             return sReturn;
         }catch(Exception ex){
             ex.printStackTrace();
-
         }
         return null;
     }
