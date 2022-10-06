@@ -327,7 +327,7 @@ public class MyGitUtility {
 
 
     public static String getLocalGitDirectory(Context context, String sRemoteUrl) {
-        return Environment.getExternalStorageDirectory() +
+        return context.getExternalFilesDir("")+
                 File.separator + PreferenceManager.getDefaultSharedPreferences(context).getString("GitLocalDirName", "gitnotetaking") + File.separator + getLocalGitDir(sRemoteUrl);
     }
 

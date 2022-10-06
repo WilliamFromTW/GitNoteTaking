@@ -49,7 +49,14 @@ public class CreateLocalGitActivity extends AppCompatActivity {
                         }
                     };
                     MyAlertDialog.setNeutralButton("OK", OkClick);
-                    MyAlertDialog.show();
+                    runOnUiThread(new Runnable() {
+                                      @Override
+                                      public void run() {
+                                          MyAlertDialog.show();
+                                      }
+
+                                  }
+                    );
                     return;
                 }
 
@@ -107,7 +114,16 @@ public class CreateLocalGitActivity extends AppCompatActivity {
                                                 }
                                             };
                                             MyAlertDialog.setNeutralButton("OK", OkClick);
-                                            MyAlertDialog.show();
+
+                                            runOnUiThread(new Runnable() {
+                                                              @Override
+                                                              public void run() {
+                                                                  MyAlertDialog.show();
+                                                              }
+
+                                                          }
+                                            );
+
                                             Looper.loop();
                                         } else {
 
@@ -120,7 +136,15 @@ public class CreateLocalGitActivity extends AppCompatActivity {
                                                 }
                                             };
                                             MyAlertDialog.setNeutralButton("OK", OkClick);
-                                            MyAlertDialog.show();
+
+                                            runOnUiThread(new Runnable() {
+                                                              @Override
+                                                              public void run() {
+                                                                  MyAlertDialog.show();
+                                                              }
+
+                                                          }
+                                            );
                                             Looper.loop();
                                         }
                                     }
@@ -144,7 +168,14 @@ public class CreateLocalGitActivity extends AppCompatActivity {
                         }
                     };
                     MyAlertDialog.setNeutralButton("OK", OkClick);
-                    MyAlertDialog.show();
+                    runOnUiThread(new Runnable() {
+                                      @Override
+                                      public void run() {
+                                          MyAlertDialog.show();
+                                      }
+
+                                  }
+                    );
                 }
               //  Log.d("asdf", "count=" + aRemoteGitDAO.getCount());
             }
