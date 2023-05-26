@@ -278,7 +278,7 @@ public class MyGitUtility {
             Log.d(TAG, "Remote repository exists ? " + bIsRemoteRepositoryExist);
             if (bIsRemoteRepositoryExist) {
                 Log.d(TAG, "try to clone remote repository if local repository is not exists \n");
-                if (aGitUtil.clone(sUserName, sUserPassword)) {
+                if (aGitUtil.clone(sUserName, sUserPassword,1)) {
                     Log.d(TAG, "clone finished!");
                     if (aGitUtil != null) aGitUtil.close();
                     return true;

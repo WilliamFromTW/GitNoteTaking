@@ -5,10 +5,10 @@ android {
     compileSdkVersion 33
     defaultConfig {
         applicationId "inmethod.gitnotetaking"
-        minSdkVersion 26
+        minSdkVersion 33
         targetSdkVersion 33
-        versionCode 33
-        versionName "2.29"
+        versionCode 34
+        versionName "3.00"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -28,6 +28,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation files('libs/InMethodJakarta-3.2b2-20221007.jar')
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.material:material:1.6.1'

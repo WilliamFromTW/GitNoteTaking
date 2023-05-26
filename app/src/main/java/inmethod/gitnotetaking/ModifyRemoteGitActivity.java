@@ -51,7 +51,7 @@ public class ModifyRemoteGitActivity extends AppCompatActivity {
         adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, items);
         spinnerRemoteBranch.setAdapter(adapter);
 
-        ImageButton aSearchButton = (ImageButton) findViewById(R.id.searchButton);
+
 
         Button buttonOK = (Button) findViewById(R.id.buttonOK);
 
