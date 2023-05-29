@@ -15,4 +15,4 @@ https://github.com/WilliamFromTW/test.git
 這個連結加上登入資訊, 就可以使用將git倉庫同步到APP使用
 
 ## 3rd party library
-https://www.eclipse.org/jgit version 4.5.7
+https://www.eclipse.org/jgit version 6.3.0
