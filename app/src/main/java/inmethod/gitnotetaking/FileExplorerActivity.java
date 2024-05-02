@@ -1,5 +1,6 @@
 package inmethod.gitnotetaking;
 
+
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
 
 import org.eclipse.jgit.util.FileUtils;
 
@@ -270,12 +272,18 @@ public class FileExplorerActivity extends AppCompatActivity {
                         if (m_isFile.exists()) {
                             Intent intent = new Intent();
                             intent.setAction(android.content.Intent.ACTION_VIEW);
-                            Log.d(TAG, "file type = " + getMimeType(Uri.fromFile(m_isFile), activity));
-                            intent.setDataAndType(path, getMimeType(path, activity));
+                            Log.d(TAG, "file type = " + getMimeType(Uri.fromFile(m_isFile), activity)+", uri="+path.getPath());
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.setFlags (Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                            String authority = activity.getPackageName()+".fileprovider";
+                            Uri uri = FileProvider.getUriForFile(activity,authority,m_isFile);
+                            intent.setDataAndType(uri, getMimeType(path, activity));
+
                             try {
                                 startActivity(intent);
                             } catch (ActivityNotFoundException e) {
+                                e.printStackTrace();
                             }
                         }
                     }

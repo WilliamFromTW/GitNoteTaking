@@ -35,13 +35,13 @@ public class FileUtility {
      */
     @SuppressLint("NewApi")
     public static String getPath(final Context context, final Uri uri) {
-        // check here to KITKAT or new version
-        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
         String selection = null;
         String[] selectionArgs = null;
         // DocumentProvider
-        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+        if ( DocumentsContract.isDocumentUri(context, uri)) {
             // ExternalStorageProvider
+            Log.d("ddd","uri path="+uri.getPath());
+
             if (isExternalStorageDocument(uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);
                 Log.d("asdf", "docId=" + docId);
@@ -58,7 +58,7 @@ public class FileUtility {
 
             // DownloadsProvider
             else if (isDownloadsDocument(uri)) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
                     final String id;
                     Cursor cursor = null;
                     try {
@@ -97,26 +97,10 @@ public class FileUtility {
 
                     }
 
-                } else {
-                    final String id = DocumentsContract.getDocumentId(uri);
-                    final boolean isOreo = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
-                    if (id.startsWith("raw:")) {
-                        return id.replaceFirst("raw:", "");
-                    }
-                    try {
-                        contentUri = ContentUris.withAppendedId(
-                                Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
-
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                    }
-                    if (contentUri != null) {
-                        return getDataColumn(context, contentUri, null, null);
-                    }
                 }
 
 
-            }
+
             // MediaProvider
             else if (isMediaDocument(uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -50,6 +52,17 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView rv = null;
     RecyclerAdapterForDevice adapter = null;
 
+    int REQUEST_CODE_PERMISSIONS = 123;
+
+    String [] _app_permissions = {
+            Manifest.permission.READ_MEDIA_VIDEO,
+            Manifest.permission.READ_MEDIA_IMAGES,
+            Manifest.permission.CAMERA,
+            Manifest.permission.INTERNET,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+    };
+
     public boolean isInternetPermissionGranted() {
         if (checkSelfPermission(Manifest.permission.INTERNET)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -82,7 +95,83 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+    private void requestPermission()
+    {
+        List<String> listPermissionNeed = new ArrayList<String>();
+        for(String per : _app_permissions)
+        {
 
+            if (ContextCompat.checkSelfPermission(this, per) != PackageManager.PERMISSION_GRANTED)
+            {
+                listPermissionNeed.add(per);
+            }
+        }
+
+        if (listPermissionNeed.size()>0)
+        {
+            String [] pers = listPermissionNeed.toArray(new String[0]);
+            if(ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, Manifest.permission.READ_MEDIA_VIDEO)) {
+            }else  if(ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, Manifest.permission.READ_MEDIA_IMAGES)) {
+            }else  if(ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, Manifest.permission.CAMERA)) {
+            }else  if(ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, Manifest.permission.INTERNET)) {
+
+            }else
+            ActivityCompat.requestPermissions(this, pers, REQUEST_CODE_PERMISSIONS);
+        }
+
+    }
+
+    public boolean isCameraPermissionGranted() {
+
+        if (checkSelfPermission(Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            Log.v(TAG, "Permission is PERMISSION_GRANTED");
+            return true;
+        } else if(ActivityCompat.shouldShowRequestPermissionRationale(
+                this, Manifest.permission.CAMERA)){
+            return true;
+        }else{
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 2);
+            return false;
+
+        }
+    }
+
+    public boolean isReadMediaVideoPermissionGranted() {
+
+        if (checkSelfPermission(Manifest.permission.READ_MEDIA_VIDEO)
+                == PackageManager.PERMISSION_GRANTED) {
+            Log.v(TAG, "Permission is READ_MEDIA_VIDEO");
+            return true;
+        }  else if(ActivityCompat.shouldShowRequestPermissionRationale(
+                this, Manifest.permission.READ_MEDIA_VIDEO)){
+            return true;
+        }else{
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_VIDEO}, 2);
+            return false;
+
+        }
+    }
+
+    public boolean isReadMediaImagesPermissionGranted() {
+
+        if (checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES)
+                == PackageManager.PERMISSION_GRANTED) {
+            Log.v(TAG, "Permission is READ_MEDIA_IMAGES");
+            return true;
+        } else if(ActivityCompat.shouldShowRequestPermissionRationale(
+                this, Manifest.permission.READ_MEDIA_IMAGES)){
+            return true;
+        }else{
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, 2);
+            return false;
+
+        }
+    }
     public boolean isWriteStoragePermissionGranted() {
 
         if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -97,29 +186,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String [] permissions, int [] grantResults)
+    {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case 2:
-                Log.d(TAG, "External storage2");
-                if (grantResults.length > 0)
-                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
-                        //resume tasks needing this permission
-                    } else {
-                    }
-                break;
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                    Log.i(TAG, "PERMISSION_GRANTED=" + permissions[i]);
+                } else {
+                    Log.i(TAG, "PERMISSION_DENY=" + permissions[i]);
+                    sb.append(permissions[i]).append("\r\n");
+                }
+            }
 
-            case 3:
-                Log.d(TAG, "External storage1");
-                if (grantResults.length > 0)
-                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
-                        //resume tasks needing this permission
-                    } else {
-                    }
-                break;
+            if (sb.length() > 0) {
+                showError(new Exception("PERMISSION_DENY\r\n" + sb.toString()));
+            }
         }
+    }
+
+    public void showError(Exception ex)
+    {
+        Log.e(TAG, ex.getMessage(), ex);
+        //UIUtils.showDialog(this, R.string.warning, ex.getMessage());
     }
 
     @Override
@@ -128,9 +218,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        isInternetPermissionGranted();
-        //isReadStoragePermissionGranted();
-        isWriteStoragePermissionGranted();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         try {
@@ -139,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        requestPermission();
 
     }
 

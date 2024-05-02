@@ -302,6 +302,7 @@ public class MyGitUtility {
 
     public static boolean createLocalGitRepository(Activity activity, String sLocalGitName) {
         try {
+            Log.d(TAG,"Local git directory = "+getLocalGitDirectory(activity, "localhost://local" + File.separator + sLocalGitName + ".git"));
             GitUtil aGitUtil = new GitUtil("localhost://local" + File.separator + sLocalGitName + ".git", getLocalGitDirectory(activity, "localhost://local" + File.separator + sLocalGitName + ".git"));
             boolean bReturn = aGitUtil.createLocalRepository();
             if (aGitUtil != null) aGitUtil.close();

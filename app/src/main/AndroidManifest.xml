@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="inmethod.gitnotetaking">
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
-        android:allowBackup="true"
         android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:name="inmethod.gitnotetaking.MyApplication"
+        android:enableOnBackInvokedCallback="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CloneGitActivity"></activity>
-        <activity android:name=".CreateLocalGitActivity"></activity>
+
+        <activity android:name=".CloneGitActivity" />
+
+        <activity android:name=".CreateLocalGitActivity" />
+
         <activity
             android:name=".PreferencesSettings"
             android:configChanges="orientation|keyboardHidden"
@@ -51,7 +57,7 @@
         </activity>
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.provider"
+            android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -60,7 +66,8 @@
         </provider>
     </application>
 
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
+    <uses-feature android:name="android.hardware.camera" android:required="true"
+        tools:ignore="ManifestOrder" />
 
 
 </manifest>
