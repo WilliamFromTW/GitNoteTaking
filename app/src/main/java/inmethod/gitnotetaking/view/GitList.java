@@ -71,7 +71,7 @@ public class GitList {
                     layout0.setText(aGitList.getGitName() + MyApplication.getAppContext().getResources().getString(R.string.main_notes_need_push));
             } else if (aGitList.getPushStatus() ==  MyGitUtility.GIT_STATUS_CLONING) {
                 layout0.setTextColor(Color.RED);
-                layout0.setText(aGitList.getGitName() + " " + MyApplication.getAppContext().getResources().getString(R.string.main_notes_cloning));
+                layout0.setText("「"+aGitList.getGitName() + "」" + MyApplication.getAppContext().getResources().getString(R.string.main_notes_cloning));
             } else {
                 layout0.setTextColor(Color.BLACK);
 

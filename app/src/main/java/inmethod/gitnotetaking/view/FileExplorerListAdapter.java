@@ -10,11 +10,14 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.preference.PreferenceManager;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import inmethod.gitnotetaking.MyApplication;
 import inmethod.gitnotetaking.R;
 
 public class FileExplorerListAdapter extends BaseAdapter {
@@ -57,6 +60,7 @@ public class FileExplorerListAdapter extends BaseAdapter {
             m_view = m_inflater.inflate(R.layout.activity_file_explorer_content, null);
             m_viewHolder = new FileExplorerViewHolder();
             m_viewHolder.m_tvFileName = (TextView) m_view.findViewById(R.id.lr_tvFileName);
+            m_viewHolder.m_tvFileName.setTextSize( Integer.parseInt( PreferenceManager.getDefaultSharedPreferences(MyApplication.getAppContext()).getString("GitEditTextSize" ,"14" )));
             m_viewHolder.m_tvDate = (TextView) m_view.findViewById(R.id.lr_tvdate);
             m_viewHolder.m_ivIcon = (ImageView) m_view.findViewById(R.id.lr_ivFileIcon);
             m_viewHolder.m_cbCheck = (CheckBox) m_view.findViewById(R.id.lr_cbCheck);

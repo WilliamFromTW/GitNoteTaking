@@ -401,7 +401,12 @@ public class FileExplorerActivity extends AppCompatActivity {
                                                 aDestFile = new File(m_curDir, txtUrl.getText().toString().trim());
                                                 Log.d(TAG, "dest file = " + aDestFile.getCanonicalPath());
                                                 final String sDestFileNameString;
-                                                sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
+
+                                                //sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
+                                                if( aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length()).startsWith("/"))
+                                                    sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length()+1);
+                                                else
+                                                    sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
                                                 Files.copy(aSelectedFile.toPath(), aDestFile.toPath());
                                                 bFinishCopy = true;
 
@@ -414,7 +419,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                                                             e.printStackTrace();
                                                         }
                                                         boolean bCommit = false;
-                                                        bCommit = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_add_attachment_file_commit) + "\n" + sDestFileNameString);
+                                                        bCommit = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_add_attachment_file_commit) + sDestFileNameString);
                                                         if (sGitRemoteUrl.indexOf("local") == -1 && bCommit)
                                                             MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
 

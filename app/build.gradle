@@ -6,9 +6,9 @@ android {
     defaultConfig {
         applicationId "inmethod.gitnotetaking"
         minSdkVersion 33
-        targetSdkVersion 33
-        versionCode 38
-        versionName "3.04"
+        targetSdk 33
+        versionCode 40
+        versionName "3.06"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -23,6 +23,7 @@ android {
         targetCompatibility = 11
         sourceCompatibility = 11
     }
+    namespace 'inmethod.gitnotetaking'
 
 }
 
@@ -35,12 +36,12 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.material:material:1.11.0'
     implementation "androidx.preference:preference-ktx:1.2.1"
-    implementation 'org.slf4j:slf4j-nop:1.7.28'
+    implementation 'org.slf4j:slf4j-nop:1.7.32'
     implementation 'androidx.annotation:annotation:1.4.1'
     implementation "androidx.cardview:cardview:1.0.0"
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test:runner:1.4.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'androidx.mediarouter:mediarouter:1.7.0'
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0"
 }

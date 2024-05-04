@@ -19,7 +19,7 @@
 
     // Preference
     <string name="GitEditTextSize">筆記字型大小</string>
-    <string name="GitLocalDirName">本地端根目錄(修改後需重新刪除所有筆記本)</string>
+    <string name="GitLocalDirName">本地端根目錄(修改後，請刪除/重設定目前已有的筆記)</string>
     <string name="GitRemoteName">遠端分支名稱</string>
     <string name="GitCheckBoxCommitMessage">是否要求輸入修改理由</string>
 
