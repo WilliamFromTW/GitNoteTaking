@@ -19,8 +19,11 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.List;
 
+import inmethod.gitnotetaking.MainActivity;
+
 public class FileUtility {
     private static Uri contentUri = null;
+    public static final String TAG = MainActivity.TAG;
 
     /**
      * Get a file path from a Uri. This will get the the path for Storage Access
@@ -40,11 +43,11 @@ public class FileUtility {
         // DocumentProvider
         if ( DocumentsContract.isDocumentUri(context, uri)) {
             // ExternalStorageProvider
-            Log.d("ddd","uri path="+uri.getPath());
+            Log.d(TAG,"uri path="+uri.getPath());
 
             if (isExternalStorageDocument(uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);
-                Log.d("asdf", "docId=" + docId);
+                Log.d(TAG, "docId=" + docId);
                 final String[] split = docId.split(":");
                 final String type = split[0];
 
@@ -184,7 +187,7 @@ public class FileUtility {
         // don't know any API that can get the root path of that storage based on its id.
         //
         // so no "primary" type, but let the check here for other devices
-        Log.d("asdf", "type=" + type + ",relativePath=" + relativePath);
+        Log.d(TAG, "type=" + type + ",relativePath=" + relativePath);
 
         if ("primary".equalsIgnoreCase(type)) {
             fullPath = Environment.getExternalStorageDirectory() + relativePath;

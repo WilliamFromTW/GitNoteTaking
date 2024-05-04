@@ -25,6 +25,7 @@ import inmethod.gitnotetaking.db.RemoteGitDAO;
 import inmethod.gitnotetaking.utility.MyGitUtility;
 
 public class CloneGitActivity extends AppCompatActivity {
+    public static final String TAG =MainActivity.TAG;
 
     private String sRemoteName = "";
     private EditText editRemoteURL = null;
@@ -131,9 +132,9 @@ public class CloneGitActivity extends AppCompatActivity {
                                         if (MyGitUtility.cloneGit(MyApplication.getAppContext(), editRemoteURL.getText().toString(),sRemoteName, editUserAccount.getText().toString(), editUserPassword.getText().toString())) {
                                             aValue.setStatus(MyGitUtility.GIT_STATUS_SUCCESS);
                                             if( aRemoteGitDAO.updateByRemoteUrl(aValue) )
-                                                Log.d("CloneGitActivity",aValue.getNickname() +"cloning success");
+                                                Log.d(TAG,aValue.getNickname() +"cloning success");
                                             else
-                                                Log.d("CloneGitActivity",aValue.getNickname() +"cloning fail");
+                                                Log.d(TAG,aValue.getNickname() +"cloning fail");
 
                                             aRemoteGitDAO.close();
                                         } else {

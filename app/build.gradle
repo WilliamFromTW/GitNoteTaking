@@ -7,27 +7,30 @@ android {
         applicationId "inmethod.gitnotetaking"
         minSdkVersion 33
         targetSdkVersion 33
-        versionCode 35
-        versionName "3.01"
+        versionCode 38
+        versionName "3.04"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
 
         release {
-            minifyEnabled true
+            minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
-        targetCompatibility = 1.8
-        sourceCompatibility = 1.8
+        targetCompatibility = 11
+        sourceCompatibility = 11
     }
 
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation files('libs/InMethodJakarta-v3.4b1-SNAPSHOT-20240422.jar')
+    implementation files('libs/InMethodTools-2.04-20240430.jar')
+    implementation files('libs/org.eclipse.jgit-6.3.0.202209071007-r.jar')
+    releaseImplementation files('libs/commons-net-3.5.jar')
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.material:material:1.11.0'

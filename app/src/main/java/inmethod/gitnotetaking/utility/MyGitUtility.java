@@ -52,7 +52,7 @@ public class MyGitUtility {
         List<String> aReturn = null;
         try {
             aGitUtil = new GitUtil(sRemoteUrl, null);
-            aReturn = aGitUtil.fetchGitBranches(aRemoteGit.getUid(),aRemoteGit.getPwd());
+            aReturn = aGitUtil.getRemoteBranches(aRemoteGit.getUid(),aRemoteGit.getPwd());
             if (aGitUtil != null) aGitUtil.close();
         } catch (Exception ee) {
             ee.printStackTrace();

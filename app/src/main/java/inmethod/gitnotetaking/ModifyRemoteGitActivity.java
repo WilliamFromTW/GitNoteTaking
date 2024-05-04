@@ -24,6 +24,7 @@ import inmethod.gitnotetaking.db.RemoteGitDAO;
 import inmethod.gitnotetaking.utility.MyGitUtility;
 
 public class ModifyRemoteGitActivity extends AppCompatActivity {
+    public static final String TAG =MainActivity.TAG;
 
     private String sRemoteURL = null;
     private EditText editUserAccount = null;
@@ -87,7 +88,7 @@ public class ModifyRemoteGitActivity extends AppCompatActivity {
                             aRemoteGitDAO.update(aValue);
                             aRemoteGitDAO.close();
                             boolean bCheck = MyGitUtility.checkout(MyApplication.getAppContext(), sRemoteURL);
-                            Log.d("gitnotetaking", "bCheckout=" + bCheck);
+                            Log.d(TAG, "bCheckout=" + bCheck);
                         } catch (Exception ex) {
 
                         }

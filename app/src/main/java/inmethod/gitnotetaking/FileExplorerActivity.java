@@ -48,7 +48,8 @@ import inmethod.gitnotetaking.view.FileExplorerViewHolder;
 
 public class FileExplorerActivity extends AppCompatActivity {
 
-    public static final String TAG = "GitNoteTaking";
+    public static final String TAG =MainActivity.TAG;
+
     private Activity activity = this;
     ListView view = null;
     FileExplorerListAdapter adapter = null;
@@ -130,7 +131,7 @@ public class FileExplorerActivity extends AppCompatActivity {
             for (int m_delItem : adapter.m_selectedItem) {
                 File m_delFile = new File(m_path.get(m_delItem));
 
-                Log.d("file", m_path.get(m_delItem));
+                Log.d(TAG, m_path.get(m_delItem));
                 if (m_delFile.isDirectory()) {
                     MyApplication.storeFiles(m_delFile);
                 } else {
@@ -166,7 +167,7 @@ public class FileExplorerActivity extends AppCompatActivity {
             for (int m_delItem : adapter.m_selectedItem) {
                 File m_delFile = new File(m_path.get(m_delItem));
                 sTemp = m_delFile.getName() + "\n" + sTemp;
-                Log.d("file", m_path.get(m_delItem));
+                Log.d(TAG, m_path.get(m_delItem));
                 if (m_delFile.isDirectory()) {
                     try {
                         FileUtils.delete(m_delFile, FileUtils.RECURSIVE);
@@ -319,7 +320,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                 String m_text = m_edtinput.getText().toString();
                 if (p_opt == 1) {
                     File m_newPath = new File(m_curDir, m_text);
-                    Log.d("cur dir", m_curDir);
+                    Log.d(TAG, m_curDir);
                     if (!m_newPath.exists()) {
                         m_newPath.mkdirs();
                     }

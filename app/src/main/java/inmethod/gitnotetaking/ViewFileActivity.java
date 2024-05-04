@@ -69,7 +69,7 @@ import inmethod.gitnotetaking.view.FileExplorerListAdapter;
 
 public class ViewFileActivity extends AppCompatActivity {
 
-    public static final String TAG = "GitNoteTaking";
+    public static final String TAG =MainActivity.TAG;
     private Activity activity = this;
     ListView view = null;
     FileExplorerListAdapter adapter = null;

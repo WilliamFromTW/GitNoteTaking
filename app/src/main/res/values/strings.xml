@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GIT Text Note</string>
+    <string name="app_name">GIT Note Taking</string>
     <string name="action_settings">Settings</string>
     <string name="view_file_action_edit">Edit</string>
     <string name="view_file_action_save">Save</string>

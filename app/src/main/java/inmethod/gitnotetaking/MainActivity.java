@@ -10,6 +10,7 @@ import android.icu.text.SimpleDateFormat;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
@@ -45,6 +46,7 @@ import inmethod.gitnotetaking.view.GitList;
 import inmethod.gitnotetaking.view.RecyclerAdapterForDevice;
 
 
+@RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "GitNoteTaking";
@@ -57,47 +59,18 @@ public class MainActivity extends AppCompatActivity {
     String [] _app_permissions = {
             Manifest.permission.READ_MEDIA_VIDEO,
             Manifest.permission.READ_MEDIA_IMAGES,
-            Manifest.permission.CAMERA,
             Manifest.permission.INTERNET,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
     };
 
-    public boolean isInternetPermissionGranted() {
-        if (checkSelfPermission(Manifest.permission.INTERNET)
-                == PackageManager.PERMISSION_GRANTED) {
-            Log.v(TAG, "Permission is granted1");
-            return true;
-        } else {
 
-            Log.v(TAG, "Permission is revoked1");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, 1);
-            return false;
-        }
-    }
 
-    /**
-     * No need to use any more after  android 4.1
-     *
-     * @return
-     */
-    public boolean isReadStoragePermissionGranted() {
 
-        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED) {
-            Log.v(TAG, "Permission is granted1");
-            return true;
-        } else {
-
-            Log.v(TAG, "Permission is revoked1");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 3);
-            return false;
-        }
-
-    }
     private void requestPermission()
     {
         List<String> listPermissionNeed = new ArrayList<String>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+            listPermissionNeed.add( Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED);
+
         for(String per : _app_permissions)
         {
 
@@ -110,80 +83,14 @@ public class MainActivity extends AppCompatActivity {
         if (listPermissionNeed.size()>0)
         {
             String [] pers = listPermissionNeed.toArray(new String[0]);
-            if(ActivityCompat.shouldShowRequestPermissionRationale(
-                    this, Manifest.permission.READ_MEDIA_VIDEO)) {
-            }else  if(ActivityCompat.shouldShowRequestPermissionRationale(
-                    this, Manifest.permission.READ_MEDIA_IMAGES)) {
-            }else  if(ActivityCompat.shouldShowRequestPermissionRationale(
-                    this, Manifest.permission.CAMERA)) {
-            }else  if(ActivityCompat.shouldShowRequestPermissionRationale(
-                    this, Manifest.permission.INTERNET)) {
+            // Permission request logic
 
-            }else
             ActivityCompat.requestPermissions(this, pers, REQUEST_CODE_PERMISSIONS);
         }
 
     }
 
-    public boolean isCameraPermissionGranted() {
 
-        if (checkSelfPermission(Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED) {
-            Log.v(TAG, "Permission is PERMISSION_GRANTED");
-            return true;
-        } else if(ActivityCompat.shouldShowRequestPermissionRationale(
-                this, Manifest.permission.CAMERA)){
-            return true;
-        }else{
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 2);
-            return false;
-
-        }
-    }
-
-    public boolean isReadMediaVideoPermissionGranted() {
-
-        if (checkSelfPermission(Manifest.permission.READ_MEDIA_VIDEO)
-                == PackageManager.PERMISSION_GRANTED) {
-            Log.v(TAG, "Permission is READ_MEDIA_VIDEO");
-            return true;
-        }  else if(ActivityCompat.shouldShowRequestPermissionRationale(
-                this, Manifest.permission.READ_MEDIA_VIDEO)){
-            return true;
-        }else{
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_VIDEO}, 2);
-            return false;
-
-        }
-    }
-
-    public boolean isReadMediaImagesPermissionGranted() {
-
-        if (checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES)
-                == PackageManager.PERMISSION_GRANTED) {
-            Log.v(TAG, "Permission is READ_MEDIA_IMAGES");
-            return true;
-        } else if(ActivityCompat.shouldShowRequestPermissionRationale(
-                this, Manifest.permission.READ_MEDIA_IMAGES)){
-            return true;
-        }else{
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, 2);
-            return false;
-
-        }
-    }
-    public boolean isWriteStoragePermissionGranted() {
-
-        if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED) {
-            Log.v(TAG, "Permission is granted2");
-            return true;
-        } else {
-            Log.v(TAG, "Permission is revoked2");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
-            return false;
-        }
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String [] permissions, int [] grantResults)
