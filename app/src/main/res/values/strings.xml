@@ -16,6 +16,11 @@
     <string name="action_paste">Paste</string>
     <string name="no_file_or_dir_selected">No file or directory be selected</string>
     <string name="modify_remote_settings_branches_fetched">new branches fetched</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_reset">Reset</string>
+
+
 
     // Preference
     <string name="GitEditTextSize">Notes Text Size</string>

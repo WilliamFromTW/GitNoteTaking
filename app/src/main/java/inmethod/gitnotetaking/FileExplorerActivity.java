@@ -40,9 +40,13 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import inmethod.gitnotetaking.utility.FileUtility;
 import inmethod.gitnotetaking.utility.MyGitUtility;
@@ -262,6 +266,17 @@ public class FileExplorerActivity extends AppCompatActivity {
                                 if( path.getFileName().toString().indexOf(sSearchText)!=-1  ) {
                                     m_files.add(path.getFileName().toString());
                                     m_filesPath.add(path.toString());
+                                }else{
+                                    if( path.getFileName().toString().toLowerCase().indexOf("txt")!=-1 || path.getFileName().toString().toLowerCase().indexOf("md")!=-1) {
+                                        try {
+                                            if (searchTextFileContent(path.toFile(), sSearchText)) {
+                                                m_files.add(path.getFileName().toString());
+                                                m_filesPath.add(path.toString());
+                                            }
+                                        }catch(FileNotFoundException ee){
+                                            ee.printStackTrace();
+                                        }
+                                    }
                                 }
                             }
 
@@ -282,9 +297,18 @@ public class FileExplorerActivity extends AppCompatActivity {
                     if( file.getName().indexOf(sSearchText)!=-1 ){
                         m_files.add(file.getName());
                         m_filesPath.add(file.getPath());
+                    }else if( file.getName().toString().toLowerCase().indexOf("txt")!=-1 || file.getName().toString().toLowerCase().indexOf("md")!=-1) {
+                        try {
+                            if (searchTextFileContent(file, sSearchText)) {
+                                m_files.add(file.getName());
+                                m_filesPath.add(file.getPath());
+                            }
+                        } catch (FileNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
 
-                }else {
+                } else{
                     m_files.add(file.getName());
                     m_filesPath.add(file.getPath());
                 }
@@ -357,14 +381,17 @@ public class FileExplorerActivity extends AppCompatActivity {
                         .setTitle(getResources().getString(R.string.title_search_text))
                         .setMessage(getResources().getString(R.string.message_search_text))
                         .setView(txtUrl)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(MyApplication.getAppContext().getText(R.string.dialog_ok), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 sSearchText = txtUrl.getText().toString();
                                 bRefreshDir = true;
                                 new MyAsyncTask().execute();
                             }
-                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        }).setNegativeButton(MyApplication.getAppContext().getText(R.string.dialog_reset) , new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+                                sSearchText = "";
+                                bRefreshDir = true;
+                                new MyAsyncTask().execute();
                             }
                         }).show();
 
@@ -386,6 +413,17 @@ public class FileExplorerActivity extends AppCompatActivity {
         myActivityResultLauncher.launch(intent);
     }
 
+    boolean searchTextFileContent(File aFile,String sSearch) throws FileNotFoundException {
+
+            Scanner scan = new Scanner(aFile);
+            while(scan.hasNext()){
+                String line = scan.nextLine().toLowerCase().toString();
+                if(line.contains(sSearch)){
+                   return true;
+                }
+            }
+        return false;
+   }
 
 
     // You can do the assignment inside onAttach or onCreate, i.e, before the activity is displayed
@@ -417,7 +455,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                                         .setTitle(getResources().getString(R.string.dialog_title_add))
                                         .setMessage(getResources().getString(R.string.dialog_file_name))
                                         .setView(txtUrl)
-                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        .setPositiveButton(MyApplication.getAppContext().getText(R.string.dialog_ok), new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
                                                 bRefreshDir = false;
                                                 new Thread(new Runnable() {
@@ -466,7 +504,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                                                 }).start();
                                                 new MyAsyncTask().execute();
                                             }
-                                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        }).setNegativeButton(MyApplication.getAppContext().getText(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int whichButton) {
                                             }
                                         }).show();
@@ -485,41 +523,7 @@ public class FileExplorerActivity extends AppCompatActivity {
 
 
                         }
-                    } else if (requestCode == SEARCH_TEXT_CODE) {
-                        Uri uri = null;
-                        if (resultData != null) {
-                            uri = resultData.getData();
-                            Log.d(TAG, "uri = " + uri.getPath() + ",host = " + uri.getHost() + ", authority = " + uri.getAuthority() + ", real path = " + FileUtility.getPath(activity, uri));
 
-                            try {
-
-                                final EditText txtUrl = new EditText(activity);
-                                txtUrl.setText(sSearchText);
-                                txtUrl.setMaxLines(3);
-                                txtUrl.setLines(3);
-
-                                new AlertDialog.Builder(activity)
-                                        .setTitle(getResources().getString(R.string.title_search_text))
-                                        .setMessage(getResources().getString(R.string.message_search_text))
-                                        .setView(txtUrl)
-                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int whichButton) {
-                                                bRefreshDir = true;
-                                                new MyAsyncTask().execute();
-                                            }
-                                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int whichButton) {
-                                            }
-                                        }).show();
-
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-
-                            }
-
-
-                        }
 
                     }
                 }
