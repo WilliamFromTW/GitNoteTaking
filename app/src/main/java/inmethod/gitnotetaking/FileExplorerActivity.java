@@ -101,72 +101,7 @@ public class FileExplorerActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    boolean pasteFile() {
-        try {
-            if (MyApplication.getCutCopyStatus() == MyApplication.CUT) {
-                List<File> aCutFileList = MyApplication.getStoreFiles();
-                for (File aFile : aCutFileList) {
-                    if (aFile.isDirectory()) {
-                        Files.move(aFile.toPath(), new File(m_curDir + File.separator + aFile.getName()).toPath());
-                    } else {
-                        Files.move(aFile.toPath(), new File(m_curDir + File.separator + aFile.getName()).toPath());
-                    }
-                }
-            } else if (MyApplication.getCutCopyStatus() == MyApplication.COPY) {
-                List<File> aCutFileList = MyApplication.getStoreFiles();
-                for (File aFile : aCutFileList) {
-                    if (aFile.isDirectory()) {
-                        Log.d(TAG, "directory name = " + aFile.getName());
-                        Files.copy(aFile.toPath(), new File(m_curDir + File.separator + aFile.getName()).toPath());
-                    } else {
-                        Files.copy(aFile.toPath(), new File(m_curDir + File.separator + aFile.getName()).toPath());
-                    }
-                }
-            }
-            return true;
-        } catch (Exception ee) {
-            ee.printStackTrace();
-            return false;
-        }
-    }
 
-    boolean storeFile() {
-        if (adapter.m_selectedItem.size() == 0) {
-            Toast.makeText(FileExplorerActivity.this, getResources().getString(R.string.select_file_or_directory), Toast.LENGTH_SHORT).show();
-            return false;
-        } else {
-
-            MyApplication.resetFiles();
-            for (int m_delItem : adapter.m_selectedItem) {
-                File m_delFile = new File(m_path.get(m_delItem));
-
-                Log.d(TAG, m_path.get(m_delItem));
-                if (m_delFile.isDirectory()) {
-                    MyApplication.storeFiles(m_delFile);
-                } else {
-                    MyApplication.storeFiles(m_delFile);
-                }
-            }
-            return true;
-        }
-    }
-
-    boolean copyFile() {
-        boolean bStatus = storeFile();
-        if (bStatus) {
-            MyApplication.setCutCopyStatus(MyApplication.COPY);
-        } else MyApplication.setCutCopyStatus(MyApplication.NONE);
-
-        return bStatus;
-    }
-
-    boolean cutFile() {
-        boolean bStatus = storeFile();
-        if (bStatus) {
-            MyApplication.setCutCopyStatus(MyApplication.CUT);
-        } else MyApplication.setCutCopyStatus(MyApplication.NONE);
-        return bStatus;
-    }
 
     void deleteFile() {
         if (adapter.m_selectedItem.size() == 0) {
@@ -233,7 +168,7 @@ public class FileExplorerActivity extends AppCompatActivity {
         File m_file = new File(p_rootPath);
         File[] m_filesArray = m_file.listFiles();
         if( sSearchText!=null && !sSearchText.equals("") ) {
-            m_item.add("==== "+ MyApplication.getAppContext().getString(R.string.search_mode) + " ====");
+            m_item.add(MyApplication.getAppContext().getString(R.string.search_mode) +":"+ sSearchText);
             m_path.add(".");
         }
             //Log.d(TAG,"rootPath="+p_rootPath+",GitRootDir="+sGitRootDir);
@@ -263,7 +198,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                         try {
                             listAllFiles(file.toPath(), allFiles);
                             for (Path path : allFiles) {
-                                if( path.getFileName().toString().indexOf(sSearchText)!=-1  ) {
+                                if( path.getFileName().toString().toLowerCase().indexOf(sSearchText)!=-1  ) {
                                     m_files.add(path.getFileName().toString());
                                     m_filesPath.add(path.toString());
                                 }else{
@@ -294,7 +229,7 @@ public class FileExplorerActivity extends AppCompatActivity {
             } else {
 
                 if( sSearchText!=null && !sSearchText.equals("") ){
-                    if( file.getName().indexOf(sSearchText)!=-1 ){
+                    if( file.getName().toLowerCase().indexOf(sSearchText)!=-1 ){
                         m_files.add(file.getName());
                         m_filesPath.add(file.getPath());
                     }else if( file.getName().toString().toLowerCase().indexOf("txt")!=-1 || file.getName().toString().toLowerCase().indexOf("md")!=-1) {
@@ -327,9 +262,7 @@ public class FileExplorerActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                if( m_item.get(position)!=null && m_item.get(position).indexOf(R.string.search_mode)!=-1 ){
-                    return;
-                }
+                if( m_item.get(position)!=null && m_item.get(position).indexOf(R.string.search_mode)==-1 ){
 
                 File m_isFile = new File(m_path.get(position));
 
@@ -349,12 +282,12 @@ public class FileExplorerActivity extends AppCompatActivity {
                         if (m_isFile.exists()) {
                             Intent intent = new Intent();
                             intent.setAction(android.content.Intent.ACTION_VIEW);
-                            Log.d(TAG, "file type = " + getMimeType(Uri.fromFile(m_isFile), activity)+", uri="+path.getPath());
+                            Log.d(TAG, "file type = " + getMimeType(Uri.fromFile(m_isFile), activity) + ", uri=" + path.getPath());
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            intent.setFlags (Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                            String authority = activity.getPackageName()+".fileprovider";
-                            Uri uri = FileProvider.getUriForFile(activity,authority,m_isFile);
+                            String authority = activity.getPackageName() + ".fileprovider";
+                            Uri uri = FileProvider.getUriForFile(activity, authority, m_isFile);
                             intent.setDataAndType(uri, getMimeType(path, activity));
 
                             try {
@@ -364,6 +297,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                             }
                         }
                     }
+                }
                 }
             }
         });
@@ -383,7 +317,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                         .setView(txtUrl)
                         .setPositiveButton(MyApplication.getAppContext().getText(R.string.dialog_ok), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                sSearchText = txtUrl.getText().toString();
+                                sSearchText = txtUrl.getText().toString().toLowerCase();
                                 bRefreshDir = true;
                                 new MyAsyncTask().execute();
                             }
@@ -719,38 +653,6 @@ public class FileExplorerActivity extends AppCompatActivity {
         } else if (id == R.id.action_create_file) {
             sSearchText="";
             createNewFolder(0);
-        } else if (id == R.id.action_cut) {
-            sSearchText="";
-            cutFile();
-        } else if (id == R.id.action_paste) {
-            sSearchText="";
-            if (MyApplication.getStoreFiles().size() > 0) {
-                if (pasteFile()) {
-                    MyApplication.resetFiles();
-                    getDirFromRoot(m_curDir);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_paste_attachment_file_commit))) {
-                                if (MyApplication.isLocal(sGitRemoteUrl))
-                                    MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
-
-                            }
-
-                        }
-                    }).start();
-                }
-            } else {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getResources().getText(R.string.no_file_or_dir_selected), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        } else if (id == R.id.action_copy) {
-            sSearchText="";
-            copyFile();
         }
         return super.onOptionsItemSelected(item);
     }
