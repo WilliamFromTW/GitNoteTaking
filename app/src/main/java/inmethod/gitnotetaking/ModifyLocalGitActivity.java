@@ -29,7 +29,6 @@ public class ModifyLocalGitActivity extends AppCompatActivity {
         Intent myIntent = getIntent();
         sRemoteURL =   myIntent.getStringExtra("GIT_REMOTE_URL");
         editNickName = (EditText) findViewById(R.id.editLocalGitName);
-        ImageButton aSearchButton = (ImageButton)findViewById(R.id.searchButton);
 
         Button buttonOK = (Button) findViewById(R.id.buttonOK);
 
@@ -37,7 +36,7 @@ public class ModifyLocalGitActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if ( editNickName.getText().toString().equals("")) {
+                if (editNickName.getText().toString().isEmpty()) {
                     AlertDialog.Builder MyAlertDialog = new AlertDialog.Builder(activity);
                     MyAlertDialog.setTitle(getResources().getString(R.string.main_notes_title_modify));
                     MyAlertDialog.setMessage(getResources().getString(R.string.tv_all_parametes_must_be_set));

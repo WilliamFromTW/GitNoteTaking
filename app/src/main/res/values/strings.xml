@@ -95,7 +95,7 @@
     <string name="tv_create_local_git_fail">Create Local GIT failed!</string>
     <string name="dialog_title_add">Add File</string>
     <string name="title_search_text">Search</string>
-    <string name="search_mode">Search Mode</string>
+    <string name="search_mode">Search Text</string>
     <string name="toast_pulling">Pulling Try later</string>
     <string name="toast_cloning">Cloning Try later</string>
     <string name="message_search_text">" "</string>

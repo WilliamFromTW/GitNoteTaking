@@ -44,6 +44,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -170,12 +171,13 @@ public class FileExplorerActivity extends AppCompatActivity {
         if( sSearchText!=null && !sSearchText.equals("") ) {
             m_item.add(MyApplication.getAppContext().getString(R.string.search_mode) +":"+ sSearchText);
             m_path.add(".");
-        }
+        }else {
             //Log.d(TAG,"rootPath="+p_rootPath+",GitRootDir="+sGitRootDir);
         if (!p_rootPath.equals(sGitRootDir)) {
             m_item.add("../");
             m_path.add(m_file.getParent());
             m_isRoot = false;
+        }
         }
 
         m_curDir = p_rootPath;
@@ -188,21 +190,21 @@ public class FileExplorerActivity extends AppCompatActivity {
 
             if (file.isDirectory()) {
                 try {
-                    if (file.getCanonicalPath().indexOf("_attach") != -1) {
+                    if (file.getCanonicalPath().contains("_attach")) {
                     }
-                    else if (file.getName().substring(0, 1).equals(".")) {
+                    else if (file.getName().charAt(0) == '.') {
                     }
-                    else if( sSearchText!=null && !sSearchText.equals("") ) {
+                    else if( sSearchText!=null && !sSearchText.isEmpty()) {
 
                         List<Path> allFiles = new ArrayList<>();
                         try {
                             listAllFiles(file.toPath(), allFiles);
                             for (Path path : allFiles) {
-                                if( path.getFileName().toString().toLowerCase().indexOf(sSearchText)!=-1  ) {
+                                if(path.getFileName().toString().toLowerCase().contains(sSearchText)) {
                                     m_files.add(path.getFileName().toString());
                                     m_filesPath.add(path.toString());
                                 }else{
-                                    if( path.getFileName().toString().toLowerCase().indexOf("txt")!=-1 || path.getFileName().toString().toLowerCase().indexOf("md")!=-1) {
+                                    if(path.getFileName().toString().toLowerCase().contains("txt") || path.getFileName().toString().toLowerCase().contains("md")) {
                                         try {
                                             if (searchTextFileContent(path.toFile(), sSearchText)) {
                                                 m_files.add(path.getFileName().toString());
@@ -229,10 +231,10 @@ public class FileExplorerActivity extends AppCompatActivity {
             } else {
 
                 if( sSearchText!=null && !sSearchText.equals("") ){
-                    if( file.getName().toLowerCase().indexOf(sSearchText)!=-1 ){
+                    if(file.getName().toLowerCase().contains(sSearchText)){
                         m_files.add(file.getName());
                         m_filesPath.add(file.getPath());
-                    }else if( file.getName().toString().toLowerCase().indexOf("txt")!=-1 || file.getName().toString().toLowerCase().indexOf("md")!=-1) {
+                    }else if(file.getName().toLowerCase().contains("txt") || file.getName().toLowerCase().contains("md")) {
                         try {
                             if (searchTextFileContent(file, sSearchText)) {
                                 m_files.add(file.getName());
@@ -262,8 +264,8 @@ public class FileExplorerActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                if( m_item.get(position)!=null && m_item.get(position).indexOf(R.string.search_mode)==-1 ){
-
+                if( m_item.get(position)!=null && !m_item.get(position).contains(MyApplication.getAppContext().getString(R.string.search_mode))){
+Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+",m_path="+m_path+",m_path get = "+ m_path.get(position));
                 File m_isFile = new File(m_path.get(position));
 
                 if (m_isFile.isDirectory()) {
@@ -659,7 +661,7 @@ public class FileExplorerActivity extends AppCompatActivity {
 
     public String getMimeType(Uri uri, Context context) {
         String mimeType = null;
-        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+        if (Objects.equals(uri.getScheme(), ContentResolver.SCHEME_CONTENT)) {
             ContentResolver cr = context.getContentResolver();
             mimeType = cr.getType(uri);
         } else {

@@ -59,6 +59,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import inmethod.gitnotetaking.db.RemoteGit;
 import inmethod.gitnotetaking.db.RemoteGitDAO;
@@ -125,7 +126,7 @@ public class ViewFileActivity extends AppCompatActivity {
         else
             toolbar.setTitle("");
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         editText = findViewById(R.id.editFile);
         editText.setText("");
         listener = editText.getKeyListener();
@@ -165,19 +166,19 @@ public class ViewFileActivity extends AppCompatActivity {
                             lp.setMargins(0, 0, 10, 0);
                             aTV.setLayoutParams(lp);
                             final Uri filuri = Uri.fromFile(file);
-                            if (getMimeType(filuri, activity).toLowerCase().indexOf("image") != -1)
+                            if (getMimeType(filuri, activity).toLowerCase().contains("image"))
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.image24, 0, 0, 0);
-                            else if (getMimeType(filuri, activity).toLowerCase().indexOf("plain") != -1)
+                            else if (getMimeType(filuri, activity).toLowerCase().contains("plain"))
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.txt24, 0, 0, 0);
-                            else if (getMimeType(filuri, activity).toLowerCase().indexOf("excel") != -1)
+                            else if (getMimeType(filuri, activity).toLowerCase().contains("excel"))
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.xls24, 0, 0, 0);
-                            else if (getMimeType(filuri, activity).toLowerCase().indexOf("word") != -1)
+                            else if (getMimeType(filuri, activity).toLowerCase().contains("word"))
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.doc24, 0, 0, 0);
-                            else if (getMimeType(filuri, activity).toLowerCase().indexOf("pdf") != -1)
+                            else if (getMimeType(filuri, activity).toLowerCase().contains("pdf"))
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.pdf24, 0, 0, 0);
-                            else if (getMimeType(filuri, activity).toLowerCase().indexOf("powerpoint") != -1)
+                            else if (getMimeType(filuri, activity).toLowerCase().contains("powerpoint"))
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt24, 0, 0, 0);
-                            else if (getMimeType(filuri, activity).toLowerCase().indexOf("presentation") != -1)
+                            else if (getMimeType(filuri, activity).toLowerCase().contains("presentation"))
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt24, 0, 0, 0);
                             else
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.unknown24, 0, 0, 0);
@@ -186,10 +187,15 @@ public class ViewFileActivity extends AppCompatActivity {
                             aTV.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
+                                    Log.d(TAG,"filuri="+filuri.toString());
                                     Intent intent = new Intent();
                                     intent.setAction(android.content.Intent.ACTION_VIEW);
-                                    intent.setDataAndType(filuri, getMimeType(filuri, activity));
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                                    String authority = activity.getPackageName() + ".fileprovider";
+                                    Uri filuri = FileProvider.getUriForFile(activity, authority, file);
+                                    intent.setDataAndType(filuri, getMimeType(filuri, activity));
                                     try {
                                         startActivity(intent);
                                     } catch (ActivityNotFoundException e) {
@@ -421,10 +427,10 @@ public class ViewFileActivity extends AppCompatActivity {
             return true;
         } else if (id == R.id.view_file_action_edit) {
             enable();
-            Log.d(TAG, "asdfdddddd");
             isModify = true;
             return true;
         } else if (id == R.id.view_file_action_camera_picture) {
+            Log.d(TAG, "asdfdddddd");
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             // Ensure that there's a camera activity to handle the intent
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -436,9 +442,10 @@ public class ViewFileActivity extends AppCompatActivity {
 
                 }
                 // Continue only if the File was successfully created
+                String authority = activity.getPackageName() + ".fileprovider";
                 if (photoFile != null) {
                     Uri photoURI = FileProvider.getUriForFile(this,
-                            "inmethod.gitnotetaking.provider",
+                            authority,
                             photoFile);
                     Log.d(TAG, "photoURI" + photoURI.toString());
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
