@@ -5,6 +5,11 @@
 
 
     <item
+        android:id="@+id/action_search_text_file"
+        android:orderInCategory="100"
+        android:title="@string/file_filter_external_file"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_add_file"
         android:orderInCategory="100"
         android:title="@string/file_add_external_file"

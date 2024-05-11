@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Looper;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -20,9 +19,12 @@ import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -34,8 +36,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +47,6 @@ import java.util.List;
 import inmethod.gitnotetaking.utility.FileUtility;
 import inmethod.gitnotetaking.utility.MyGitUtility;
 import inmethod.gitnotetaking.view.FileExplorerListAdapter;
-import inmethod.gitnotetaking.view.FileExplorerViewHolder;
 
 
 public class FileExplorerActivity extends AppCompatActivity {
@@ -61,8 +64,10 @@ public class FileExplorerActivity extends AppCompatActivity {
     private String sGitName;
     private String sGitRemoteUrl;
     private String m_curDir;
-    public static int READ_REQUEST_CODE = 2;
-    private static boolean bFinishCopy=false;
+    public static int ADD_REQUEST_CODE = 2;
+    public static int SEARCH_TEXT_CODE = 3;
+    private static boolean bRefreshDir =false;
+    private static String sSearchText = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,7 +197,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, "delete files  = \n" + sDeleteFilesName)) {
+                        if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_delete_attachment_file_commit)+ sDeleteFilesName)) {
                             MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
                         }
                     }
@@ -200,6 +205,20 @@ public class FileExplorerActivity extends AppCompatActivity {
         }
     }
 
+    private static void listAllFiles(Path currentPath, List<Path> allFiles)
+            throws IOException
+    {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(currentPath))
+        {
+            for (Path entry : stream) {
+                if (Files.isDirectory(entry)) {
+                    listAllFiles(entry, allFiles);
+                } else {
+                    allFiles.add(entry);
+                }
+            }
+        }
+    }
 
     public void getDirFromRoot(String p_rootPath) {
         m_item = new ArrayList<String>();
@@ -209,12 +228,17 @@ public class FileExplorerActivity extends AppCompatActivity {
         m_filesPath = new ArrayList<String>();
         File m_file = new File(p_rootPath);
         File[] m_filesArray = m_file.listFiles();
-        //Log.d(TAG,"rootPath="+p_rootPath+",GitRootDir="+sGitRootDir);
+        if( sSearchText!=null && !sSearchText.equals("") ) {
+            m_item.add("==== "+ MyApplication.getAppContext().getString(R.string.search_mode) + " ====");
+            m_path.add(".");
+        }
+            //Log.d(TAG,"rootPath="+p_rootPath+",GitRootDir="+sGitRootDir);
         if (!p_rootPath.equals(sGitRootDir)) {
             m_item.add("../");
             m_path.add(m_file.getParent());
             m_isRoot = false;
         }
+
         m_curDir = p_rootPath;
         if (m_filesArray == null) return;
         //sorting file list in alphabetical order
@@ -225,21 +249,45 @@ public class FileExplorerActivity extends AppCompatActivity {
 
             if (file.isDirectory()) {
                 try {
-                    if (file.getCanonicalPath().indexOf("_attach") != -1)
-                        continue;
-                    else if (file.getName().substring(0, 1).equals("."))
-                        continue;
-                    else {
+                    if (file.getCanonicalPath().indexOf("_attach") != -1) {
+                    }
+                    else if (file.getName().substring(0, 1).equals(".")) {
+                    }
+                    else if( sSearchText!=null && !sSearchText.equals("") ) {
+
+                        List<Path> allFiles = new ArrayList<>();
+                        try {
+                            listAllFiles(file.toPath(), allFiles);
+                            for (Path path : allFiles) {
+                                if( path.getFileName().toString().indexOf(sSearchText)!=-1  ) {
+                                    m_files.add(path.getFileName().toString());
+                                    m_filesPath.add(path.toString());
+                                }
+                            }
+
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                    }else{
                         m_item.add(file.getName());
                         m_path.add(file.getPath());
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    continue;
                 }
             } else {
-                m_files.add(file.getName());
-                m_filesPath.add(file.getPath());
+
+                if( sSearchText!=null && !sSearchText.equals("") ){
+                    if( file.getName().indexOf(sSearchText)!=-1 ){
+                        m_files.add(file.getName());
+                        m_filesPath.add(file.getPath());
+                    }
+
+                }else {
+                    m_files.add(file.getName());
+                    m_filesPath.add(file.getPath());
+                }
             }
         }
         for (String m_AddFile : m_files) {
@@ -255,6 +303,10 @@ public class FileExplorerActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
+                if( m_item.get(position)!=null && m_item.get(position).indexOf(R.string.search_mode)!=-1 ){
+                    return;
+                }
+
                 File m_isFile = new File(m_path.get(position));
 
                 if (m_isFile.isDirectory()) {
@@ -292,13 +344,186 @@ public class FileExplorerActivity extends AppCompatActivity {
             }
         });
     }
+    void searchTextFile() {
+
+            try {
+
+                final EditText txtUrl = new EditText(activity);
+                txtUrl.setText(sSearchText);
+                txtUrl.setMaxLines(3);
+                txtUrl.setLines(3);
+
+                new AlertDialog.Builder(activity)
+                        .setTitle(getResources().getString(R.string.title_search_text))
+                        .setMessage(getResources().getString(R.string.message_search_text))
+                        .setView(txtUrl)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                sSearchText = txtUrl.getText().toString();
+                                bRefreshDir = true;
+                                new MyAsyncTask().execute();
+                            }
+                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                            }
+                        }).show();
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
+
+
+
+
+    }
 
     void addFile() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
-        startActivityForResult(intent, READ_REQUEST_CODE);
+        myActivityResultLauncher.launch(intent);
     }
+
+
+
+    // You can do the assignment inside onAttach or onCreate, i.e, before the activity is displayed
+    ActivityResultLauncher<Intent> myActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+
+                    int requestCode = result.getResultCode();
+                    Intent resultData = result.getData();
+                    Log.d(TAG, "resultcode = "+ result.getResultCode());
+
+                    if (requestCode == Activity.RESULT_OK) {
+                        Uri uri = null;
+                        if (resultData != null) {
+                            uri = resultData.getData();
+                            Log.d(TAG, "uri = " + uri.getPath() + ",host = " + uri.getHost() + ", authority = " + uri.getAuthority() + ", real path = " + FileUtility.getPath(activity, uri));
+                            final File aSelectedFile = new File(FileUtility.getPath(activity, uri));
+
+                            try {
+
+                                final EditText txtUrl = new EditText(activity);
+                                txtUrl.setText(aSelectedFile.getName());
+                                txtUrl.setMaxLines(3);
+                                txtUrl.setLines(3);
+
+                                new AlertDialog.Builder(activity)
+                                        .setTitle(getResources().getString(R.string.dialog_title_add))
+                                        .setMessage(getResources().getString(R.string.dialog_file_name))
+                                        .setView(txtUrl)
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                bRefreshDir = false;
+                                                new Thread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        final File aDestFile;
+                                                        try {
+                                                            aDestFile = new File(m_curDir, txtUrl.getText().toString().trim());
+                                                            Log.d(TAG, "dest file = " + aDestFile.getCanonicalPath());
+                                                            final String sDestFileNameString;
+
+                                                            //sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
+                                                            if (aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length()).startsWith("/"))
+                                                                sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length() + 1);
+                                                            else
+                                                                sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
+                                                            Files.copy(aSelectedFile.toPath(), aDestFile.toPath());
+                                                            bRefreshDir = true;
+
+                                                            new Thread(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    try {
+                                                                        Thread.sleep(1000);
+                                                                    } catch (
+                                                                            InterruptedException e) {
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                    boolean bCommit = false;
+                                                                    bCommit = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_add_attachment_file_commit) + sDestFileNameString);
+                                                                    if (sGitRemoteUrl.indexOf("local") == -1 && bCommit)
+                                                                        MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+
+                                                                }
+                                                            }).start();
+
+                                                        } catch (FileAlreadyExistsException ee) {
+
+                                                        } catch (IOException e) {
+                                                            e.printStackTrace();
+
+                                                        }
+                                                        bRefreshDir = true;
+
+                                                    }
+                                                }).start();
+                                                new MyAsyncTask().execute();
+                                            }
+                                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                            }
+                                        }).show();
+
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MyApplication.getAppContext(), "Add Failed!", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                            }
+
+
+                        }
+                    } else if (requestCode == SEARCH_TEXT_CODE) {
+                        Uri uri = null;
+                        if (resultData != null) {
+                            uri = resultData.getData();
+                            Log.d(TAG, "uri = " + uri.getPath() + ",host = " + uri.getHost() + ", authority = " + uri.getAuthority() + ", real path = " + FileUtility.getPath(activity, uri));
+
+                            try {
+
+                                final EditText txtUrl = new EditText(activity);
+                                txtUrl.setText(sSearchText);
+                                txtUrl.setMaxLines(3);
+                                txtUrl.setLines(3);
+
+                                new AlertDialog.Builder(activity)
+                                        .setTitle(getResources().getString(R.string.title_search_text))
+                                        .setMessage(getResources().getString(R.string.message_search_text))
+                                        .setView(txtUrl)
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                bRefreshDir = true;
+                                                new MyAsyncTask().execute();
+                                            }
+                                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                            }
+                                        }).show();
+
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+
+                            }
+
+
+                        }
+
+                    }
+                }
+            });
 
     void createNewFolder(final int p_opt) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -367,12 +592,13 @@ public class FileExplorerActivity extends AppCompatActivity {
         builder.show();
     }
 
+    /*
     @Override
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent resultData) {
         super.onActivityResult(requestCode, resultCode, resultData);
 
-        if (requestCode == READ_REQUEST_CODE) {
+        if (requestCode == ADD_REQUEST_CODE) {
             Uri uri = null;
             if (resultData != null) {
                 uri = resultData.getData();
@@ -458,9 +684,11 @@ public class FileExplorerActivity extends AppCompatActivity {
 
 
             }
+        }else if (requestCode == SEARCH_TXT_CODE){
+
         }
     }
-
+*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.file_explorer_menu, menu);
@@ -473,17 +701,25 @@ public class FileExplorerActivity extends AppCompatActivity {
         if (id == android.R.id.home) {
             onBackPressed();
             return true;
+        } else if (id == R.id.action_search_text_file) {
+            searchTextFile();
         } else if (id == R.id.action_add_file) {
+            sSearchText="";
             addFile();
         } else if (id == R.id.action_delete) {
+            sSearchText="";
             deleteFile();
         } else if (id == R.id.action_create_folder) {
+            sSearchText="";
             createNewFolder(1);
         } else if (id == R.id.action_create_file) {
+            sSearchText="";
             createNewFolder(0);
         } else if (id == R.id.action_cut) {
+            sSearchText="";
             cutFile();
         } else if (id == R.id.action_paste) {
+            sSearchText="";
             if (MyApplication.getStoreFiles().size() > 0) {
                 if (pasteFile()) {
                     MyApplication.resetFiles();
@@ -491,7 +727,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, "paste files")) {
+                            if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_paste_attachment_file_commit))) {
                                 if (MyApplication.isLocal(sGitRemoteUrl))
                                     MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
 
@@ -509,6 +745,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                 });
             }
         } else if (id == R.id.action_copy) {
+            sSearchText="";
             copyFile();
         }
         return super.onOptionsItemSelected(item);
@@ -528,12 +765,12 @@ public class FileExplorerActivity extends AppCompatActivity {
         return mimeType;
     }
 
-    private class MyAsyncTask extends AsyncTask<Void, Void, Void> {
+     class MyAsyncTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
             // 這裡處理背景工作
             while (true) {
-                if (bFinishCopy)
+                if (bRefreshDir)
                     break;
             }
             return null;

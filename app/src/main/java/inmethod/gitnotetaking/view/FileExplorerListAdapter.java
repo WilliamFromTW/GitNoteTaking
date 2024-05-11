@@ -1,6 +1,7 @@
 package inmethod.gitnotetaking.view;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,23 +77,29 @@ public class FileExplorerListAdapter extends BaseAdapter {
             m_viewHolder.m_cbCheck.setVisibility(View.INVISIBLE);
         }
 
-        m_viewHolder.m_tvFileName.setText(m_item.get(p_position));
-        m_viewHolder.m_ivIcon.setImageResource(setFileImageType(new File(m_path.get(p_position))));
-        m_viewHolder.m_tvDate.setText(getLastDate(p_position));
-        m_viewHolder.m_cbCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        if( m_item.get(p_position).indexOf(  MyApplication.getAppContext().getString(R.string.search_mode)  )!=-1 ){
+            m_viewHolder.m_tvFileName.setText(m_item.get(p_position));
+            m_viewHolder.m_tvFileName.setTextColor(Color.RED);
+            m_viewHolder.m_ivIcon.setVisibility(View.INVISIBLE);
+            m_viewHolder.m_cbCheck.setVisibility(View.INVISIBLE);
+            m_viewHolder.m_tvDate.setVisibility(View.INVISIBLE);
+        }else {
 
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked)
-                {
-                    m_selectedItem.add(p_position);
+            m_viewHolder.m_tvFileName.setText(m_item.get(p_position));
+            m_viewHolder.m_tvDate.setText(getLastDate(p_position));
+            m_viewHolder.m_ivIcon.setImageResource(setFileImageType(new File(m_path.get(p_position))));
+            m_viewHolder.m_cbCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        m_selectedItem.add(p_position);
+                    } else {
+                        m_selectedItem.remove(m_selectedItem.indexOf(p_position));
+                    }
                 }
-                else
-                {
-                    m_selectedItem.remove(m_selectedItem.indexOf(p_position));
-                }
-            }
-        });
+            });
+        }
         return m_view;
     }
 

@@ -46,6 +46,7 @@
     <string name="file_exists">檔案已存在!</string>
     <string name="file_create_failed">檔案建立失敗!</string>
     <string name="file_add_external_file">新增檔案</string>
+    <string name="file_filter_external_file">搜尋</string>
 
     // ViewFileActivity
     <string name="commit">提交</string>
@@ -57,6 +58,7 @@
     <string name="dialog_title_modify">修改</string>
     <string name="dialog_file_name">檔案名稱</string>
     <string name="view_file_delete_attachment_file_commit">刪除檔案 : </string>
+    <string name="view_file_paste_attachment_file_commit">複製檔案</string>
     <string name="view_file_add_attachment_file_commit">新增檔案 : </string>
     <string name="view_file_action_camera_picture">拍照存擋</string>
 
@@ -87,5 +89,8 @@
     <string name="dialog_title_add">新增檔案</string>
     <string name="toast_pulling">同步中,請稍後</string>
     <string name="toast_cloning">複製中,請稍後</string>
+    <string name="title_search_text">搜尋</string>
+    <string name="message_search_text">" "</string>
+    <string name="search_mode">搜尋模式</string>
 
 </resources>
