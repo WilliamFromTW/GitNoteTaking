@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     String [] _app_permissions = {
             Manifest.permission.READ_MEDIA_VIDEO,
             Manifest.permission.READ_MEDIA_IMAGES,
+            Manifest.permission.CAMERA,
             Manifest.permission.INTERNET,
     };
 
