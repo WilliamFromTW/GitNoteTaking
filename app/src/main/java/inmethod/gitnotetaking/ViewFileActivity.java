@@ -70,29 +70,42 @@ import inmethod.gitnotetaking.view.FileExplorerListAdapter;
 
 public class ViewFileActivity extends AppCompatActivity {
 
-    public static final String TAG =MainActivity.TAG;
-    private Activity activity = this;
+    public static final String TAG = MainActivity.TAG;
+    public static final int REQUEST_TAKE_PHOTO = 100;
+    public static int READ_REQUEST_CODE = 2;
     ListView view = null;
     FileExplorerListAdapter adapter = null;
+    EditText editText;
+    LinearLayout layoutAttachment;
+    KeyListener listener = null;
+    String currentPhotoPath;
+    private Activity activity = this;
     private List<String> m_item;
     private List<String> m_path;
     private List<String> m_files;
     private List<String> m_filesPath;
     private String sFilePath;
     private String sGitRemoteUrl;
-
     private File file = null;
     private MenuItem itemEdit;
     private MenuItem itemSave;
-    EditText editText;
-    LinearLayout layoutAttachment;
-    public static int READ_REQUEST_CODE = 2;
-    public static final int REQUEST_TAKE_PHOTO = 100;
     private File photoFile;
-    private boolean isModify = false;
-    KeyListener listener = null;
     //  TextView tvCountFiles;
+    private boolean isModify = false;
 
+    public static int countFilesInDirectory(File directory) {
+
+        int count = 0;
+        for (File file : directory.listFiles()) {
+            if (file.isFile()) {
+                count++;
+            }
+            if (file.isDirectory()) {
+                count += countFilesInDirectory(file);
+            }
+        }
+        return count;
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -154,11 +167,12 @@ public class ViewFileActivity extends AppCompatActivity {
                 }
                 Log.d(TAG, "file = " + file.getCanonicalPath());
                 File attachDirectory = new File(file.getAbsolutePath() + "_attach");
+                int iFileCount = 0;
                 if (attachDirectory.isDirectory()) {
                     for (final File file : attachDirectory.listFiles()) {
                         if (file.isFile()) {
+                            iFileCount++;
                             final TextView aTV = new TextView(activity);
-                            aTV.setText(file.getName());
                             aTV.setTextColor(Color.BLUE);
                             aTV.setBackgroundColor(Color.LTGRAY);
 
@@ -166,28 +180,37 @@ public class ViewFileActivity extends AppCompatActivity {
                             lp.setMargins(0, 0, 10, 0);
                             aTV.setLayoutParams(lp);
                             final Uri filuri = Uri.fromFile(file);
-                            if (getMimeType(filuri, activity).toLowerCase().contains("image"))
+                            if (getMimeType(filuri, activity).toLowerCase().contains("image")) {
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.image24, 0, 0, 0);
-                            else if (getMimeType(filuri, activity).toLowerCase().contains("plain"))
+                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                            } else if (getMimeType(filuri, activity).toLowerCase().contains("plain")) {
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.txt24, 0, 0, 0);
-                            else if (getMimeType(filuri, activity).toLowerCase().contains("excel"))
+                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                            } else if (getMimeType(filuri, activity).toLowerCase().contains("excel")) {
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.xls24, 0, 0, 0);
-                            else if (getMimeType(filuri, activity).toLowerCase().contains("word"))
+                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                            } else if (getMimeType(filuri, activity).toLowerCase().contains("word")) {
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.doc24, 0, 0, 0);
-                            else if (getMimeType(filuri, activity).toLowerCase().contains("pdf"))
+                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                            } else if (getMimeType(filuri, activity).toLowerCase().contains("pdf")) {
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.pdf24, 0, 0, 0);
-                            else if (getMimeType(filuri, activity).toLowerCase().contains("powerpoint"))
+                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                            } else if (getMimeType(filuri, activity).toLowerCase().contains("powerpoint")) {
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt24, 0, 0, 0);
-                            else if (getMimeType(filuri, activity).toLowerCase().contains("presentation"))
+                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                            } else if (getMimeType(filuri, activity).toLowerCase().contains("presentation")) {
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt24, 0, 0, 0);
-                            else
+                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                            } else {
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.unknown24, 0, 0, 0);
+                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                            }
 
                             aTV.setTextSize(22);
                             aTV.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    Log.d(TAG,"filuri="+filuri.toString());
+                                    Log.d(TAG, "filuri=" + filuri.toString());
                                     Intent intent = new Intent();
                                     intent.setAction(android.content.Intent.ACTION_VIEW);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -268,7 +291,6 @@ public class ViewFileActivity extends AppCompatActivity {
 
     }
 
-
     private void disable() {
         editText.setKeyListener(null);
         editText.requestFocus();
@@ -277,7 +299,6 @@ public class ViewFileActivity extends AppCompatActivity {
 
 
     }
-
 
     private void enable() {
         editText.setKeyListener(listener);
@@ -347,8 +368,8 @@ public class ViewFileActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 isModify = false;
                                 disable();
-                                if( txtUrl.getText().toString().trim().equals(""))
-                                txtUrl.setText("<" + file.getName() + ">");
+                                if (txtUrl.getText().toString().trim().equals(""))
+                                    txtUrl.setText("<" + file.getName() + ">");
                                 else
                                     txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
 
@@ -368,7 +389,7 @@ public class ViewFileActivity extends AppCompatActivity {
                         }).show();
             } else {
                 Log.d(TAG, "onback");
-                if( txtUrl.getText().toString().trim().equals(""))
+                if (txtUrl.getText().toString().trim().equals(""))
                     txtUrl.setText("<" + file.getName() + ">");
                 else
                     txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
@@ -396,11 +417,9 @@ public class ViewFileActivity extends AppCompatActivity {
                     }
                 }).start();
             }
-        }else super.onBackPressed();
+        } else super.onBackPressed();
 
     }
-
-    String currentPhotoPath;
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -476,7 +495,7 @@ public class ViewFileActivity extends AppCompatActivity {
                         .setView(txtUrl)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                if( txtUrl.getText().toString().trim().equals(""))
+                                if (txtUrl.getText().toString().trim().equals(""))
                                     txtUrl.setText("<" + file.getName() + ">");
                                 else
                                     txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
@@ -502,7 +521,7 @@ public class ViewFileActivity extends AppCompatActivity {
                         }).show();
             } else {
 
-                if( txtUrl.getText().toString().trim().equals(""))
+                if (txtUrl.getText().toString().trim().equals(""))
                     txtUrl.setText("<" + file.getName() + ">");
                 else
                     txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
@@ -536,20 +555,6 @@ public class ViewFileActivity extends AppCompatActivity {
             startActivityForResult(intent, READ_REQUEST_CODE);
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public static int countFilesInDirectory(File directory) {
-
-        int count = 0;
-        for (File file : directory.listFiles()) {
-            if (file.isFile()) {
-                count++;
-            }
-            if (file.isDirectory()) {
-                count += countFilesInDirectory(file);
-            }
-        }
-        return count;
     }
 
     @Override
@@ -618,9 +623,9 @@ public class ViewFileActivity extends AppCompatActivity {
 
                                 }
                             }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                        }
-                    }).show();
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                }
+                            }).show();
 
 
                 } catch (Exception e) {
@@ -711,7 +716,7 @@ public class ViewFileActivity extends AppCompatActivity {
 
     public String getMimeType(Uri uri, Context context) {
         String mimeType = null;
-        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+        if (Objects.equals(uri.getScheme(), ContentResolver.SCHEME_CONTENT)) {
             ContentResolver cr = context.getContentResolver();
             mimeType = cr.getType(uri);
         } else {

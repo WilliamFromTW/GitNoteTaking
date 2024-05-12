@@ -112,12 +112,15 @@ public class FileUtility {
 
                 Uri contentUri = null;
 
+                Log.d(TAG,"docid type="+type);
                 if ("image".equals(type)) {
                     contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
                 } else if ("video".equals(type)) {
                     contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
                 } else if ("audio".equals(type)) {
                     contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                } else {
+//                    contentUri = MediaStore.Files.getContentUri("external");
                 }
                 selection = "_id=?";
                 selectionArgs = new String[]{split[1]};
@@ -141,14 +144,7 @@ public class FileUtility {
             if (isGoogleDriveUri(uri)) {
                 return getDriveFilePath(uri, context);
             }
-            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.N) {
-                // return getFilePathFromURI(context,uri);
-                return getMediaFilePathForN(uri, context);
-                // return getRealPathFromURI(context,uri);
-            } else {
-
-                return getDataColumn(context, uri, null, null);
-            }
+            return getDataColumn(context, uri, null, null);
 
 
         }

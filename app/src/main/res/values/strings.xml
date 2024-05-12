@@ -99,5 +99,6 @@
     <string name="toast_pulling">Pulling Try later</string>
     <string name="toast_cloning">Cloning Try later</string>
     <string name="message_search_text">" "</string>
+    <string name="attachment">File</string>
 
 </resources>
