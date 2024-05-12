@@ -495,6 +495,12 @@ public class ViewFileActivity extends AppCompatActivity {
                         .setView(txtUrl)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.toast_pulling), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                                 if (txtUrl.getText().toString().trim().equals(""))
                                     txtUrl.setText("<" + file.getName() + ">");
                                 else
@@ -520,7 +526,12 @@ public class ViewFileActivity extends AppCompatActivity {
                             }
                         }).show();
             } else {
-
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.toast_pulling), Toast.LENGTH_SHORT).show();
+                    }
+                });
                 if (txtUrl.getText().toString().trim().equals(""))
                     txtUrl.setText("<" + file.getName() + ">");
                 else
