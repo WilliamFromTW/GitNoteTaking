@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.text.InputType;
@@ -26,6 +27,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -79,6 +81,7 @@ public class ViewFileActivity extends AppCompatActivity {
     LinearLayout layoutAttachment;
     KeyListener listener = null;
     String currentPhotoPath;
+    boolean shouldBlink = true;
     private Activity activity = this;
     private List<String> m_item;
     private List<String> m_path;
@@ -301,17 +304,38 @@ public class ViewFileActivity extends AppCompatActivity {
     }
 
     private void enable() {
-        editText.setKeyListener(listener);
-        editText.setFocusableInTouchMode(true);
-        editText.setFocusable(true);
         itemEdit.setVisible(false);
         itemSave.setVisible(true);
         SpannableString s = new SpannableString(itemSave.getTitle());
         s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
         itemSave.setTitle(s);
+        editText.setKeyListener(listener);
+        editText.setFocusableInTouchMode(true);
+        editText.setFocusable(true);
+        editText.requestFocus();
+        editText.setText(editText.getText());
+        editText.setPressed(true);
+        editText.setSelection(editText.getText().length());
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
     }
+    private void blink() {
+        if (shouldBlink) {
+            editText.setText(editText.getText());
+            editText.setPressed(true);
+            editText.setSelection(editText.getText().length());
 
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (shouldBlink) {
+                        blink();
+                    }
+                }
+            }, 500);
+        }
+    }
     @Override
     public void onStart() {
         super.onStart();
@@ -344,6 +368,8 @@ public class ViewFileActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (isModify) {
+            Log.d(TAG, "onback");
+
             FileWriter fw = null;
             final EditText txtUrl = new EditText(this);
             txtUrl.setMaxLines(3);
@@ -366,6 +392,12 @@ public class ViewFileActivity extends AppCompatActivity {
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
                             public void onClick(DialogInterface dialog, int whichButton) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.toast_pulling), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                                 isModify = false;
                                 disable();
                                 if (txtUrl.getText().toString().trim().equals(""))
@@ -389,6 +421,13 @@ public class ViewFileActivity extends AppCompatActivity {
                         }).show();
             } else {
                 Log.d(TAG, "onback");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.toast_pulling), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
                 if (txtUrl.getText().toString().trim().equals(""))
                     txtUrl.setText("<" + file.getName() + ">");
                 else
