@@ -162,6 +162,12 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             Toast.makeText(activity, getString(R.string.toast_pulling) , Toast.LENGTH_SHORT).show();
+                            Intent.putExtra("GIT_ROOT_DIR", MyGitUtility.getLocalGitDirectory(activity, sRemoteUrl));
+                            Intent.putExtra("GIT_NAME", sGitName);
+                            Intent.putExtra("GIT_REMOTE_URL", sRemoteUrl);
+                            startActivity(Intent);
+
+
                         }
                     });
                 } else if (aRemoteGit.getStatus() == MyGitUtility.GIT_STATUS_CLONING) {
