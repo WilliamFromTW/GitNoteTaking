@@ -7,6 +7,7 @@
         app:key="GitAuthorName"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
+        app:summary=""
         app:title="@string/GitAuthorName">
     </androidx.preference.EditTextPreference>
 
@@ -14,10 +15,11 @@
         app:key="GitAuthorEmail"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
+        app:summary=""
         app:title="@string/GitAuthorEmail">
     </androidx.preference.EditTextPreference>
     <androidx.preference.EditTextPreference
-        app:defaultValue="14"
+        app:defaultValue="18"
         app:key="GitEditTextSize"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"

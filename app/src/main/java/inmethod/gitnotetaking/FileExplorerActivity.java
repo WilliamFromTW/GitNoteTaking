@@ -11,6 +11,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,6 +32,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
+import androidx.preference.PreferenceManager;
 
 import org.eclipse.jgit.util.FileUtils;
 
@@ -312,7 +316,7 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
                 txtUrl.setText(sSearchText);
                 txtUrl.setMaxLines(3);
                 txtUrl.setLines(3);
-
+                txtUrl.setTextSize(  Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitEditTextSize", "18")));
                 new AlertDialog.Builder(activity)
                         .setTitle(getResources().getString(R.string.title_search_text))
                         .setMessage(getResources().getString(R.string.message_search_text))
@@ -386,7 +390,7 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
                                 txtUrl.setText(aSelectedFile.getName());
                                 txtUrl.setMaxLines(3);
                                 txtUrl.setLines(3);
-
+                                txtUrl.setTextSize(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitEditTextSize", "18")));
                                 new AlertDialog.Builder(activity)
                                         .setTitle(getResources().getString(R.string.dialog_title_add))
                                         .setMessage(getResources().getString(R.string.dialog_file_name))
@@ -634,6 +638,20 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
         getMenuInflater().inflate(R.menu.file_explorer_menu, menu);
         return true;
     }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            SpannableString spanString = new SpannableString(menu.getItem(i).getTitle().toString());
+            int end = spanString.length();
+            //spanString
+            spanString.setSpan(new RelativeSizeSpan(1.2f), 0, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            item.setTitle(spanString);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

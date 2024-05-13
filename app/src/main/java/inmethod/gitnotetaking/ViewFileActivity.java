@@ -19,10 +19,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.text.InputType;
+import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.method.BaseKeyListener;
 import android.text.method.KeyListener;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -151,7 +153,7 @@ public class ViewFileActivity extends AppCompatActivity {
             layoutAttachment = findViewById(R.id.layoutAttachment);
             layoutAttachment.removeAllViews();
 
-            int iTextSize = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitEditTextSize", "16"));
+            int iTextSize = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitEditTextSize", "18"));
             editText.setTextSize(iTextSize);
             editText.setTextColor(Color.BLACK);
 
@@ -209,7 +211,7 @@ public class ViewFileActivity extends AppCompatActivity {
                                 aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
                             }
 
-                            aTV.setTextSize(22);
+                            aTV.setTextSize(iTextSize);
                             aTV.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
@@ -355,6 +357,14 @@ public class ViewFileActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        for(int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            SpannableString spanString = new SpannableString(menu.getItem(i).getTitle().toString());
+            int end = spanString.length();
+            //spanString
+            spanString.setSpan(new RelativeSizeSpan(1.2f), 0, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            item.setTitle(spanString);
+        }
         itemEdit = menu.findItem(R.id.view_file_action_edit);
         itemSave = menu.findItem(R.id.view_file_action_save);
         if (isModify)
@@ -375,6 +385,8 @@ public class ViewFileActivity extends AppCompatActivity {
             txtUrl.setMaxLines(3);
             txtUrl.setLines(3);
             txtUrl.setText("");
+            txtUrl.setTextSize(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitEditTextSize", "18")));
+
             try {
                 fw = new FileWriter(new File(sFilePath));
                 BufferedWriter bw = new BufferedWriter(fw);
@@ -517,6 +529,8 @@ public class ViewFileActivity extends AppCompatActivity {
             //  txtUrl.setHint("your hint");
             txtUrl.setMaxLines(3);
             txtUrl.setLines(3);
+            txtUrl.setTextSize(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitEditTextSize", "18")));
+
             try {
                 fw = new FileWriter(new File(sFilePath));
                 BufferedWriter bw = new BufferedWriter(fw);
@@ -627,6 +641,8 @@ public class ViewFileActivity extends AppCompatActivity {
                     txtUrl.setText(aSelectedFile.getName());
                     txtUrl.setMaxLines(3);
                     txtUrl.setLines(3);
+                    txtUrl.setTextSize(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitEditTextSize", "18")));
+
                     new AlertDialog.Builder(this)
                             .setTitle(getResources().getString(R.string.dialog_title_add))
                             .setMessage(getResources().getString(R.string.dialog_file_name))
@@ -702,6 +718,8 @@ public class ViewFileActivity extends AppCompatActivity {
                 txtUrl.setText(photoFile.getName());
                 txtUrl.setMaxLines(3);
                 txtUrl.setLines(3);
+                txtUrl.setTextSize(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(activity).getString("GitEditTextSize", "18")));
+
                 new AlertDialog.Builder(this)
                         .setTitle(getResources().getString(R.string.dialog_title_modify))
                         .setMessage(getResources().getString(R.string.dialog_file_name))

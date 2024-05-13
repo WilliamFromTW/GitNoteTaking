@@ -16,6 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="40sp"
             android:background="?attr/colorPrimary"
+
+            app:titleTextAppearance="@style/BarFontSize"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </com.google.android.material.appbar.AppBarLayout>
