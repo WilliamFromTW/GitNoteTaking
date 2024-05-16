@@ -1,6 +1,9 @@
 package inmethod.gitnotetaking;
 
 
+import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
+import static android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
@@ -9,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.Spannable;
@@ -34,6 +38,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.preference.PreferenceManager;
 
+import com.hbisoft.pickit.PickiT;
+import com.hbisoft.pickit.PickiTCallbacks;
+
 import org.eclipse.jgit.util.FileUtils;
 
 import java.io.File;
@@ -58,7 +65,7 @@ import inmethod.gitnotetaking.utility.MyGitUtility;
 import inmethod.gitnotetaking.view.FileExplorerListAdapter;
 
 
-public class FileExplorerActivity extends AppCompatActivity {
+public class FileExplorerActivity extends AppCompatActivity  implements PickiTCallbacks {
 
     public static final String TAG =MainActivity.TAG;
 
@@ -77,6 +84,7 @@ public class FileExplorerActivity extends AppCompatActivity {
     public static int SEARCH_TEXT_CODE = 3;
     private static boolean bRefreshDir =false;
     private static String sSearchText = "";
+    PickiT pickiT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +99,7 @@ public class FileExplorerActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         m_curDir = sGitRootDir;
+        pickiT = new PickiT(this, this, this);
     }
 
 
@@ -290,7 +299,7 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
                             intent.setAction(android.content.Intent.ACTION_VIEW);
                             Log.d(TAG, "file type = " + getMimeType(Uri.fromFile(m_isFile), activity) + ", uri=" + path.getPath());
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            intent.setFlags(FLAG_GRANT_READ_URI_PERMISSION);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                             String authority = activity.getPackageName() + ".fileprovider";
                             Uri uri = FileProvider.getUriForFile(activity, authority, m_isFile);
@@ -350,6 +359,8 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+        intent.setFlags(FLAG_GRANT_READ_URI_PERMISSION | FLAG_GRANT_WRITE_URI_PERMISSION);
         myActivityResultLauncher.launch(intent);
     }
 
@@ -381,8 +392,177 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
                         Uri uri = null;
                         if (resultData != null) {
                             uri = resultData.getData();
-                            Log.d(TAG, "uri = " + uri.getPath() + ",host = " + uri.getHost() + ", authority = " + uri.getAuthority() + ", real path = " + FileUtility.getPath(activity, uri));
-                            final File aSelectedFile = new File(FileUtility.getPath(activity, uri));
+                            pickiT.getPath(uri, Build.VERSION.SDK_INT);
+                        }
+
+
+                    }
+                }
+            });
+
+    void createNewFolder(final int p_opt) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final EditText m_edtinput = new EditText(this);
+        if (p_opt == 1) {
+            builder.setTitle(getResources().getString(R.string.create_folder));
+            m_edtinput.setText("NewFolder");
+        } else {
+            builder.setTitle(getResources().getString(R.string.create_file));
+            m_edtinput.setText("NewFile.txt");
+        }
+        // Set up the input
+        // Specify the type of input expected;
+        m_edtinput.setInputType(InputType.TYPE_CLASS_TEXT);
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String m_text = m_edtinput.getText().toString();
+                if (p_opt == 1) {
+                    File m_newPath = new File(m_curDir, m_text);
+                    Log.d(TAG, m_curDir);
+                    if (!m_newPath.exists()) {
+                        m_newPath.mkdirs();
+                    }
+                } else {
+                    File m_newPath = new File(m_curDir, m_text);
+                    if (m_newPath.exists()) {
+                        Log.d(TAG, "file exists!");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getResources().getText(R.string.file_exists), Toast.LENGTH_SHORT);
+                            }
+                        });
+                        return;
+                    }
+                    try {
+                        FileOutputStream m_Output = new FileOutputStream((m_curDir + File.separator + m_text), false);
+                        m_Output.close();
+
+                    } catch (FileNotFoundException e) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getResources().getText(R.string.file_create_failed), Toast.LENGTH_SHORT);
+                            }
+                        });
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                getDirFromRoot(m_curDir);
+
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.setView(m_edtinput);
+        builder.show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.file_explorer_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            SpannableString spanString = new SpannableString(menu.getItem(i).getTitle().toString());
+            int end = spanString.length();
+            //spanString
+            spanString.setSpan(new RelativeSizeSpan(1.2f), 0, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            item.setTitle(spanString);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            onBackPressed();
+            return true;
+        } else if (id == R.id.action_search_text_file) {
+            searchTextFile();
+        } else if (id == R.id.action_add_file) {
+            sSearchText="";
+            addFile();
+        } else if (id == R.id.action_delete) {
+            sSearchText="";
+            deleteFile();
+        } else if (id == R.id.action_create_folder) {
+            sSearchText="";
+            createNewFolder(1);
+        } else if (id == R.id.action_create_file) {
+            sSearchText="";
+            createNewFolder(0);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public String getMimeType(Uri uri, Context context) {
+        String mimeType = null;
+        if (Objects.equals(uri.getScheme(), ContentResolver.SCHEME_CONTENT)) {
+            ContentResolver cr = context.getContentResolver();
+            mimeType = cr.getType(uri);
+        } else {
+            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
+                    .toString());
+            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                    fileExtension.toLowerCase());
+        }
+        return mimeType;
+    }
+
+    //When selecting a file from Google Drive, for example, the Uri will be returned before the file is available(if it has not yet been cached/downloaded).
+    //We are unable to see the progress
+    //Apps like Dropbox will display a dialog inside the picker
+    //This will only be called when selecting a drive file
+    @Override
+    public void PickiTonUriReturned() {
+        //Use to let user know that we are waiting for the application to return the file
+        //See the demo project to see how I used this.
+    }
+
+    //Called when the file creations starts (similar to onPreExecute)
+    //This will only be called if the selected file is not local or if the file is from an unknown file provider
+    @Override
+    public void PickiTonStartListener() {
+        //Can be used to display a ProgressDialog
+    }
+
+    //Returns the progress of the file being created (in percentage)
+    //This will only be called if the selected file is not local or if the file is from an unknown file provider
+    @Override
+    public void PickiTonProgressUpdate(int progress) {
+        //Can be used to update the progress of your dialog
+    }
+
+    //If the selected file was a local file then this will be called directly, returning the path as a String.
+    //String path - returned path
+    //boolean wasDriveFile - check if it was a drive file
+    //boolean wasUnknownProvider - check if it was from an unknown file provider
+    //boolean wasSuccessful - check if it was successful
+    //String reason - the get the reason why wasSuccessful returned false
+    @Override
+    public void PickiTonCompleteListener(String path, boolean wasDriveFile, boolean wasUnknownProvider, boolean wasSuccessful, String reason) {
+        //Dismiss dialog and return the path
+        Log.d(TAG,"pickiT real path ="+path +", was successful = "+ wasSuccessful +", reason = "+ reason);
+
+              //              Log.d(TAG, "uri = " + uri.getPath() + ",host = " + uri.getHost() + ", authority = " + uri.getAuthority() + ", real path = " + FileUtility.getPath(activity, uri));
+
+                            final File aSelectedFile = new File(path);
 
                             try {
 
@@ -462,236 +642,15 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
                             }
 
 
-                        }
 
-
-                    }
-                }
-            });
-
-    void createNewFolder(final int p_opt) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        final EditText m_edtinput = new EditText(this);
-        if (p_opt == 1) {
-            builder.setTitle(getResources().getString(R.string.create_folder));
-            m_edtinput.setText("NewFolder");
-        } else {
-            builder.setTitle(getResources().getString(R.string.create_file));
-            m_edtinput.setText("NewFile.txt");
-        }
-        // Set up the input
-        // Specify the type of input expected;
-        m_edtinput.setInputType(InputType.TYPE_CLASS_TEXT);
-        // Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String m_text = m_edtinput.getText().toString();
-                if (p_opt == 1) {
-                    File m_newPath = new File(m_curDir, m_text);
-                    Log.d(TAG, m_curDir);
-                    if (!m_newPath.exists()) {
-                        m_newPath.mkdirs();
-                    }
-                } else {
-                    File m_newPath = new File(m_curDir, m_text);
-                    if (m_newPath.exists()) {
-                        Log.d(TAG, "file exists!");
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getResources().getText(R.string.file_exists), Toast.LENGTH_SHORT);
-                            }
-                        });
-                        return;
-                    }
-                    try {
-                        FileOutputStream m_Output = new FileOutputStream((m_curDir + File.separator + m_text), false);
-                        m_Output.close();
-
-                    } catch (FileNotFoundException e) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getResources().getText(R.string.file_create_failed), Toast.LENGTH_SHORT);
-                            }
-                        });
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                getDirFromRoot(m_curDir);
-
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        builder.setView(m_edtinput);
-        builder.show();
-    }
-
-    /*
-    @Override
-    public void onActivityResult(int requestCode, int resultCode,
-                                 Intent resultData) {
-        super.onActivityResult(requestCode, resultCode, resultData);
-
-        if (requestCode == ADD_REQUEST_CODE) {
-            Uri uri = null;
-            if (resultData != null) {
-                uri = resultData.getData();
-                Log.d(TAG, "uri = " + uri.getPath() + ",host = " + uri.getHost() + ", authority = " + uri.getAuthority() + ", real path = " + FileUtility.getPath(activity, uri));
-                final File aSelectedFile = new File(FileUtility.getPath(activity, uri));
-
-                try {
-
-                    final EditText txtUrl = new EditText(this);
-                    txtUrl.setText(aSelectedFile.getName());
-                    txtUrl.setMaxLines(3);
-                    txtUrl.setLines(3);
-
-                    new AlertDialog.Builder(this)
-                            .setTitle(getResources().getString(R.string.dialog_title_add))
-                            .setMessage(getResources().getString(R.string.dialog_file_name))
-                            .setView(txtUrl)
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    bFinishCopy = false;
-                                    new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            final File aDestFile;
-                                            try {
-                                                aDestFile = new File(m_curDir, txtUrl.getText().toString().trim());
-                                                Log.d(TAG, "dest file = " + aDestFile.getCanonicalPath());
-                                                final String sDestFileNameString;
-
-                                                //sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
-                                                if( aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length()).startsWith("/"))
-                                                    sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length()+1);
-                                                else
-                                                    sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
-                                                Files.copy(aSelectedFile.toPath(), aDestFile.toPath());
-                                                bFinishCopy = true;
-
-                                                new Thread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        try {
-                                                            Thread.sleep(1000);
-                                                        } catch (InterruptedException e) {
-                                                            e.printStackTrace();
-                                                        }
-                                                        boolean bCommit = false;
-                                                        bCommit = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_add_attachment_file_commit) + sDestFileNameString);
-                                                        if (sGitRemoteUrl.indexOf("local") == -1 && bCommit)
-                                                            MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
-
-                                                    }
-                                                }).start();
-
-                                            }catch(FileAlreadyExistsException ee){
-
-                                            }
-                                            catch (IOException e) {
-                                                e.printStackTrace();
-
-                                            }
-                                            bFinishCopy = true;
-
-                                        }
-                                    }).start();
-                                    new MyAsyncTask().execute();
-                                }
-                            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                        }
-                    }).show();
-
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(MyApplication.getAppContext(), "Add Failed!", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                }
-
-
-            }
-        }else if (requestCode == SEARCH_TXT_CODE){
-
-        }
-    }
-*/
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.file_explorer_menu, menu);
-        return true;
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        for (int i = 0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            SpannableString spanString = new SpannableString(menu.getItem(i).getTitle().toString());
-            int end = spanString.length();
-            //spanString
-            spanString.setSpan(new RelativeSizeSpan(1.2f), 0, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            item.setTitle(spanString);
-        }
-        return super.onPrepareOptionsMenu(menu);
+    public void PickiTonMultipleCompleteListener(ArrayList<String> arrayList, boolean b, String s) {
+
     }
 
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            onBackPressed();
-            return true;
-        } else if (id == R.id.action_search_text_file) {
-            searchTextFile();
-        } else if (id == R.id.action_add_file) {
-            sSearchText="";
-            addFile();
-        } else if (id == R.id.action_delete) {
-            sSearchText="";
-            deleteFile();
-        } else if (id == R.id.action_create_folder) {
-            sSearchText="";
-            createNewFolder(1);
-        } else if (id == R.id.action_create_file) {
-            sSearchText="";
-            createNewFolder(0);
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    public String getMimeType(Uri uri, Context context) {
-        String mimeType = null;
-        if (Objects.equals(uri.getScheme(), ContentResolver.SCHEME_CONTENT)) {
-            ContentResolver cr = context.getContentResolver();
-            mimeType = cr.getType(uri);
-        } else {
-            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
-                    .toString());
-            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-                    fileExtension.toLowerCase());
-        }
-        return mimeType;
-    }
-
-     class MyAsyncTask extends AsyncTask<Void, Void, Void> {
+    class MyAsyncTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
             // 這裡處理背景工作
