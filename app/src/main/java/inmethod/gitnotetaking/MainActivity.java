@@ -170,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
                             intent.putExtra("GIT_ROOT_DIR", MyGitUtility.getLocalGitDirectory(activity, sRemoteUrl));
                             intent.putExtra("GIT_NAME", sGitName);
                             intent.putExtra("GIT_REMOTE_URL", sRemoteUrl);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intent);
 
 
@@ -186,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
                     intent.putExtra("GIT_ROOT_DIR", MyGitUtility.getLocalGitDirectory(activity, sRemoteUrl));
                     intent.putExtra("GIT_NAME", sGitName);
                     intent.putExtra("GIT_REMOTE_URL", sRemoteUrl);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
 
                 }

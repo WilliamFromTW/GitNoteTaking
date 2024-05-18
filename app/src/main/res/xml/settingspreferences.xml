@@ -30,7 +30,15 @@
         app:allowDividerBelow="true"
         app:defaultValue="false"
         app:key="GitCheckBoxCommitMessage"
-        app:title="@string/GitCheckBoxCommitMessage"></androidx.preference.CheckBoxPreference>
+        app:title="@string/GitCheckBoxCommitMessage">
+    </androidx.preference.CheckBoxPreference>
+    <androidx.preference.CheckBoxPreference
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:defaultValue="false"
+        app:key="GitShowAttachDir"
+        app:title="@string/GitShowAttachDir">
+    </androidx.preference.CheckBoxPreference>
     <androidx.preference.EditTextPreference
         app:defaultValue="gitnotetaking"
         app:key="GitLocalDirName"

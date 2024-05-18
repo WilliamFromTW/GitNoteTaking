@@ -100,6 +100,7 @@
     <string name="message_search_text">" "</string>
     <string name="attachment">File</string>
     <string name="refres_files">Refresh</string>
+    <string name="GitShowAttachDir">Show Attachment Dir</string>
 
 
 </resources>

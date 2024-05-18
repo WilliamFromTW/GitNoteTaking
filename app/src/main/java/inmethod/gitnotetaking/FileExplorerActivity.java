@@ -4,6 +4,7 @@ package inmethod.gitnotetaking;
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
 import static android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
@@ -27,7 +28,9 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.window.OnBackInvokedDispatcher;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -79,6 +82,7 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
     private String sGitRootDir;
     private String sGitName;
     private String sGitRemoteUrl;
+    private String m_PreviousDir;
     private String m_curDir;
     public static int ADD_REQUEST_CODE = 2;
     public static int SEARCH_TEXT_CODE = 3;
@@ -98,8 +102,21 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
         toolbar.setTitle(sGitName);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        m_PreviousDir = sGitRootDir;
         m_curDir = sGitRootDir;
         pickiT = new PickiT(this, this, this);
+        OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // handle backpressed here
+
+                if( m_item.get(0).equalsIgnoreCase("../"))
+                    getDirFromRoot( m_path.get(0));
+                else
+                    finish();//onBackPressed();
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this,onBackPressedCallback);
     }
 
 
@@ -203,7 +220,7 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
 
             if (file.isDirectory()) {
                 try {
-                    if (file.getCanonicalPath().contains("_attach")) {
+                    if (  !PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("GitShowAttachDir", false) && file.getCanonicalPath().contains("_attach")) {
                     }
                     else if (file.getName().charAt(0) == '.') {
                     }
@@ -282,6 +299,8 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
                 File m_isFile = new File(m_path.get(position));
 
                 if (m_isFile.isDirectory()) {
+                    m_PreviousDir = m_curDir;
+                    Log.d(TAG,"m_PreviousDir="+m_PreviousDir+",m_curDir="+m_curDir);
                     getDirFromRoot(m_isFile.toString());
                 } else {
                     String sFileName = m_isFile.getName().toLowerCase();
@@ -486,12 +505,15 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
         return super.onPrepareOptionsMenu(menu);
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
+            if( m_item.get(0).equalsIgnoreCase("../"))
+                getDirFromRoot( m_path.get(0));
+            else
             onBackPressed();
+
             return true;
         } else if (id == R.id.action_refresh) {
             sSearchText="";
