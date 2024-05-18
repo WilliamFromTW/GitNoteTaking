@@ -24,6 +24,7 @@ public class MyGitUtility {
     public static final int GIT_STATUS_FAIL = -1;
     public static final int GIT_STATUS_CLONING = -3;
     public static final int GIT_STATUS_PULLING = -4;
+    public static boolean bGitLock = false;
 
 
     public static boolean deleteLocalGitRepository(Context context, String sRemoteUrl) {
@@ -60,11 +61,19 @@ public class MyGitUtility {
         return aReturn;
     }
 
+    public static void setGitLock(boolean bLock){
+        bGitLock = bLock;
+    }
+
+    public static boolean checkGitLock(){
+        return bGitLock;
+    }
 
     public static boolean push(Context context, String sRemoteUrl) {
         RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(context);
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
         if (aRemoteGit == null) return false;
+        setGitLock(true);
         String sLocalDirectory = getLocalGitDirectory(context, sRemoteUrl);
         boolean bIsRemoteRepositoryExist = false;
         GitUtil aGitUtil=null;
@@ -75,6 +84,7 @@ public class MyGitUtility {
                 Log.e(TAG, "check remote url failed");
                 aRemoteGit.setStatus( MyGitUtility.GIT_STATUS_FAIL);
                 aRemoteGitDAO.update(aRemoteGit);
+                setGitLock(false);
                 if (aGitUtil != null) aGitUtil.close();
                 return false;
             }
@@ -85,6 +95,7 @@ public class MyGitUtility {
                     Log.d(TAG, "push finished!");
                     aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_SUCCESS);
                     aRemoteGitDAO.update(aRemoteGit);
+                    setGitLock(false);
                     aRemoteGitDAO.close();
                     if (aGitUtil != null) aGitUtil.close();
                     return true;
@@ -92,11 +103,14 @@ public class MyGitUtility {
                     aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_FAIL);
                     aRemoteGitDAO.update(aRemoteGit);
                     Log.d(TAG, "push failed!");
+                    setGitLock(false);
                     aRemoteGitDAO.close();
                     if (aGitUtil != null) aGitUtil.close();
                     return false;
                 }
             }
+            setGitLock(false);
+
             if( aRemoteGitDAO!=null)
             aRemoteGitDAO.close();
             if (aGitUtil != null) aGitUtil.close();
@@ -105,7 +119,9 @@ public class MyGitUtility {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        setGitLock(false);
         if (aGitUtil != null) aGitUtil.close();
+
         return false;
     }
 
@@ -113,6 +129,7 @@ public class MyGitUtility {
 
         String sLocalDirectory = getLocalGitDirectory(context, sRemoteUrl);
         GitUtil aGitUtil=null;
+        setGitLock(true);
         RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(context);
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
         try {
@@ -123,17 +140,20 @@ public class MyGitUtility {
             if (aGitUtil.commit(sCommitMessages, sAuthorName, sAuthorEmail)) {
                 aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_SUCCESS);
                 Log.d(TAG, "commit finished!");
+                setGitLock(false);
                 if (aGitUtil != null) aGitUtil.close();
                 return true;
             } else {
                 aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_FAIL);
                 Log.d(TAG, "commit failed!");
+                setGitLock(false);
                 if (aGitUtil != null) aGitUtil.close();
                 return false;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        setGitLock(false);
         if (aGitUtil != null) aGitUtil.close();
         return false;
     }
@@ -183,6 +203,8 @@ public class MyGitUtility {
         String sLocalDirectory = getLocalGitDirectory(context, sRemoteUrl);
         GitUtil aGitUtil;
         boolean bReturn = false;
+        setGitLock(true);
+
         try {
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
                 bReturn = aGitUtil.checkout(aRemoteGit.getBranch());
@@ -190,6 +212,7 @@ public class MyGitUtility {
         }catch (Exception ee){
             Log.d(TAG,ee.getLocalizedMessage());
         }
+        setGitLock(false);
         return bReturn;
     }
 
@@ -211,6 +234,8 @@ public class MyGitUtility {
         RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(context);
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
         if (aRemoteGit == null) return false;
+        setGitLock(true);
+
         String sUserName = aRemoteGit.getUid();
         aRemoteGit.setStatus(GIT_STATUS_PULLING);
         aRemoteGitDAO.update(aRemoteGit);
@@ -225,6 +250,7 @@ public class MyGitUtility {
                 aRemoteGit.setStatus(GIT_STATUS_FAIL);
                 aRemoteGitDAO.update(aRemoteGit);
                 Log.e(TAG, "check remote url failed");
+                setGitLock(false);
                 if (aGitUtil != null) aGitUtil.close();
                 return false;
             }
@@ -235,18 +261,21 @@ public class MyGitUtility {
                     Log.d(TAG, "pull finished!");
                     aRemoteGit.setStatus(GIT_STATUS_SUCCESS);
                     aRemoteGitDAO.update(aRemoteGit);
+                    setGitLock(false);
                     if (aGitUtil != null) aGitUtil.close();
                     return true;
                 } else {
                     aRemoteGit.setStatus(GIT_STATUS_FAIL);
                     aRemoteGitDAO.update(aRemoteGit);
                     Log.d(TAG, "pull failed!");
+                    setGitLock(false);
                     if (aGitUtil != null) aGitUtil.close();
                     return false;
                 }
             }
             aRemoteGit.setStatus(GIT_STATUS_FAIL);
             aRemoteGitDAO.update(aRemoteGit);
+            setGitLock(false);
             if (aGitUtil != null) aGitUtil.close();
             if( aRemoteGit!=null )
             aRemoteGitDAO.close();
@@ -265,6 +294,9 @@ public class MyGitUtility {
         if (checkLocalGitRepository(context, sRemoteUrl)) {
             return false;
         }
+
+        setGitLock(true);
+
         boolean bIsRemoteRepositoryExist = false;
         GitUtil aGitUtil;
         try {
@@ -272,6 +304,7 @@ public class MyGitUtility {
             bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(sUserName, sUserPassword);
             if (!bIsRemoteRepositoryExist) {
                 Log.e(TAG, "check remote url failed");
+                setGitLock(false);
                 if (aGitUtil != null) aGitUtil.close();
                 return false;
             }
@@ -280,16 +313,19 @@ public class MyGitUtility {
                 Log.d(TAG, "try to clone remote repository if local repository is not exists \n");
                 if (aGitUtil.clone(sUserName, sUserPassword,1)) {
                     Log.d(TAG, "clone finished!");
+                    setGitLock(false);
                     if (aGitUtil != null) aGitUtil.close();
                     return true;
                 } else {
                     Log.d(TAG, "clone failed!");
+                    setGitLock(false);
                     if (aGitUtil != null) aGitUtil.close();
                     return false;
                 }
             } else if (bIsRemoteRepositoryExist && aGitUtil.checkLocalRepository()) {
                 Log.d(TAG, "pull branch = " + aGitUtil.getRemoteDefaultBranch() + " , status : "
                         + aGitUtil.pull(sRemoteName, sUserName, sUserPassword));
+                setGitLock(false);
                 if (aGitUtil != null) aGitUtil.close();
                 return true;
             }
@@ -297,6 +333,7 @@ public class MyGitUtility {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        setGitLock(false);
         return false;
     }
 

@@ -423,20 +423,30 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
                                 });
                                 isModify = false;
                                 disable();
-                                if (txtUrl.getText().toString().trim().equals(""))
-                                    txtUrl.setText("<" + file.getName() + ">");
-                                else
-                                    txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
 
                                 boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
 
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        if (bCommitStatus) {
-                                            if (sGitRemoteUrl.indexOf("local") == -1) {
-                                                MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+                                        try {
+                                            if (txtUrl.getText().toString().trim().equals(""))
+                                                txtUrl.setText("<" + file.getName() + ">");
+                                            else
+                                                txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
+                                            boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
+                                            Thread.sleep(100);
+                                            if (bCommitStatus) {
+                                                if (sGitRemoteUrl.indexOf("local") == -1) {
+                                                    if (bCommitStatus) {
+                                                        MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+                                                    }
+                                                }
+
                                             }
+
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
                                         }
                                     }
                                 }).start();
@@ -451,12 +461,7 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
                     }
                 });
 
-                if (txtUrl.getText().toString().trim().equals(""))
-                    txtUrl.setText("<" + file.getName() + ">");
-                else
-                    txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
 
-                boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
                 isModify = false;
                 disable();
 
@@ -464,20 +469,27 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
                     @Override
                     public void run() {
                         try {
-                            Thread.sleep(1000);
+                            if (txtUrl.getText().toString().trim().equals(""))
+                                txtUrl.setText("<" + file.getName() + ">");
+                            else
+                                txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
+                            boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
+                            Thread.sleep(100);
+                            if (bCommitStatus) {
+                                if (sGitRemoteUrl.indexOf("local") == -1) {
+                                    if (bCommitStatus) {
+                                        MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+                                    }
+                                }
+
+                            }
+
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        if (bCommitStatus) {
-                            if (sGitRemoteUrl.indexOf("local") == -1) {
-                                if (bCommitStatus) {
-                                    MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
-                                }
-                            }
-
-                        }
                     }
                 }).start();
+                super.onBackPressed();
             }
         } else super.onBackPressed();
 
@@ -565,25 +577,28 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
                                         Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.toast_pulling), Toast.LENGTH_SHORT).show();
                                     }
                                 });
-                                if (txtUrl.getText().toString().trim().equals(""))
-                                    txtUrl.setText("<" + file.getName() + ">");
-                                else
-                                    txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
 
-                                boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
-                                if (bCommitStatus) {
                                     isModify = false;
                                     disable();
                                     Log.d(TAG, "asdf");
-                                }
 
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        if (bCommitStatus) {
-                                            if (sGitRemoteUrl.indexOf("local") == -1) {
-                                                MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+                                        try {
+                                            if (txtUrl.getText().toString().trim().equals(""))
+                                                txtUrl.setText("<" + file.getName() + ">");
+                                            else
+                                                txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
+                                            boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
+                                            Thread.sleep(100);
+                                            if (bCommitStatus) {
+                                                if (sGitRemoteUrl.indexOf("local") == -1) {
+                                                  MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+                                                }
                                             }
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
                                         }
                                     }
                                 }).start();
@@ -596,27 +611,25 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
                         Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.toast_pulling), Toast.LENGTH_SHORT).show();
                     }
                 });
-                if (txtUrl.getText().toString().trim().equals(""))
-                    txtUrl.setText("<" + file.getName() + ">");
-                else
-                    txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
-                boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
-                if (bCommitStatus) {
                     isModify = false;
                     disable();
-                }
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            Thread.sleep(1000);
+                            if (txtUrl.getText().toString().trim().equals(""))
+                                txtUrl.setText("<" + file.getName() + ">");
+                            else
+                                txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
+                            boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
+                            Thread.sleep(100);
+                            if (bCommitStatus) {
+                                if (sGitRemoteUrl.indexOf("local") == -1) {
+                                    MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+                                }
+                            }
                         } catch (InterruptedException e) {
                             e.printStackTrace();
-                        }
-                        if (bCommitStatus) {
-                            if (sGitRemoteUrl.indexOf("local") == -1) {
-                                MyGitUtility.push(activity, sGitRemoteUrl);
-                            }
                         }
                     }
                 }).start();

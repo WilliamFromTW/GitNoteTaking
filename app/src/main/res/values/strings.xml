@@ -21,7 +21,6 @@
     <string name="dialog_reset">Reset</string>
 
 
-
     // Preference
     <string name="GitEditTextSize">Notes Text Size</string>
     <string name="GitLocalDirName">Local Git root directory(default)</string>
@@ -100,5 +99,7 @@
     <string name="toast_cloning">Cloning Try later</string>
     <string name="message_search_text">" "</string>
     <string name="attachment">File</string>
+    <string name="refres_files">Refresh</string>
+
 
 </resources>

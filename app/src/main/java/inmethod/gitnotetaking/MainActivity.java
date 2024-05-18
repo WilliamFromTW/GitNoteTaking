@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, int position) {
                 // Toast.makeText(activity, "click position=" + position, Toast.LENGTH_LONG).show();
-                Intent Intent = new Intent(MainActivity.this, FileExplorerActivity.class);
+                Intent intent = new Intent(MainActivity.this, FileExplorerActivity.class);
                 Object[] aTextView = GitList.getDeviceInfoFromLayoutId(view);
                 String sGitName = ((TextView) aTextView[0]).getText().toString();
                 String sRemoteUrl = ((TextView) aTextView[1]).getText().toString();
@@ -167,10 +167,10 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             Toast.makeText(activity, getString(R.string.toast_pulling) , Toast.LENGTH_SHORT).show();
-                            Intent.putExtra("GIT_ROOT_DIR", MyGitUtility.getLocalGitDirectory(activity, sRemoteUrl));
-                            Intent.putExtra("GIT_NAME", sGitName);
-                            Intent.putExtra("GIT_REMOTE_URL", sRemoteUrl);
-                            startActivity(Intent);
+                            intent.putExtra("GIT_ROOT_DIR", MyGitUtility.getLocalGitDirectory(activity, sRemoteUrl));
+                            intent.putExtra("GIT_NAME", sGitName);
+                            intent.putExtra("GIT_REMOTE_URL", sRemoteUrl);
+                            startActivity(intent);
 
 
                         }
@@ -183,10 +183,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-                    Intent.putExtra("GIT_ROOT_DIR", MyGitUtility.getLocalGitDirectory(activity, sRemoteUrl));
-                    Intent.putExtra("GIT_NAME", sGitName);
-                    Intent.putExtra("GIT_REMOTE_URL", sRemoteUrl);
-                    startActivity(Intent);
+                    intent.putExtra("GIT_ROOT_DIR", MyGitUtility.getLocalGitDirectory(activity, sRemoteUrl));
+                    intent.putExtra("GIT_NAME", sGitName);
+                    intent.putExtra("GIT_REMOTE_URL", sRemoteUrl);
+                    startActivity(intent);
 
                 }
             }

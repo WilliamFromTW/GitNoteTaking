@@ -493,6 +493,9 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
         if (id == android.R.id.home) {
             onBackPressed();
             return true;
+        } else if (id == R.id.action_refresh) {
+            sSearchText="";
+            getDirFromRoot(m_curDir);
         } else if (id == R.id.action_search_text_file) {
             searchTextFile();
         } else if (id == R.id.action_add_file) {
