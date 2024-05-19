@@ -65,7 +65,7 @@ public class MyGitUtility {
         bGitLock = bLock;
     }
 
-    public static boolean checkGitLock(){
+    public static boolean isGitLock(){
         return bGitLock;
     }
 

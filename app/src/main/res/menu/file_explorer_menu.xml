@@ -6,14 +6,15 @@
 
     <item
         android:id="@+id/action_refresh"
-        android:orderInCategory="99"
+        android:orderInCategory="98"
         android:title="@string/refres_files"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_search_text_file"
         android:orderInCategory="100"
         android:title="@string/file_filter_external_file"
-        app:showAsAction="always" />
+        android:visible="false"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_add_file"
         android:orderInCategory="101"
@@ -26,9 +27,9 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/action_create_file"
-        android:orderInCategory="103"
+        android:orderInCategory="99"
         android:title="@string/action_create_file"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_delete"
         android:orderInCategory="104"

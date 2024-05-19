@@ -101,6 +101,6 @@
     <string name="attachment">File</string>
     <string name="refres_files">Refresh</string>
     <string name="GitShowAttachDir">Show Attachment Dir</string>
-
+    <string name="textViewSearch">Search</string>
 
 </resources>

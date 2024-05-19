@@ -5,7 +5,7 @@
     <string name="view_file_action_save">儲存</string>
     <string name="GitAuthorName">名字</string>
     <string name="GitAuthorEmail">電子郵件</string>
-    <string name="action_create_file">建立文字檔案</string>
+    <string name="action_create_file">建立檔案</string>
     <string name="action_create_folder">建立目錄</string>
     <string name="action_delete">刪除</string>
     <string name="title_remove">移除</string>
@@ -45,7 +45,7 @@
     <string name="select_file_or_directory">必須選擇檔案或目錄</string>
     <string name="file_exists">檔案已存在!</string>
     <string name="file_create_failed">檔案建立失敗!</string>
-    <string name="file_add_external_file">新增檔案</string>
+    <string name="file_add_external_file">加入檔案</string>
     <string name="file_filter_external_file">搜尋</string>
 
 
@@ -88,7 +88,7 @@
     <string name="tv_create_local_git_success">新增成功</string>
     <string name="tv_create_local_git_fail">新增失敗</string>
     <string name="dialog_title_add">新增檔案</string>
-    <string name="toast_pulling">同步中,請稍後</string>
+    <string name="toast_pulling">背景同步中,請稍後</string>
     <string name="toast_cloning">複製中,請稍後</string>
     <string name="title_search_text">搜尋</string>
     <string name="message_search_text">" "</string>
@@ -99,5 +99,6 @@
     <string name="attachment">附件</string>
     <string name="refres_files">重整</string>
     <string name="GitShowAttachDir">顯示附件目錄</string>
+    <string name="textViewSearch">搜尋</string>
 
 </resources>

@@ -15,11 +15,15 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputType;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +31,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.window.OnBackInvokedDispatcher;
 
@@ -89,6 +94,7 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
     private static boolean bRefreshDir =false;
     private static String sSearchText = "";
     PickiT pickiT;
+    EditText aEditTextSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +130,53 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
     public void onStart() {
         super.onStart();
         view = (ListView) findViewById(R.id.rl_lvListRoot);
+      //  TextView textViewSearch= (TextView)findViewById(R.id.editTextSearch);
+     //   textViewSearch.setTextSize(TypedValue.COMPLEX_UNIT_PX, Integer.parseInt( PreferenceManager.getDefaultSharedPreferences(MyApplication.getAppContext()).getString("GitEditTextSize" ,"18" )));
+        aEditTextSearch = (EditText)findViewById(R.id.editTextSearch);
+        aEditTextSearch.setTextSize( Integer.parseInt( PreferenceManager.getDefaultSharedPreferences(MyApplication.getAppContext()).getString("GitEditTextSize" ,"18" )));
+        aEditTextSearch.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                sSearchText = s.toString();
+                getDirFromRoot(m_curDir);
+
+            }
+
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (TextUtils.isEmpty(s.toString().trim())) {
+
+                } else {
+
+                }
+            }
+        });
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(3000);
+                    Log.d(TAG,"wait and refresh if still locking after 3 seconds ");
+                    if(MyGitUtility.isGitLock()){
+                        while(MyGitUtility.isGitLock())
+                        getDirFromRoot(m_curDir);
+                    }else{
+                        Log.d(TAG,"no need to refresh");
+                    }
+                } catch (
+                        InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
         getDirFromRoot(m_curDir);
     }
 
@@ -199,8 +252,8 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
         File m_file = new File(p_rootPath);
         File[] m_filesArray = m_file.listFiles();
         if( sSearchText!=null && !sSearchText.equals("") ) {
-            m_item.add(MyApplication.getAppContext().getString(R.string.search_mode) +":"+ sSearchText);
-            m_path.add(".");
+//            m_item.add(MyApplication.getAppContext().getString(R.string.search_mode) +":"+ sSearchText);
+  //          m_path.add(".");
         }else {
             //Log.d(TAG,"rootPath="+p_rootPath+",GitRootDir="+sGitRootDir);
         if (!p_rootPath.equals(sGitRootDir)) {
