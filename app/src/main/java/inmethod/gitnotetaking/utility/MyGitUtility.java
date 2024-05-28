@@ -256,7 +256,7 @@ public class MyGitUtility {
             }
             Log.d(TAG, "Remote repository exists ? " + bIsRemoteRepositoryExist);
             if (bIsRemoteRepositoryExist) {
-                Log.d(TAG, "try to update remote repository if local repository is not exists , branch="+aRemoteGit.getRemoteName());
+                Log.d(TAG, "try to pull remote repository , branch="+aRemoteGit.getRemoteName());
                 if (aGitUtil.pull(aRemoteGit.getRemoteName(), sUserName, sUserPassword)) {
                     Log.d(TAG, "pull finished!");
                     aRemoteGit.setStatus(GIT_STATUS_SUCCESS);
@@ -265,6 +265,11 @@ public class MyGitUtility {
                     if (aGitUtil != null) aGitUtil.close();
                     return true;
                 } else {
+                    try {
+                        aGitUtil.commit("Merge");
+                    }catch(Exception ee){
+
+                    }
                     aRemoteGit.setStatus(GIT_STATUS_FAIL);
                     aRemoteGitDAO.update(aRemoteGit);
                     Log.d(TAG, "pull failed!");

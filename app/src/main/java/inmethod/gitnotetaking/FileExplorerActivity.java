@@ -165,7 +165,6 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
                     Thread.sleep(3000);
                     Log.d(TAG,"wait and refresh if still locking after 3 seconds ");
                     if(MyGitUtility.isGitLock()){
-                        while(MyGitUtility.isGitLock())
                         getDirFromRoot(m_curDir);
                     }else{
                         Log.d(TAG,"no need to refresh");
@@ -182,6 +181,10 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
 
     @Override
     public void onResume() {
+
+        if( sSearchText!=null && !sSearchText.trim().equals(""))
+           aEditTextSearch.setText (sSearchText);
+
         super.onResume();
     }
 
@@ -570,6 +573,7 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
             return true;
         } else if (id == R.id.action_refresh) {
             sSearchText="";
+            aEditTextSearch.setText("");
             getDirFromRoot(m_curDir);
         } else if (id == R.id.action_search_text_file) {
             searchTextFile();
