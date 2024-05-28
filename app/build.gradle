@@ -7,8 +7,8 @@ android {
         applicationId "inmethod.gitnotetaking"
         minSdkVersion 33
         targetSdk 33
-        versionCode 132
-        versionName "3.98"
+        versionCode 133
+        versionName "3.99"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

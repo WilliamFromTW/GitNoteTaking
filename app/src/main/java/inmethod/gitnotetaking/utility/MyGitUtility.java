@@ -7,6 +7,7 @@ import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
+import org.eclipse.jgit.api.MergeResult;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.io.File;
@@ -265,11 +266,10 @@ public class MyGitUtility {
                     if (aGitUtil != null) aGitUtil.close();
                     return true;
                 } else {
-                    try {
-                        aGitUtil.commit("Merge");
-                    }catch(Exception ee){
 
-                    }
+                    File aFile = new File(aGitUtil.getGit().getRepository().getDirectory()+"/.git/index.lock");
+                    if( aFile.isFile() )
+                         aFile.delete();
                     aRemoteGit.setStatus(GIT_STATUS_FAIL);
                     aRemoteGitDAO.update(aRemoteGit);
                     Log.d(TAG, "pull failed!");
