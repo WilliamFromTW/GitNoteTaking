@@ -285,7 +285,7 @@ public class MyGitUtility {
                     lockfail.printStackTrace();
                     if (aGitUtil != null) aGitUtil.close();
                     Log.e(TAG,"aGitUtil.getGit().getRepository().getDirectory()="+aGitUtil.getGit().getRepository().getDirectory());
-                    File aFile = new File(aGitUtil.getGit().getRepository().getDirectory() + "/.git/index.lock");
+                    File aFile = new File(aGitUtil.getGit().getRepository().getDirectory() + "/index.lock");
                     if (aFile.isFile()) {
                         boolean isDelete = aFile.delete();
                         Log.e(TAG,"lock file is delete?"+isDelete);
@@ -295,7 +295,7 @@ public class MyGitUtility {
                     if( aJGitInternalException.getLocalizedMessage().toLowerCase().indexOf("lock")!=-1 ){
                         if (aGitUtil != null) aGitUtil.close();
                         Log.e(TAG,"aGitUtil.getGit().getRepository().getDirectory()="+aGitUtil.getGit().getRepository().getDirectory());
-                        File aFile = new File(aGitUtil.getGit().getRepository().getDirectory() + "/.git/index.lock");
+                        File aFile = new File(aGitUtil.getGit().getRepository().getDirectory() + "/index.lock");
                         if (aFile.isFile()) {
                             boolean isDelete = aFile.delete();
                             Log.e(TAG,"lock file is delete?"+isDelete);
@@ -306,7 +306,7 @@ public class MyGitUtility {
                     asd.printStackTrace();
                     try {
                         Log.e(TAG,"aGitUtil.getGit().getRepository().getDirectory()="+aGitUtil.getGit().getRepository().getDirectory());
-                        File aFile = new File(aGitUtil.getGit().getRepository().getDirectory() + "/.git/index.lock");
+                        File aFile = new File(aGitUtil.getGit().getRepository().getDirectory() + "/index.lock");
                         if (aFile.isFile()) {
                             boolean isDelete = aFile.delete();
                             Log.e(TAG,"lock file is delete?"+isDelete);
