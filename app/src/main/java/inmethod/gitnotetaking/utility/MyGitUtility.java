@@ -12,6 +12,7 @@ import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 import org.eclipse.jgit.errors.LockFailedException;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.io.File;
@@ -304,7 +305,14 @@ public class MyGitUtility {
                 }catch(WrongRepositoryStateException asd){
                     asd.printStackTrace();
                     try {
-                        aGitUtil.reset(ResetCommand.ResetType.HARD, PreferenceManager.getDefaultSharedPreferences(context).getString("GitRemoteName", "master"));
+                        Log.e(TAG,"aGitUtil.getGit().getRepository().getDirectory()="+aGitUtil.getGit().getRepository().getDirectory());
+                        File aFile = new File(aGitUtil.getGit().getRepository().getDirectory() + "/.git/index.lock");
+                        if (aFile.isFile()) {
+                            boolean isDelete = aFile.delete();
+                            Log.e(TAG,"lock file is delete?"+isDelete);
+                        }
+
+                        aGitUtil.reset(ResetCommand.ResetType.HARD, "HEAD");
                     }catch (Exception resetEx){
                         Log.e(TAG,"reset exception");
                         resetEx.printStackTrace();
