@@ -8,6 +8,7 @@ import android.util.Log;
 import androidx.preference.PreferenceManager;
 
 import org.eclipse.jgit.api.MergeResult;
+import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.io.File;
@@ -268,14 +269,15 @@ public class MyGitUtility {
                     return true;
                 } else {
 
-                    File aFile = new File(aGitUtil.getGit().getRepository().getDirectory()+"/.git/index.lock");
-                    if( aFile.isFile() )
-                         aFile.delete();
+                    aGitUtil.reset(ResetCommand.ResetType.MIXED, PreferenceManager.getDefaultSharedPreferences( context ).getString("GitRemoteName", "master"));
                     aRemoteGit.setStatus(GIT_STATUS_FAIL);
                     aRemoteGitDAO.update(aRemoteGit);
                     Log.d(TAG, "pull failed!");
                     setGitLock(false);
                     if (aGitUtil != null) aGitUtil.close();
+                    File aFile = new File(aGitUtil.getGit().getRepository().getDirectory()+"/.git/index.lock");
+                    if( aFile.isFile() )
+                        aFile.delete();
                     return false;
                 }
             }
