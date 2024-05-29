@@ -102,5 +102,6 @@
     <string name="refres_files">Refresh</string>
     <string name="GitShowAttachDir">Show Attachment Dir</string>
     <string name="textViewSearch">Search</string>
+    <string name="pulling_failed">Pulling Failed!</string>
 
 </resources>

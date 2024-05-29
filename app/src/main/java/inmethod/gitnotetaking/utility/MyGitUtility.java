@@ -246,6 +246,7 @@ public class MyGitUtility {
         GitUtil aGitUtil;
         try {
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
+            aGitUtil.setContentMergeStrategyOURS();
             bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(sUserName, sUserPassword);
             if (!bIsRemoteRepositoryExist) {
                 aRemoteGit.setStatus(GIT_STATUS_FAIL);

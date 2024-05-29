@@ -100,5 +100,6 @@
     <string name="refres_files">重整</string>
     <string name="GitShowAttachDir">顯示附件目錄</string>
     <string name="textViewSearch">搜尋</string>
+    <string name="pulling_failed">同步失敗，請再試幾次或筆記刪除重新同步</string>
 
 </resources>

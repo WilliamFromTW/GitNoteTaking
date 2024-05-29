@@ -276,6 +276,13 @@ public class MainActivity extends AppCompatActivity {
                                     public void run() {
                                         if (MyGitUtility.pull(MyApplication.getAppContext(), ((TextView) aTextView[1]).getText().toString())) {
 
+                                        }else{
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Toast.makeText(activity,MyApplication.getAppContext().getText(R.string.pulling_failed) , Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
                                         }
                                         dialog.dismiss();
                                     }
