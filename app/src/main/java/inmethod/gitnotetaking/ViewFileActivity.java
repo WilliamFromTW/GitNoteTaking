@@ -79,7 +79,7 @@ import inmethod.gitnotetaking.utility.MyGitUtility;
 import inmethod.gitnotetaking.view.FileExplorerListAdapter;
 
 
-public class ViewFileActivity extends AppCompatActivity  implements PickiTCallbacks {
+public class ViewFileActivity extends AppCompatActivity implements PickiTCallbacks {
 
     public static final String TAG = MainActivity.TAG;
     public static final int REQUEST_TAKE_PHOTO = 100;
@@ -197,33 +197,36 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
                             aTV.setLayoutParams(lp);
                             final Uri filuri = Uri.fromFile(file);
                             String sMimeType = getMimeType(filuri, activity);
-                            if( sMimeType==null){
+                            if (sMimeType == null) {
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.unknown24, 0, 0, 0);
                                 aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
-                            } else{
+                            } else {
                                 sMimeType = sMimeType.toLowerCase();
-                            if (sMimeType.contains("image")) {
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.image24, 0, 0, 0);
-                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
-                            } else if (sMimeType.contains("plain")) {
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.txt24, 0, 0, 0);
-                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
-                            } else if (sMimeType.contains("excel")) {
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.xls24, 0, 0, 0);
-                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
-                            } else if (sMimeType.contains("word")) {
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.doc24, 0, 0, 0);
-                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
-                            } else if (sMimeType.contains("pdf")) {
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.pdf24, 0, 0, 0);
-                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
-                            } else if (sMimeType.contains("powerpoint")) {
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt24, 0, 0, 0);
-                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
-                            } else if (sMimeType.contains("presentation")) {
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt24, 0, 0, 0);
-                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
-                            }
+                                if (sMimeType.contains("image")) {
+                                    aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.image24, 0, 0, 0);
+                                    aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                                } else if (sMimeType.contains("plain")) {
+                                    aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.txt24, 0, 0, 0);
+                                    aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                                } else if (sMimeType.contains("excel")) {
+                                    aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.xls24, 0, 0, 0);
+                                    aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                                } else if (sMimeType.contains("word")) {
+                                    aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.doc24, 0, 0, 0);
+                                    aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                                } else if (sMimeType.contains("pdf")) {
+                                    aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.pdf24, 0, 0, 0);
+                                    aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                                } else if (sMimeType.contains("powerpoint")) {
+                                    aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt24, 0, 0, 0);
+                                    aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                                } else if (sMimeType.contains("presentation")) {
+                                    aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt24, 0, 0, 0);
+                                    aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                                } else {
+                                    aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.unknown24, 0, 0, 0);
+                                    aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                                }
                             }
 
                             aTV.setTextSize(iTextSize);
@@ -333,10 +336,11 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
         editText.setText(editText.getText());
         editText.setPressed(true);
         editText.setSelection(editText.getText().length());
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
     }
+
     private void blink() {
         if (shouldBlink) {
             editText.setText(editText.getText());
@@ -353,6 +357,7 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
             }, 500);
         }
     }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -372,7 +377,7 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        for(int i = 0; i < menu.size(); i++) {
+        for (int i = 0; i < menu.size(); i++) {
             MenuItem item = menu.getItem(i);
             SpannableString spanString = new SpannableString(menu.getItem(i).getTitle().toString());
             int end = spanString.length();
@@ -582,9 +587,9 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
                                     }
                                 });
 
-                                    isModify = false;
-                                    disable();
-                                    Log.d(TAG, "asdf");
+                                isModify = false;
+                                disable();
+                                Log.d(TAG, "asdf");
 
                                 new Thread(new Runnable() {
                                     @Override
@@ -598,7 +603,7 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
                                             Thread.sleep(100);
                                             if (bCommitStatus) {
                                                 if (sGitRemoteUrl.indexOf("local") == -1) {
-                                                  MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+                                                    MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
                                                 }
                                             }
                                         } catch (InterruptedException e) {
@@ -615,8 +620,8 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
                         Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.toast_pulling), Toast.LENGTH_SHORT).show();
                     }
                 });
-                    isModify = false;
-                    disable();
+                isModify = false;
+                disable();
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -661,7 +666,7 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
             Uri uri = null;
             if (resultData != null) {
                 uri = resultData.getData();
-                        pickiT.getPath(uri, Build.VERSION.SDK_INT);
+                pickiT.getPath(uri, Build.VERSION.SDK_INT);
 
             }
         } else if (requestCode == REQUEST_TAKE_PHOTO) {
@@ -751,7 +756,7 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
                 mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
                         fileExtension.toLowerCase());
             }
-        }catch(Exception ee){
+        } catch (Exception ee) {
             ee.printStackTrace();
         }
         return mimeType;
@@ -791,7 +796,7 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
     @Override
     public void PickiTonCompleteListener(String path, boolean wasDriveFile, boolean wasUnknownProvider, boolean wasSuccessful, String reason) {
         //Dismiss dialog and return the path
-        Log.d(TAG,"pickiT real path ="+path +", was successful = "+ wasSuccessful +", reason = "+ reason);
+        Log.d(TAG, "pickiT real path =" + path + ", was successful = " + wasSuccessful + ", reason = " + reason);
 
         final File aSelectedFile = new File(path);
         try {
@@ -869,14 +874,12 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
         }
 
 
-
     }
 
     @Override
     public void PickiTonMultipleCompleteListener(ArrayList<String> arrayList, boolean b, String s) {
 
     }
-
 
 
 }
