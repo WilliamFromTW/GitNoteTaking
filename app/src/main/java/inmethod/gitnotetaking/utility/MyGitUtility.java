@@ -9,6 +9,8 @@ import androidx.preference.PreferenceManager;
 
 import org.eclipse.jgit.api.MergeResult;
 import org.eclipse.jgit.api.ResetCommand;
+import org.eclipse.jgit.api.errors.JGitInternalException;
+import org.eclipse.jgit.errors.LockFailedException;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.io.File;
@@ -260,28 +262,38 @@ public class MyGitUtility {
             Log.d(TAG, "Remote repository exists ? " + bIsRemoteRepositoryExist);
             if (bIsRemoteRepositoryExist) {
                 Log.d(TAG, "try to pull remote repository , branch="+aRemoteGit.getRemoteName());
-                if (aGitUtil.pull(aRemoteGit.getRemoteName(), sUserName, sUserPassword)) {
+                try{
+                  if (aGitUtil.pull(aRemoteGit.getRemoteName(), sUserName, sUserPassword)) {
                     Log.d(TAG, "pull finished!");
                     aRemoteGit.setStatus(GIT_STATUS_SUCCESS);
                     aRemoteGitDAO.update(aRemoteGit);
                     setGitLock(false);
                     if (aGitUtil != null) aGitUtil.close();
                     return true;
-                } else {
-
-                    aGitUtil.reset(ResetCommand.ResetType.MIXED, PreferenceManager.getDefaultSharedPreferences( context ).getString("GitRemoteName", "master"));
-                    aRemoteGit.setStatus(GIT_STATUS_FAIL);
-                    aRemoteGitDAO.update(aRemoteGit);
-                    Log.d(TAG, "pull failed!");
-                    setGitLock(false);
-                    if (aGitUtil != null) aGitUtil.close();
-                    File aFile = new File(aGitUtil.getGit().getRepository().getDirectory()+"/.git/index.lock");
-                    if( aFile.isFile() )
+                  } else {
+                      aGitUtil.reset(ResetCommand.ResetType.MIXED, PreferenceManager.getDefaultSharedPreferences(context).getString("GitRemoteName", "master"));
+                      aRemoteGit.setStatus(GIT_STATUS_FAIL);
+                      aRemoteGitDAO.update(aRemoteGit);
+                      Log.d(TAG, "pull failed!");
+                      setGitLock(false);
+                      if (aGitUtil != null) aGitUtil.close();
+                      return false;
+                  }
+                }catch(LockFailedException lockfail){
+                    lockfail.printStackTrace();
+                    File aFile = new File(aGitUtil.getGit().getRepository().getDirectory() + "/.git/index.lock");
+                    if (aFile.isFile())
                         aFile.delete();
                     return false;
+                }catch(JGitInternalException aJGitInternalException){
+                    if( aJGitInternalException.getLocalizedMessage().toLowerCase().indexOf("lock")!=-1 ){
+                        File aFile = new File(aGitUtil.getGit().getRepository().getDirectory() + "/.git/index.lock");
+                        if (aFile.isFile())
+                            aFile.delete();
+                        return false;
+                    }
                 }
-            }
-            aRemoteGit.setStatus(GIT_STATUS_FAIL);
+            }            aRemoteGit.setStatus(GIT_STATUS_FAIL);
             aRemoteGitDAO.update(aRemoteGit);
             setGitLock(false);
             if (aGitUtil != null) aGitUtil.close();
