@@ -594,7 +594,7 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
     }
 
     public String getMimeType(Uri uri, Context context) {
-        String mimeType = "unknown";
+        String mimeType = null;
         try {
             if (Objects.equals(uri.getScheme(), ContentResolver.SCHEME_CONTENT)) {
                 ContentResolver cr = context.getContentResolver();

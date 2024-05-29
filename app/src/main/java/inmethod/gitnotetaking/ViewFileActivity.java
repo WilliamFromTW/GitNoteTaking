@@ -196,30 +196,34 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
                             lp.setMargins(0, 0, 10, 0);
                             aTV.setLayoutParams(lp);
                             final Uri filuri = Uri.fromFile(file);
-                            if (getMimeType(filuri, activity).toLowerCase().contains("image")) {
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.image24, 0, 0, 0);
-                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
-                            } else if (getMimeType(filuri, activity).toLowerCase().contains("plain")) {
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.txt24, 0, 0, 0);
-                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
-                            } else if (getMimeType(filuri, activity).toLowerCase().contains("excel")) {
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.xls24, 0, 0, 0);
-                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
-                            } else if (getMimeType(filuri, activity).toLowerCase().contains("word")) {
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.doc24, 0, 0, 0);
-                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
-                            } else if (getMimeType(filuri, activity).toLowerCase().contains("pdf")) {
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.pdf24, 0, 0, 0);
-                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
-                            } else if (getMimeType(filuri, activity).toLowerCase().contains("powerpoint")) {
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt24, 0, 0, 0);
-                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
-                            } else if (getMimeType(filuri, activity).toLowerCase().contains("presentation")) {
-                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt24, 0, 0, 0);
-                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
-                            } else {
+                            String sMimeType = getMimeType(filuri, activity);
+                            if( sMimeType==null){
                                 aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.unknown24, 0, 0, 0);
                                 aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                            } else{
+                                sMimeType = sMimeType.toLowerCase();
+                            if (sMimeType.contains("image")) {
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.image24, 0, 0, 0);
+                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                            } else if (sMimeType.contains("plain")) {
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.txt24, 0, 0, 0);
+                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                            } else if (sMimeType.contains("excel")) {
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.xls24, 0, 0, 0);
+                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                            } else if (sMimeType.contains("word")) {
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.doc24, 0, 0, 0);
+                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                            } else if (sMimeType.contains("pdf")) {
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.pdf24, 0, 0, 0);
+                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                            } else if (sMimeType.contains("powerpoint")) {
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt24, 0, 0, 0);
+                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                            } else if (sMimeType.contains("presentation")) {
+                                aTV.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ppt24, 0, 0, 0);
+                                aTV.setText(MyApplication.getAppContext().getText(R.string.attachment).toString() + iFileCount);
+                            }
                             }
 
                             aTV.setTextSize(iTextSize);
@@ -736,7 +740,7 @@ public class ViewFileActivity extends AppCompatActivity  implements PickiTCallba
     }
 
     public String getMimeType(Uri uri, Context context) {
-        String mimeType = "unknown";
+        String mimeType = null;
         try {
             if (Objects.equals(uri.getScheme(), ContentResolver.SCHEME_CONTENT)) {
                 ContentResolver cr = context.getContentResolver();
