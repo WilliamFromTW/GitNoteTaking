@@ -10,6 +10,7 @@ import androidx.preference.PreferenceManager;
 import org.eclipse.jgit.api.MergeResult;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.JGitInternalException;
+import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 import org.eclipse.jgit.errors.LockFailedException;
 import org.eclipse.jgit.revwalk.RevCommit;
 
@@ -281,9 +282,13 @@ public class MyGitUtility {
                   }
                 }catch(LockFailedException lockfail){
                     lockfail.printStackTrace();
+                    if (aGitUtil != null) aGitUtil.close();
+                    Log.e(TAG,"aGitUtil.getGit().getRepository().getDirectory()="+aGitUtil.getGit().getRepository().getDirectory());
                     File aFile = new File(aGitUtil.getGit().getRepository().getDirectory() + "/.git/index.lock");
-                    if (aFile.isFile())
-                        aFile.delete();
+                    if (aFile.isFile()) {
+                        boolean isDelete = aFile.delete();
+                        Log.e(TAG,"lock file is delete?"+isDelete);
+                    }
                     return false;
                 }catch(JGitInternalException aJGitInternalException){
                     if( aJGitInternalException.getLocalizedMessage().toLowerCase().indexOf("lock")!=-1 ){
@@ -292,8 +297,17 @@ public class MyGitUtility {
                             aFile.delete();
                         return false;
                     }
+                }catch(WrongRepositoryStateException asd){
+                    aGitUtil.reset(ResetCommand.ResetType.MIXED, PreferenceManager.getDefaultSharedPreferences(context).getString("GitRemoteName", "master"));
+                    aRemoteGit.setStatus(GIT_STATUS_FAIL);
+                    aRemoteGitDAO.update(aRemoteGit);
+                    Log.d(TAG, "pull failed!");
+                    setGitLock(false);
+                    if (aGitUtil != null) aGitUtil.close();
+                    return false;
                 }
-            }            aRemoteGit.setStatus(GIT_STATUS_FAIL);
+            }
+            aRemoteGit.setStatus(GIT_STATUS_FAIL);
             aRemoteGitDAO.update(aRemoteGit);
             setGitLock(false);
             if (aGitUtil != null) aGitUtil.close();
