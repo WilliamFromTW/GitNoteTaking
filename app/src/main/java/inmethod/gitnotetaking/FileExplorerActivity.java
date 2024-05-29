@@ -594,15 +594,19 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
     }
 
     public String getMimeType(Uri uri, Context context) {
-        String mimeType = null;
-        if (Objects.equals(uri.getScheme(), ContentResolver.SCHEME_CONTENT)) {
-            ContentResolver cr = context.getContentResolver();
-            mimeType = cr.getType(uri);
-        } else {
-            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
-                    .toString());
-            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-                    fileExtension.toLowerCase());
+        String mimeType = "unknown";
+        try {
+            if (Objects.equals(uri.getScheme(), ContentResolver.SCHEME_CONTENT)) {
+                ContentResolver cr = context.getContentResolver();
+                mimeType = cr.getType(uri);
+            } else {
+                String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
+                        .toString());
+                mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                        fileExtension.toLowerCase());
+            }
+        }catch(Exception ee){
+            ee.printStackTrace();
         }
         return mimeType;
     }
