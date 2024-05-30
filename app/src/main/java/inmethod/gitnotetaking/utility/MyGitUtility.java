@@ -176,7 +176,6 @@ public class MyGitUtility {
                 if( aJGitInternalException.getLocalizedMessage().toLowerCase().indexOf("lock")!=-1 ){
                     Log.d(TAG, "commit failed!");
                     setGitLock(false);
-                    if (aGitUtil != null) aGitUtil.close();
                     FileUtility.deleteLockFile(aGitUtil);
                     if (aGitUtil.commit(sCommitMessages, sAuthorName, sAuthorEmail)) {
                         aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_SUCCESS);
