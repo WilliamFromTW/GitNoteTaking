@@ -143,18 +143,51 @@ public class MyGitUtility {
             String sAuthorName = aRemoteGit.getAuthor_name();
             String sAuthorEmail = aRemoteGit.getAuthor_email();
             aRemoteGitDAO.close();
-            if (aGitUtil.commit(sCommitMessages, sAuthorName, sAuthorEmail)) {
-                aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_SUCCESS);
-                Log.d(TAG, "commit finished!");
-                setGitLock(false);
-                if (aGitUtil != null) aGitUtil.close();
-                return true;
-            } else {
+            try {
+                if (aGitUtil.commit(sCommitMessages, sAuthorName, sAuthorEmail)) {
+                    aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_SUCCESS);
+                    Log.d(TAG, "commit finished!");
+                    setGitLock(false);
+                    if (aGitUtil != null) aGitUtil.close();
+                    return true;
+                } else {
+                    aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_FAIL);
+                    Log.d(TAG, "commit failed!");
+                    setGitLock(false);
+                    if (aGitUtil != null) aGitUtil.close();
+                    return false;
+                }
+            }catch(LockFailedException ee){
+                ee.printStackTrace();
                 aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_FAIL);
                 Log.d(TAG, "commit failed!");
                 setGitLock(false);
                 if (aGitUtil != null) aGitUtil.close();
+                Log.e(TAG,"aGitUtil.getGit().getRepository().getDirectory()="+aGitUtil.getGit().getRepository().getDirectory());
+                File aFile = new File(aGitUtil.getGit().getRepository().getDirectory() + "/index.lock");
+                if (aFile.isFile()) {
+                    boolean isDelete = aFile.delete();
+                    Log.e(TAG,"lock file is delete?"+isDelete);
+                }
+                if (aGitUtil.commit(sCommitMessages, sAuthorName, sAuthorEmail)) {
+                    return true;
+                }
                 return false;
+
+            }catch(JGitInternalException aJGitInternalException){
+                if( aJGitInternalException.getLocalizedMessage().toLowerCase().indexOf("lock")!=-1 ){
+                    aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_FAIL);
+                    Log.d(TAG, "commit failed!");
+                    setGitLock(false);
+                    if (aGitUtil != null) aGitUtil.close();
+                    Log.e(TAG,"aGitUtil.getGit().getRepository().getDirectory()="+aGitUtil.getGit().getRepository().getDirectory());
+                    File aFile = new File(aGitUtil.getGit().getRepository().getDirectory() + "/index.lock");
+                    if (aFile.isFile()) {
+                        boolean isDelete = aFile.delete();
+                        Log.e(TAG,"lock file is delete?"+isDelete);
+                    }
+                    return false;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
