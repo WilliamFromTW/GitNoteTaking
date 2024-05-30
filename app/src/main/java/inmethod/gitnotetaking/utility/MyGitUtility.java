@@ -138,6 +138,7 @@ public class MyGitUtility {
         setGitLock(true);
         RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(context);
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
+        Log.d(TAG, "MyGitUtility.commit()");
         try {
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
             String sAuthorName = aRemoteGit.getAuthor_name();
@@ -162,20 +163,28 @@ public class MyGitUtility {
                 aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_FAIL);
                 Log.d(TAG, "commit failed!");
                 setGitLock(false);
-                if (aGitUtil != null) aGitUtil.close();
                 FileUtility.deleteLockFile(aGitUtil);
                 if (aGitUtil.commit(sCommitMessages, sAuthorName, sAuthorEmail)) {
+                    aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_SUCCESS);
+                    if (aGitUtil != null) aGitUtil.close();
                     return true;
                 }
+                if (aGitUtil != null) aGitUtil.close();
                 return false;
 
             }catch(JGitInternalException aJGitInternalException){
                 if( aJGitInternalException.getLocalizedMessage().toLowerCase().indexOf("lock")!=-1 ){
-                    aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_FAIL);
                     Log.d(TAG, "commit failed!");
                     setGitLock(false);
                     if (aGitUtil != null) aGitUtil.close();
                     FileUtility.deleteLockFile(aGitUtil);
+                    if (aGitUtil.commit(sCommitMessages, sAuthorName, sAuthorEmail)) {
+                        aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_SUCCESS);
+                        if (aGitUtil != null) aGitUtil.close();
+                        return true;
+                    }
+                    if (aGitUtil != null) aGitUtil.close();
+                    aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_FAIL);
                     return false;
                 }
             }
@@ -310,8 +319,8 @@ public class MyGitUtility {
                     aRemoteGitDAO.update(aRemoteGit);
                     Log.d(TAG, "pull failed!");
                     setGitLock(false);
-                    if (aGitUtil != null) aGitUtil.close();
                     FileUtility.deleteLockFile(aGitUtil);
+                    if (aGitUtil != null) aGitUtil.close();
                     return false;
                 }catch(JGitInternalException aJGitInternalException){
                     if( aJGitInternalException.getLocalizedMessage().toLowerCase().indexOf("lock")!=-1 ){
@@ -319,8 +328,8 @@ public class MyGitUtility {
                         aRemoteGitDAO.update(aRemoteGit);
                         Log.d(TAG, "pull failed!");
                         setGitLock(false);
-                        if (aGitUtil != null) aGitUtil.close();
                         FileUtility.deleteLockFile(aGitUtil);
+                        if (aGitUtil != null) aGitUtil.close();
                         return false;
                     }
                 }catch(WrongRepositoryStateException asd){

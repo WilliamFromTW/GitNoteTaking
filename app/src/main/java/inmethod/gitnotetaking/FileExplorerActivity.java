@@ -219,15 +219,18 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
             }
             final String sDeleteFilesName = sTemp;
             getDirFromRoot(m_curDir);
-            if (sGitRemoteUrl.indexOf("local") == -1)
+            if (sGitRemoteUrl.indexOf("local") == -1) {
+                Log.d(TAG, "commit after file delete");
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_delete_attachment_file_commit)+ sDeleteFilesName)) {
+                        if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_delete_attachment_file_commit) + sDeleteFilesName)) {
                             MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
                         }
                     }
                 }).start();
+            }
         }
     }
 
@@ -691,6 +694,8 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
                                                                         e.printStackTrace();
                                                                     }
                                                                     boolean bCommit = false;
+                                                                    Log.d(TAG, "commit after file be copied");
+
                                                                     bCommit = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_add_attachment_file_commit) + sDestFileNameString);
                                                                     if (sGitRemoteUrl.indexOf("local") == -1 && bCommit)
                                                                         MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);

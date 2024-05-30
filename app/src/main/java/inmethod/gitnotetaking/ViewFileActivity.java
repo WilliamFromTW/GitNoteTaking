@@ -272,6 +272,8 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
                                                         new Thread(new Runnable() {
                                                             @Override
                                                             public void run() {
+                                                                Log.d(TAG,"commit when file be deleted");
+
                                                                 if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_delete_attachment_file_commit) + "\n" + sFileName))
                                                                     MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
                                                                 else {
@@ -630,8 +632,9 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
                                 txtUrl.setText("<" + file.getName() + ">");
                             else
                                 txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
+                            Log.d(TAG,"commit when view_file_action_save be triggered");
                             boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
-                            Thread.sleep(10000);
+                            Thread.sleep(1000);
                             if (bCommitStatus) {
                                 if (sGitRemoteUrl.indexOf("local") == -1) {
                                     MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
@@ -710,6 +713,8 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
                                                         e.printStackTrace();
                                                     }
                                                     boolean bCommit = false;
+                                                    Log.d(TAG,"commit when REQUEST_TAKE_PHOTO be triggered");
+
                                                     bCommit = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_add_attachment_file_commit) + "\n" + sDestFileNameString);
                                                     if (sGitRemoteUrl.indexOf("local") == -1 && bCommit)
                                                         MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
@@ -839,6 +844,8 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
                                                     e.printStackTrace();
                                                 }
                                                 boolean bCommit = false;
+                                                Log.d(TAG,"commit when file added");
+
                                                 bCommit = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_add_attachment_file_commit) + "\n" + sDestFileNameString);
                                                 if (sGitRemoteUrl.indexOf("local") == -1 && bCommit)
                                                     MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
