@@ -9,8 +9,8 @@
     <string name="action_create_folder">建立目錄</string>
     <string name="action_delete">刪除</string>
     <string name="title_remove">移除</string>
-    <string name="title_push">手動同步至遠端</string>
-    <string name="title_pull">手動同步至本地端</string>
+    <string name="title_push">同步至遠端</string>
+    <string name="title_pull">同步至手機端</string>
     <string name="action_cut">剪下</string>
     <string name="action_copy">複製</string>
     <string name="action_paste">貼上</string>
@@ -19,7 +19,7 @@
 
     // Preference
     <string name="GitEditTextSize">筆記字型大小</string>
-    <string name="GitLocalDirName">本地端根目錄(修改後，請刪除/重設定目前已有的筆記)</string>
+    <string name="GitLocalDirName">手機端根目錄(修改後，請刪除/重設定目前已有的筆記)</string>
     <string name="GitRemoteName">遠端分支名稱</string>
     <string name="GitCheckBoxCommitMessage">是否要求輸入修改理由</string>
 
@@ -30,7 +30,7 @@
     <string name="action_create_local_git">新增筆記(本地)</string>
     <string name="tv_localhost">本地</string>
     <string name="main_menu_add">增加</string>
-    <string name="main_notes_need_push">(長按與遠端同步)</string>
+    <string name="main_notes_need_push">(請長按同步至遠端)</string>
     <string name="main_notes_cloning"> 同步中 ... </string>
     <string name="main_notes_title_modify">修改設定</string>
     <string name="main_notes_not_found">找不到筆記本</string>

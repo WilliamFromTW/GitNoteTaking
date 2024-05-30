@@ -145,9 +145,19 @@ public class MyGitUtility {
 
         String sLocalDirectory = getLocalGitDirectory(context, sRemoteUrl);
         GitUtil aGitUtil=null;
-        setGitLock(true);
         RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(context);
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
+        if (aRemoteGit == null) return false;
+        if (!MyApplication.isNetworkConnected()){
+            aRemoteGit.setStatus( MyGitUtility.GIT_STATUS_FAIL);
+            aRemoteGitDAO.update(aRemoteGit);
+            setGitLock(false);
+            aRemoteGitDAO.close();
+            aRemoteGitDAO = new RemoteGitDAO(context);
+            aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
+        }
+        setGitLock(true);
+
         Log.d(TAG, "MyGitUtility.commit()");
         try {
             aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
