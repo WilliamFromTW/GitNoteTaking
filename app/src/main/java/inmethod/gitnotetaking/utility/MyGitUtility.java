@@ -187,7 +187,6 @@ public class MyGitUtility {
             }catch(JGitInternalException aJGitInternalException){
                 Log.d(TAG, "commit failed! Got aJGitInternalException = " + aJGitInternalException.getMessage());
                 aJGitInternalException.printStackTrace();
-                if( aJGitInternalException.getLocalizedMessage().toLowerCase().indexOf("lock")!=-1 ){
                     Log.d(TAG, "commit failed!");
                     setGitLock(false);
                     FileUtility.deleteLockFile(aGitUtil);
@@ -199,7 +198,6 @@ public class MyGitUtility {
                     if (aGitUtil != null) aGitUtil.close();
                     aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_FAIL);
                     return false;
-                }
             }
         } catch (Exception e) {
             Log.d(TAG, "commit failed! Got Exception = " + e.getMessage());
@@ -337,7 +335,6 @@ public class MyGitUtility {
                     if (aGitUtil != null) aGitUtil.close();
                     return false;
                 }catch(JGitInternalException aJGitInternalException){
-                    if( aJGitInternalException.getLocalizedMessage().toLowerCase().indexOf("lock")!=-1 ){
                         aRemoteGit.setStatus(GIT_STATUS_FAIL);
                         aRemoteGitDAO.update(aRemoteGit);
                         Log.d(TAG, "pull failed!");
@@ -345,7 +342,6 @@ public class MyGitUtility {
                         FileUtility.deleteLockFile(aGitUtil);
                         if (aGitUtil != null) aGitUtil.close();
                         return false;
-                    }
                 }catch(WrongRepositoryStateException asd){
                     asd.printStackTrace();
                     try {
