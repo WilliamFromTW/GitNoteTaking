@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import inmethod.gitnotetaking.MyApplication;
 import inmethod.gitnotetaking.db.RemoteGit;
 import inmethod.gitnotetaking.db.RemoteGitDAO;
 import inmethod.jakarta.vcs.GitUtil;
@@ -79,6 +80,14 @@ public class MyGitUtility {
         RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(context);
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
         if (aRemoteGit == null) return false;
+        if (!MyApplication.isNetworkConnected()){
+            aRemoteGit.setStatus( MyGitUtility.GIT_STATUS_FAIL);
+            aRemoteGitDAO.update(aRemoteGit);
+            setGitLock(false);
+            aRemoteGitDAO.close();
+            return false;
+        }
+
         setGitLock(true);
         String sLocalDirectory = getLocalGitDirectory(context, sRemoteUrl);
         boolean bIsRemoteRepositoryExist = false;
@@ -92,6 +101,7 @@ public class MyGitUtility {
                 aRemoteGitDAO.update(aRemoteGit);
                 setGitLock(false);
                 if (aGitUtil != null) aGitUtil.close();
+                aRemoteGitDAO.close();
                 return false;
             }
             Log.d(TAG, "Remote repository exists ? " + bIsRemoteRepositoryExist);

@@ -249,6 +249,7 @@ public class MainActivity extends AppCompatActivity {
                                     public void run() {
                                         if (MyGitUtility.push(MyApplication.getAppContext(), ((TextView) aTextView[1]).getText().toString())) {
                                             ((TextView) aTextView[0]).setTextColor(Color.BLACK);
+                                            ((TextView) aTextView[0]).setText(MyGitUtility.getRemoteGit(MyApplication.getAppContext(), ((TextView) aTextView[1]).getText().toString()).getNickname());
                                         }
                                         dialog.dismiss();
                                     }

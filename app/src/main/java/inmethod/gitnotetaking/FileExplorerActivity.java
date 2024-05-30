@@ -158,24 +158,6 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
                 }
             }
         });
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(3000);
-                    Log.d(TAG,"wait and refresh if still locking after 3 seconds ");
-                    if(MyGitUtility.isGitLock()){
-                        getDirFromRoot(m_curDir);
-                    }else{
-                        Log.d(TAG,"no need to refresh");
-                    }
-                } catch (
-                        InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }).start();
         getDirFromRoot(m_curDir);
     }
 
