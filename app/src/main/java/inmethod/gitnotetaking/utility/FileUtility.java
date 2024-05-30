@@ -20,11 +20,20 @@ import java.io.InputStream;
 import java.util.List;
 
 import inmethod.gitnotetaking.MainActivity;
+import inmethod.jakarta.vcs.GitUtil;
 
 public class FileUtility {
     private static Uri contentUri = null;
     public static final String TAG = MainActivity.TAG;
 
+    public static void deleteLockFile(GitUtil aGitUtil){
+        Log.e(TAG,"aGitUtil.getGit().getRepository().getDirectory()="+aGitUtil.getGit().getRepository().getDirectory());
+        File aFile = new File(aGitUtil.getGit().getRepository().getDirectory() + "/index.lock");
+        if (aFile.isFile()) {
+            boolean isDelete = aFile.delete();
+            Log.e(TAG,"lock file is delete?"+isDelete);
+        }
+    }
     /**
      * Get a file path from a Uri. This will get the the path for Storage Access
      * Framework Documents, as well as the _data field for the MediaStore and
