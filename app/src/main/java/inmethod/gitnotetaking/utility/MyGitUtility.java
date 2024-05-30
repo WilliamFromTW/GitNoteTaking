@@ -160,6 +160,8 @@ public class MyGitUtility {
                 }
             }catch(LockFailedException ee){
                 ee.printStackTrace();
+                Log.d(TAG, "commit failed! Got LockFailedException = " + ee.getMessage());
+
                 aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_FAIL);
                 Log.d(TAG, "commit failed!");
                 setGitLock(false);
@@ -173,6 +175,8 @@ public class MyGitUtility {
                 return false;
 
             }catch(JGitInternalException aJGitInternalException){
+                Log.d(TAG, "commit failed! Got aJGitInternalException = " + aJGitInternalException.getMessage());
+                aJGitInternalException.printStackTrace();
                 if( aJGitInternalException.getLocalizedMessage().toLowerCase().indexOf("lock")!=-1 ){
                     Log.d(TAG, "commit failed!");
                     setGitLock(false);
@@ -188,6 +192,7 @@ public class MyGitUtility {
                 }
             }
         } catch (Exception e) {
+            Log.d(TAG, "commit failed! Got Exception = " + e.getMessage());
             e.printStackTrace();
         }
         setGitLock(false);
