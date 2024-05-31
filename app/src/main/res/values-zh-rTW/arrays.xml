@@ -1,0 +1,14 @@
+<resources>
+    <string-array name="Sort">
+        <item>日期(小到大)</item>
+        <item>日期(大到小)</item>
+        <item>名稱(小到大)</item>
+        <item>名稱(大到小)</item>
+    </string-array>
+    <string-array name="SortData">
+        <item>11</item>
+        <item>12</item>
+        <item>21</item>
+        <item>22</item>
+    </string-array>
+</resources>

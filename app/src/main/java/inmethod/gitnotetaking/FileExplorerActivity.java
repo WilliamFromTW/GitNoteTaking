@@ -62,6 +62,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
@@ -255,6 +256,16 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
         if (m_filesArray == null) return;
         //sorting file list in alphabetical order
         Arrays.sort(m_filesArray);
+        String sSortData = PreferenceManager.getDefaultSharedPreferences(activity).getString("Sort","11");
+        if(  sSortData.equals("11") )
+          Arrays.sort(m_filesArray, Comparator.comparingLong(File::lastModified));
+        else if(  sSortData.equals("12") )
+           Arrays.sort(m_filesArray, Comparator.comparingLong(File::lastModified).reversed());
+        else if(  sSortData.equals("21") )
+            Arrays.sort(m_filesArray, Comparator.comparing(File::getName));
+        else if(  sSortData.equals("22") )
+            Arrays.sort(m_filesArray, Comparator.comparing(File::getName).reversed());
+
         for (int i = 0; i < m_filesArray.length; i++) {
             File file = m_filesArray[i];
 

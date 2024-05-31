@@ -39,6 +39,13 @@
         app:key="GitShowAttachDir"
         app:title="@string/GitShowAttachDir">
     </androidx.preference.CheckBoxPreference>
+    <ListPreference
+        android:key="Sort"
+        android:title="@string/Sort"
+        android:entries="@array/Sort"
+        app:summary="@string/Sort11"
+        app:defaultValue="11"
+        android:entryValues="@array/SortData"/>
     <androidx.preference.EditTextPreference
         app:defaultValue="gitnotetaking"
         app:key="GitLocalDirName"

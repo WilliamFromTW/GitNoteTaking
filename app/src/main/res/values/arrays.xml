@@ -1,0 +1,14 @@
+<resources>
+<string-array name="Sort">
+    <item>DateAsc</item>
+    <item>DateDesc</item>
+    <item>NameAsc</item>
+    <item>NameDesc</item>
+</string-array>
+<string-array name="SortData">
+    <item>11</item>
+    <item>12</item>
+    <item>21</item>
+    <item>22</item>
+</string-array>
+</resources>
