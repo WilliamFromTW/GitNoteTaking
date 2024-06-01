@@ -137,7 +137,7 @@ public class FileExplorerListAdapter extends BaseAdapter {
             }
             else if(m_filepath.substring(m_lastIndex).equalsIgnoreCase(".7z"))
             {
-                return R.mipmap.zip;
+                return R.mipmap.zip7;
             }
             else if(m_filepath.substring(m_lastIndex).equalsIgnoreCase(".doc"))
             {
@@ -179,9 +179,21 @@ public class FileExplorerListAdapter extends BaseAdapter {
             {
                 return R.mipmap.html;
             }
-            else if(m_filepath.substring(m_lastIndex).equalsIgnoreCase(".apk"))
-            {
+            else if(m_filepath.substring(m_lastIndex).equalsIgnoreCase(".apk")) {
                 return R.mipmap.apk;
+            }
+            else if(m_filepath.substring(m_lastIndex).equalsIgnoreCase(".jpg")) {
+                return R.mipmap.jpg;
+            }
+            else if(m_filepath.substring(m_lastIndex).equalsIgnoreCase(".jpeg"))
+            {
+                return R.mipmap.jpg;
+
+            }
+            else if(m_filepath.substring(m_lastIndex).equalsIgnoreCase(".epub"))
+            {
+                return R.mipmap.epub;
+
             } else
             {
                 return R.mipmap.unknown;

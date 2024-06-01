@@ -534,7 +534,7 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
             isModify = true;
             return true;
         } else if (id == R.id.view_file_action_camera_picture) {
-            Log.d(TAG, "asdfdddddd");
+         //   Log.d(TAG, "asdfdddddd");
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             // Ensure that there's a camera activity to handle the intent
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -591,7 +591,7 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
 
                                 isModify = false;
                                 disable();
-                                Log.d(TAG, "asdf");
+                               // Log.d(TAG, "asdf");
 
                                 new Thread(new Runnable() {
                                     @Override
