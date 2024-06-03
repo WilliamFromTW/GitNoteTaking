@@ -597,16 +597,24 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
                                     @Override
                                     public void run() {
                                         try {
-                                            if (txtUrl.getText().toString().trim().equals(""))
-                                                txtUrl.setText("<" + file.getName() + ">");
-                                            else
-                                                txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
-                                            boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
-                                            Thread.sleep(100);
-                                            if (bCommitStatus) {
-                                                if (sGitRemoteUrl.indexOf("local") == -1) {
-                                                    MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
-                                                }
+                                            synchronized (this) {
+                                                wait(500);
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        if (txtUrl.getText().toString().trim().equals(""))
+                                                            txtUrl.setText("<" + file.getName() + ">");
+                                                        else
+                                                            txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
+                                                        boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
+                                                        if (bCommitStatus) {
+                                                            if (sGitRemoteUrl.indexOf("local") == -1) {
+                                                                MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+                                                            }
+                                                        }
+
+                                                    }
+                                                });
                                             }
                                         } catch (InterruptedException e) {
                                             e.printStackTrace();
