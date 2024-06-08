@@ -4,14 +4,12 @@ package inmethod.gitnotetaking;
 import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
 import static android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -27,7 +25,6 @@ import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,7 +36,6 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.window.OnBackInvokedDispatcher;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResult;
@@ -67,7 +63,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -75,14 +70,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import inmethod.gitnotetaking.db.RemoteGit;
-import inmethod.gitnotetaking.utility.FileUtility;
 import inmethod.gitnotetaking.utility.MyGitUtility;
 import inmethod.gitnotetaking.view.FileExplorerListAdapter;
-import inmethod.gitnotetaking.view.GitList;
 
 
 public class FileExplorerActivity extends AppCompatActivity  implements PickiTCallbacks {
@@ -426,9 +416,39 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
                         }
                         else if (id == R.id.Download) {
                             File aFile = new File(  m_path.get(pos) );
+
                             try {
-                                Files.copy( aFile.toPath(),new File( Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)+"/"+ aFile.getName()).toPath());
-                            } catch (IOException e) {
+                                File aDest = new File( Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)+"/"+ aFile.getName());
+                                if( !aDest.exists()) {
+                                    try (FileOutputStream aFOS = new FileOutputStream(aDest)) {
+                                        Files.copy(aFile.toPath(), aFOS);
+                                    }catch(Exception ee){
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.download_file_exists)+"\n"+aFile.getName(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                        ee.printStackTrace();
+                                    }
+                                    if( aDest.exists()) {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.download_success)+"\n"+aFile.getName(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+                                }else{
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.download_file_exists)+"\n"+aFile.getName(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+
+                                }
+                            } catch (Exception e) {
                                 e.printStackTrace();
 //                                throw new RuntimeException(e);
                             }

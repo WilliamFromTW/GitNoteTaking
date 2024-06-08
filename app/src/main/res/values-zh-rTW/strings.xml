@@ -43,7 +43,9 @@
     <string name="create_folder">建立目錄</string>
     <string name="create_file">建立檔案</string>
     <string name="select_file_or_directory">必須選擇檔案或目錄</string>
-    <string name="file_exists">檔案已存在!</string>
+    <string name="file_exists">檔案已存在</string>
+    <string name="download_file_exists">檔案已在Download目錄</string>
+    <string name="download_success">成功複製到Download目錄</string>
     <string name="file_create_failed">檔案建立失敗!</string>
     <string name="file_add_external_file">加入檔案</string>
     <string name="file_filter_external_file">搜尋</string>
