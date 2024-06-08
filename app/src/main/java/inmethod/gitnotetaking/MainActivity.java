@@ -212,6 +212,9 @@ public class MainActivity extends AppCompatActivity {
                         if (popup.getMenu().getItem(i).getItemId() == R.id.show_all_remote_branches) {
                             popup.getMenu().getItem(i).setVisible(false);
                         }
+                        if (popup.getMenu().getItem(i).getItemId() == R.id.Pull) {
+                            popup.getMenu().getItem(i).setVisible(false);
+                        }
                     }
                 }
                 //registering popup with OnMenuItemClickListener

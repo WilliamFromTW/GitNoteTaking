@@ -214,6 +214,14 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
                         }
                     }
                 }).start();
+            }else{
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_delete_attachment_file_commit) + sDeleteFilesName);
+                    }
+                }).start();
+
             }
         }
     }
@@ -348,7 +356,10 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
                                            int pos, long id) {
 
                 Log.v(TAG,"pos: " + pos);
-             //   final Object[] aTextView = GitList.getDeviceInfoFromLayoutId(view);
+
+                if( new File(  m_path.get(pos) ).isDirectory()) return true;
+
+                //   final Object[] aTextView = GitList.getDeviceInfoFromLayoutId(view);
            //     final String sRemoteUrl = ((TextView) aTextView[1]).getText().toString();
 
                 PopupMenu popup = new PopupMenu(FileExplorerActivity.this, view);
@@ -416,7 +427,6 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
                         }
                         else if (id == R.id.Download) {
                             File aFile = new File(  m_path.get(pos) );
-
                             try {
                                 File aDest = new File( Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)+"/"+ aFile.getName());
                                 if( !aDest.exists()) {

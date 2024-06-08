@@ -64,7 +64,7 @@
     <string name="view_file_action_select_file">Add File From Storage</string>
     <string name="dialog_title_modify">Modify</string>
     <string name="dialog_file_name">File Name</string>
-    <string name="view_file_delete_attachment_file_commit">delete file : </string>
+    <string name="view_file_delete_attachment_file_commit">delete : </string>
     <string name="view_file_paste_attachment_file_commit">paste files</string>
     <string name="view_file_add_attachment_file_commit">add file : </string>
     <string name="view_file_action_camera_picture">Take Photo From Camera</string>

@@ -60,7 +60,7 @@
     <string name="view_file_action_select_file">新增附件</string>
     <string name="dialog_title_modify">修改</string>
     <string name="dialog_file_name">檔案名稱</string>
-    <string name="view_file_delete_attachment_file_commit">刪除檔案 : </string>
+    <string name="view_file_delete_attachment_file_commit">刪除 : </string>
     <string name="view_file_paste_attachment_file_commit">複製檔案</string>
     <string name="view_file_add_attachment_file_commit">新增檔案 : </string>
     <string name="view_file_action_camera_picture">拍照存擋</string>
