@@ -7,8 +7,8 @@ android {
         applicationId "inmethod.gitnotetaking"
         minSdkVersion 33
         targetSdk 33
-        versionCode 167
-        versionName "3.133"
+        versionCode 179
+        versionName "3.145"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -28,7 +28,7 @@ android {
 }
 
 dependencies {
-    implementation files('libs/InMethodJakarta-v3.4b2-SNAPSHOT-20240530.jar')
+    implementation files('libs/InMethodJakarta-v3.4b2-SNAPSHOT-20240608.jar')
     implementation files('libs/InMethodTools-2.04-20240430.jar')
     implementation files('libs/org.eclipse.jgit-6.6.1.202309021850-r.jar')
     releaseImplementation files('libs/commons-net-3.5.jar')

@@ -319,9 +319,10 @@ public class MainActivity extends AppCompatActivity {
                             container.addView(txtUrl);
 
 
-                            for (RevCommit aRev : MyGitUtility.getLocalCommiLogtList(activity, sRemoteUrl)) {
+                            for (RevCommit aRev : MyGitUtility.getLocalCommitLogList(activity, sRemoteUrl)) {
+                                if( aRev.getFullMessage()==null || aRev.getFullMessage().trim().isEmpty())
+                                  continue;
                                 i++;
-
                                 sListMessages = sListMessages + "\n" + getDate(aRev.getCommitTime()) + "\n--\n" + aRev.getFullMessage() + "\n";
                                 if (i == 50) break;
 

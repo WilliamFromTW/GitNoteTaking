@@ -105,4 +105,6 @@
     <string name="pulling_failed">Pulling Failed!</string>
     <string name="Sort">FileSort</string>
     <string name="Sort11">DateAsc</string>
+    <string name="download">download</string>
+
 </resources>

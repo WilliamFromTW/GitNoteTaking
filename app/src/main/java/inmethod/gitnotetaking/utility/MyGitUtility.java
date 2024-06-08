@@ -2,17 +2,14 @@ package inmethod.gitnotetaking.utility;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Environment;
 import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
-import org.eclipse.jgit.api.MergeResult;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 import org.eclipse.jgit.errors.LockFailedException;
-import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.io.File;
@@ -239,7 +236,22 @@ public class MyGitUtility {
         return aReturn;
     }
 
-    public static List<RevCommit> getLocalCommiLogtList(Context context, String sRemoteUrl) {
+    public static List<RevCommit> getLocalCommitIdListByFilePath(Context context, String sRemoteUrl,String sFilePath) {
+        GitUtil aGitUtil;
+        List<RevCommit> aList = null;
+        try {
+            String sLocalDirectory = getLocalGitDirectory(context, sRemoteUrl);
+            aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
+            aList = aGitUtil.getLocalCommitIdListByFilePath(sFilePath);
+            if (aGitUtil != null) aGitUtil.close();
+        } catch (Exception ee) {
+            ee.printStackTrace();
+        }
+        return aList;
+    }
+
+
+    public static List<RevCommit> getLocalCommitLogList(Context context, String sRemoteUrl) {
         GitUtil aGitUtil;
         List<RevCommit> aList = null;
         try {

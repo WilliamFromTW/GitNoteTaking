@@ -11,6 +11,8 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -21,15 +23,18 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.method.ScrollingMovementMethod;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,6 +47,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.preference.PreferenceManager;
@@ -49,6 +55,7 @@ import androidx.preference.PreferenceManager;
 import com.hbisoft.pickit.PickiT;
 import com.hbisoft.pickit.PickiTCallbacks;
 
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.util.FileUtils;
 
 import java.io.File;
@@ -63,15 +70,18 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import inmethod.gitnotetaking.db.RemoteGit;
 import inmethod.gitnotetaking.utility.FileUtility;
 import inmethod.gitnotetaking.utility.MyGitUtility;
 import inmethod.gitnotetaking.view.FileExplorerListAdapter;
+import inmethod.gitnotetaking.view.GitList;
 
 
 public class FileExplorerActivity extends AppCompatActivity  implements PickiTCallbacks {
@@ -341,6 +351,86 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
         }
         adapter = new FileExplorerListAdapter(this, m_item, m_path, m_isRoot);
         view.setAdapter(adapter);
+        view.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View view,
+                                           int pos, long id) {
+
+                Log.v(TAG,"pos: " + pos);
+             //   final Object[] aTextView = GitList.getDeviceInfoFromLayoutId(view);
+           //     final String sRemoteUrl = ((TextView) aTextView[1]).getText().toString();
+
+                PopupMenu popup = new PopupMenu(FileExplorerActivity.this, view);
+
+                popup.getMenuInflater()
+                        .inflate(R.menu.lognclick_popup_menu_fileexplorer, popup.getMenu());
+                /*
+                if (sRemoteUrl.indexOf("local") != -1) {
+                    for (int i = 0; i < popup.getMenu().size(); i++) {
+                        if (popup.getMenu().getItem(i).getItemId() == R.id.Push) {
+                            popup.getMenu().getItem(i).setVisible(false);
+                        }
+                        if (popup.getMenu().getItem(i).getItemId() == R.id.show_all_remote_branches) {
+                            popup.getMenu().getItem(i).setVisible(false);
+                        }
+                    }
+                }
+
+                 */
+                //registering popup with OnMenuItemClickListener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+                        int id = item.getItemId();
+                        if (id == R.id.show_commit_short_log) {
+
+                            AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(activity, android.R.style.Theme_Material_Light_Dialog_NoActionBar_MinWidth);
+                            TextView txtUrl = new TextView(activity);
+                            String sListMessages = "";
+                            txtUrl.setMaxLines(10);
+                            txtUrl.setMovementMethod(new ScrollingMovementMethod());
+                            //    txtUrl.setCompoundDrawablesWithIntrinsicBounds(R.drawable.list24, 0, 0, 0);
+                            int i = 0;
+
+
+                            FrameLayout container = new FrameLayout(activity);
+                            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            params.leftMargin = 20;
+                            params.rightMargin = 20;
+                            txtUrl.setLayoutParams(params);
+                            container.addView(txtUrl);
+//                            Log.d(TAG,"indexof = "+m_path.get(pos).indexOf(sGitRootDir));
+                            String sFilePath = m_path.get(pos).substring(sGitRootDir.length()+1);
+                            Log.d(TAG,"sFilePath="+sFilePath+",sGitRootDir="+sGitRootDir+",m_path.get(pos)="+m_path.get(pos)+",sGitRemoteUrl="+sGitRemoteUrl);
+
+                            for (RevCommit aRev : MyGitUtility.getLocalCommitIdListByFilePath (activity, sGitRemoteUrl,sFilePath)) {
+                                if( aRev.getFullMessage()==null || aRev.getFullMessage().trim().isEmpty())
+                                    continue;
+                                i++;
+                                sListMessages = sListMessages + "\n" + getDate(aRev.getCommitTime()) + "\n--\n" + aRev.getFullMessage() + "\n";
+                                if (i == 50) break;
+
+                            }
+                            txtUrl.setText(sListMessages);
+                            dialogbuilder.setView(container).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+
+                                        }
+                                    }).start();
+                                }
+                            });
+                            dialogbuilder.create().show();
+                        }
+                        return true;
+                    };
+                });
+                popup.show();
+                return true;
+            }
+        });
+
         view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -587,6 +677,14 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
             createNewFolder(0);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private String getDate(long time) {
+        Date date = new Date(time * 1000L); // *1000 is to convert seconds to milliseconds
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd  HH:mm:ss"); // the format of your date
+        // sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+
+        return sdf.format(date);
     }
 
     public String getMimeType(Uri uri, Context context) {

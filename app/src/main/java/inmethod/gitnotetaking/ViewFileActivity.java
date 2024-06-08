@@ -442,7 +442,7 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
                                     public void run() {
                                         try {
                                             if (txtUrl.getText().toString().trim().equals(""))
-                                                txtUrl.setText("<" + file.getName() + ">");
+                                                txtUrl.setText("");
                                             else
                                                 txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
                                             boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
@@ -481,7 +481,7 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
                     public void run() {
                         try {
                             if (txtUrl.getText().toString().trim().equals(""))
-                                txtUrl.setText("<" + file.getName() + ">");
+                                txtUrl.setText("");
                             else
                                 txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
                             boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
@@ -603,7 +603,7 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
                                                     @Override
                                                     public void run() {
                                                         if (txtUrl.getText().toString().trim().equals(""))
-                                                            txtUrl.setText("<" + file.getName() + ">");
+                                                            txtUrl.setText("");
                                                         else
                                                             txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
                                                         boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
@@ -637,7 +637,7 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
                     public void run() {
                         try {
                             if (txtUrl.getText().toString().trim().equals(""))
-                                txtUrl.setText("<" + file.getName() + ">");
+                                txtUrl.setText("");
                             else
                                 txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
                             Log.d(TAG,"commit when view_file_action_save be triggered");
