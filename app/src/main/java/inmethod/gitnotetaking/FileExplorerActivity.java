@@ -818,7 +818,7 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
                                                                 @Override
                                                                 public void run() {
                                                                     try {
-                                                                        Thread.sleep(1000);
+                                                                        Thread.sleep(100);
                                                                     } catch (
                                                                             InterruptedException e) {
                                                                         e.printStackTrace();

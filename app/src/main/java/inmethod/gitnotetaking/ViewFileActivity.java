@@ -629,9 +629,7 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        try {
-                                            synchronized (this) {
-                                                wait(500);
+
                                                 runOnUiThread(new Runnable() {
                                                     @Override
                                                     public void run() {
@@ -648,10 +646,8 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
 
                                                     }
                                                 });
-                                            }
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
+
+
                                     }
                                 }).start();
                             }
@@ -881,7 +877,7 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
                                             @Override
                                             public void run() {
                                                 try {
-                                                    Thread.sleep(1000);
+                                                    Thread.sleep(100);
                                                 } catch (InterruptedException e) {
                                                     e.printStackTrace();
                                                 }
