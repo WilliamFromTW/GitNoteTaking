@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item
+        android:id="@+id/ViewFileDownload"
+        android:title="@string/download"/>
+    <item
+        android:id="@+id/ViewFileDelete"
+        android:title="@string/action_delete"/>
+
+</menu>

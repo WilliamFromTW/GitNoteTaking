@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Spannable;
@@ -400,7 +401,7 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
                             container.addView(txtUrl);
 //                            Log.d(TAG,"indexof = "+m_path.get(pos).indexOf(sGitRootDir));
                             String sFilePath = m_path.get(pos).substring(sGitRootDir.length()+1);
-                            Log.d(TAG,"sFilePath="+sFilePath+",sGitRootDir="+sGitRootDir+",m_path.get(pos)="+m_path.get(pos)+",sGitRemoteUrl="+sGitRemoteUrl);
+                           // Log.d(TAG,"sFilePath="+sFilePath+",sGitRootDir="+sGitRootDir+",m_path.get(pos)="+m_path.get(pos)+",sGitRemoteUrl="+sGitRemoteUrl);
 
                             for (RevCommit aRev : MyGitUtility.getLocalCommitIdListByFilePath (activity, sGitRemoteUrl,sFilePath)) {
                                 if( aRev.getFullMessage()==null || aRev.getFullMessage().trim().isEmpty())
@@ -422,6 +423,15 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
                                 }
                             });
                             dialogbuilder.create().show();
+                        }
+                        else if (id == R.id.Download) {
+                            File aFile = new File(  m_path.get(pos) );
+                            try {
+                                Files.copy( aFile.toPath(),new File( Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)+"/"+ aFile.getName()).toPath());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+//                                throw new RuntimeException(e);
+                            }
                         }
                         return true;
                     };
@@ -774,7 +784,6 @@ Log.d(TAG,"m_item name = "+m_item.get(position)+",position number = "+ position+
                                                                 sDestFileNameString = aDestFile.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
                                                             Files.copy(aSelectedFile.toPath(), aDestFile.toPath());
                                                             bRefreshDir = true;
-
                                                             new Thread(new Runnable() {
                                                                 @Override
                                                                 public void run() {

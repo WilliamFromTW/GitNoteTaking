@@ -43,6 +43,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
@@ -251,50 +252,72 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
                             aTV.setOnLongClickListener(new View.OnLongClickListener() {
                                 @Override
                                 public boolean onLongClick(View view) {
+                                    PopupMenu popup = new PopupMenu(ViewFileActivity.this, view);
 
+                                    popup.getMenuInflater()
+                                            .inflate(R.menu.lognclick_popup_menu_viewfile, popup.getMenu());
+                                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                        public boolean onMenuItemClick(MenuItem item) {
+                                            int id = item.getItemId();
+                                            if (id == R.id.ViewFileDelete) {
 
-                                    final String sFileName;
-                                    try {
-                                        sFileName = file.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                        return false;
-                                    }
-                                    new AlertDialog.Builder(activity)
-                                            .setTitle(getResources().getString(R.string.view_title_remove_attach))
-                                            .setMessage(sFileName)
-                                            .setCancelable(true)
-                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int whichButton) {
-                                                    try {
-                                                        file.getCanonicalFile().delete();
+                                                final String sFileName;
+                                                try {
+                                                    sFileName = file.getCanonicalPath().toString().substring(MyGitUtility.getLocalGitDirectory(activity, sGitRemoteUrl).length());
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                    return false;
+                                                }
+                                                new AlertDialog.Builder(activity)
+                                                        .setTitle(getResources().getString(R.string.view_title_remove_attach))
+                                                        .setMessage(sFileName)
+                                                        .setCancelable(true)
+                                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                                try {
+                                                                    file.getCanonicalFile().delete();
 
-                                                        new Thread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                Log.d(TAG,"commit when file be deleted");
+                                                                    new Thread(new Runnable() {
+                                                                        @Override
+                                                                        public void run() {
+                                                                            Log.d(TAG,"commit when file be deleted");
 
-                                                                if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_delete_attachment_file_commit) + "\n" + sFileName))
-                                                                    MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
-                                                                else {
+                                                                            if (MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, MyApplication.getAppContext().getString(R.string.view_file_delete_attachment_file_commit) + "\n" + sFileName))
+                                                                                MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+                                                                            else {
 
+                                                                            }
+                                                                        }
+                                                                    }).start();
+                                                                    layoutAttachment.removeView(aTV);
+                                                                } catch (IOException e) {
+                                                                    e.printStackTrace();
                                                                 }
+
                                                             }
-                                                        }).start();
-                                                        layoutAttachment.removeView(aTV);
-                                                    } catch (IOException e) {
-                                                        e.printStackTrace();
-                                                    }
+                                                        })
+                                                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                // finish();
+                                                            }
+                                                        })
+                                                        .show();
 
+                                            }
+                                            else if( id== R.id.ViewFileDownload){
+                                                try {
+                                                    Files.copy( file.toPath(),new File( Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)+"/"+ file.getName()).toPath());
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+//                                throw new RuntimeException(e);
                                                 }
-                                            })
-                                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    // finish();
-                                                }
-                                            })
-                                            .show();
 
+                                            }
+                                            return true;
+                                        }
+                                    });
+
+                                    popup.show();
                                     return true;
                                 }
                             });
