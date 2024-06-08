@@ -468,7 +468,7 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
                                 isModify = false;
                                 disable();
 
-                                boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
+                               // boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
 
                                 new Thread(new Runnable() {
                                     @Override
@@ -637,15 +637,15 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
                                                             txtUrl.setText("");
                                                         else
                                                             txtUrl.setText(txtUrl.getText() + "\n<" + file.getName() + ">");
-                                                        boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
-                                                        if (bCommitStatus) {
-                                                            if (sGitRemoteUrl.indexOf("local") == -1) {
-                                                                MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
-                                                            }
-                                                        }
 
                                                     }
                                                 });
+                                        boolean bCommitStatus = MyGitUtility.commit(MyApplication.getAppContext(), sGitRemoteUrl, txtUrl.getText().toString());
+                                        if (bCommitStatus) {
+                                            if (sGitRemoteUrl.indexOf("local") == -1) {
+                                                MyGitUtility.push(MyApplication.getAppContext(), sGitRemoteUrl);
+                                            }
+                                        }
 
 
                                     }
