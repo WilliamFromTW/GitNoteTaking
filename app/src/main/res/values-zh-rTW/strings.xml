@@ -107,7 +107,7 @@
     <string name="Sort11">日期(小到大)</string>
     <string name="download">下載</string>
     <string name="Backup">備份</string>
-    <string name="backup_success">備份成功</string>
+    <string name="backup_success">備份到"Download"成功</string>
     <string name="backup_failed">備份失敗</string>
 
 </resources>

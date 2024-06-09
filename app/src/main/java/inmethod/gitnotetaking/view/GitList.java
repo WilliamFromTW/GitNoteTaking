@@ -64,11 +64,13 @@ public class GitList {
 
         if (aGitList.getRemoteUrl().indexOf("local") == -1) {
             if (aGitList.getPushStatus() ==  MyGitUtility.GIT_STATUS_FAIL) {
-                layout0.setTextColor(Color.RED);
+                layout0.setTextColor(Color.BLACK);
                 if (!aGitList.getBranch().equalsIgnoreCase(BRANCH_MASTER))
-                    layout0.setText( "[" + aGitList.getBranch() + "] "+aGitList.getGitName() + MyApplication.getAppContext().getResources().getString(R.string.main_notes_need_push) );
+  //                  layout0.setText( "[" + aGitList.getBranch() + "] "+aGitList.getGitName() + MyApplication.getAppContext().getResources().getString(R.string.main_notes_need_push) );
+                layout0.setText("[" + aGitList.getBranch() + "] "+aGitList.getGitName());
                 else
-                    layout0.setText(aGitList.getGitName() + MyApplication.getAppContext().getResources().getString(R.string.main_notes_need_push));
+//                    layout0.setText(aGitList.getGitName() + MyApplication.getAppContext().getResources().getString(R.string.main_notes_need_push));
+                layout0.setText(aGitList.getGitName());
             } else if (aGitList.getPushStatus() ==  MyGitUtility.GIT_STATUS_CLONING) {
                 layout0.setTextColor(Color.RED);
                 layout0.setText("「"+aGitList.getGitName() + "」" + MyApplication.getAppContext().getResources().getString(R.string.main_notes_cloning));

@@ -386,8 +386,14 @@ public class MainActivity extends AppCompatActivity {
                         }else if (id == R.id.Backup) {
                             String sBackupLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
                             String sBackupZip = ((TextView) aTextView[0]).getText().toString()+"_"+inmethod.commons.util.DateUtil.getDateStringWithFormat("yyyyMMdd")+".zip";
+                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                            builder.setCancelable(false);
+                            builder.setView(R.layout.loading_dialog);
+                            final AlertDialog dialog = builder.create();
+                            dialog.show();
                             try {
                                 MyGitUtility.backup(activity, sRemoteUrl,sBackupLocation+"/"+sBackupZip);
+
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -405,6 +411,7 @@ public class MainActivity extends AppCompatActivity {
                                 });
                                 //throw new RuntimeException(e);
                             }
+                            dialog.dismiss();
                         }
                         return true;
                     }
