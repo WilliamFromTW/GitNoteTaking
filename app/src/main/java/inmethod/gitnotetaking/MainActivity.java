@@ -135,6 +135,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        waitBuilder = new AlertDialog.Builder(activity);
+        waitBuilder.setCancelable(false);
+        waitBuilder.setView(R.layout.loading_dialog);
+        waitDialog = waitBuilder.create();
 
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -247,6 +251,50 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 });
                             } else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        waitDialog.show();
+
+                                        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                try {
+                                                    if (MyGitUtility.push(MyApplication.getAppContext(), ((TextView) aTextView[1]).getText().toString())) {
+                                                        runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                Toast.makeText(activity, MyApplication.getAppContext().getText(R.string.pushing_success), Toast.LENGTH_SHORT).show();
+                                                                waitDialog.dismiss();
+                                                            }
+                                                        });
+                                                    }else{
+                                                        runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                Toast.makeText(activity, MyApplication.getAppContext().getText(R.string.pushing_failed), Toast.LENGTH_SHORT).show();
+                                                                waitDialog.dismiss();
+                                                            }
+                                                        });
+
+                                                    }
+                                                } catch (Exception e) {
+                                                    runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            Toast.makeText(activity,MyApplication.getAppContext().getText(R.string.pushing_failed) , Toast.LENGTH_SHORT).show();
+                                                            waitDialog.dismiss();
+                                                        }
+                                                    });
+                                                    throw new RuntimeException(e);
+                                                }
+                                            }                                                // Your Code
+
+                                        }, 300);
+                                    }
+                                });
+
+                                /*
                                 AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                                 builder.setCancelable(false);
                                 builder.setView(R.layout.loading_dialog);
@@ -262,6 +310,8 @@ public class MainActivity extends AppCompatActivity {
                                         dialog.dismiss();
                                     }
                                 }).start();
+
+                                 */
                             }
 
                         } else if (id == R.id.Pull) {
@@ -275,6 +325,49 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 });
                             } else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        waitDialog.show();
+
+                                        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                try {
+                                                    if (MyGitUtility.pull(MyApplication.getAppContext(), ((TextView) aTextView[1]).getText().toString())) {
+                                                        runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                Toast.makeText(activity, MyApplication.getAppContext().getText(R.string.pulling_success), Toast.LENGTH_SHORT).show();
+                                                                waitDialog.dismiss();
+                                                            }
+                                                        });
+                                                    }else{
+                                                        runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                Toast.makeText(activity, MyApplication.getAppContext().getText(R.string.pulling_failed), Toast.LENGTH_SHORT).show();
+                                                                waitDialog.dismiss();
+                                                            }
+                                                        });
+
+                                                    }
+                                                } catch (Exception e) {
+                                                    runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            Toast.makeText(activity,MyApplication.getAppContext().getText(R.string.pulling_failed) , Toast.LENGTH_SHORT).show();
+                                                            waitDialog.dismiss();
+                                                        }
+                                                    });
+                                                    throw new RuntimeException(e);
+                                                }
+                                            }                                                // Your Code
+
+                                        }, 300);
+                                    }
+                                });
+                                /*
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -290,6 +383,8 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                     }
                                 }).start();
+
+                                 */
                             }
 
                         } else if (id == R.id.Modify) {
@@ -383,10 +478,6 @@ public class MainActivity extends AppCompatActivity {
                         }else if (id == R.id.Backup) {
                             String sBackupLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
                             String sBackupZip = ((TextView) aTextView[0]).getText().toString()+"_"+inmethod.commons.util.DateUtil.getDateStringWithFormat("yyyyMMdd")+".zip";
-                            waitBuilder = new AlertDialog.Builder(activity);
-                            waitBuilder.setCancelable(false);
-                            waitBuilder.setView(R.layout.loading_dialog);
-                            waitDialog = waitBuilder.create();
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -397,39 +488,28 @@ public class MainActivity extends AppCompatActivity {
                                         public void run() {
                                             try {
                                                 MyGitUtility.backup(activity, sRemoteUrl, sBackupLocation + "/" + sBackupZip);
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.backup_success) + "\n" + sBackupZip, Toast.LENGTH_SHORT).show();
+                                                        waitDialog.dismiss();
+                                                    }
+                                                });
                                             } catch (Exception e) {
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.backup_failed)+"\n"+sBackupZip, Toast.LENGTH_SHORT).show();
+                                                        waitDialog.dismiss();
+                                                    }
+                                                });
                                                 throw new RuntimeException(e);
                                             }
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.backup_success) + "\n" + sBackupZip, Toast.LENGTH_SHORT).show();
-                                            waitDialog.dismiss();
-                                                }
-                                                });
                                         }                                                // Your Code
 
                                     }, 300);
                                 }
                             });
-                            try {
-
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                    }
-                                });
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.backup_failed)+"\n"+sBackupZip, Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                //throw new RuntimeException(e);
-                            }
                         }
                         return true;
                     }

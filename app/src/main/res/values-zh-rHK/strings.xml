@@ -19,17 +19,17 @@
 
     // Preference
     <string name="GitEditTextSize">筆記字型大小</string>
-    <string name="GitLocalDirName">手機端根目錄(修改後，請刪除/重設定目前已有的筆記)</string>
+    <string name="GitLocalDirName">手機端根目錄(請先備份，修改後需刪除重建已有的筆記)</string>
     <string name="GitRemoteName">遠端分支名稱</string>
     <string name="GitCheckBoxCommitMessage">是否要求輸入修改理由</string>
 
     // MainActivity
     <string name="tv_title_first_time">設定</string>
     <string name="tv_first_time">請先設定您的名字與郵件</string>
-    <string name="action_clone">同步筆記(遠端GIT)</string>
-    <string name="action_create_local_git">新增筆記(本地)</string>
+    <string name="action_clone">建立筆記(遠端GIT)</string>
+    <string name="action_create_local_git">建立筆記(本地)</string>
     <string name="tv_localhost">本地</string>
-    <string name="main_menu_add">增加</string>
+    <string name="main_menu_add">建立</string>
     <string name="main_notes_need_push">(請長按同步至遠端)</string>
     <string name="main_notes_cloning"> 同步中 ... </string>
     <string name="main_notes_title_modify">修改設定</string>
@@ -102,7 +102,10 @@
     <string name="refres_files">重整</string>
     <string name="GitShowAttachDir">顯示附件目錄</string>
     <string name="textViewSearch">搜尋</string>
-    <string name="pulling_failed">同步失敗，請再試幾次或筆記刪除重新同步</string>
+    <string name="pulling_success">同步成功</string>
+    <string name="pulling_failed">同步失敗，請再試幾次或筆記刪除筆記重建</string>
+    <string name="pushing_success">同步成功</string>
+    <string name="pushing_failed">同步失敗，請再試幾次或筆記刪除筆記重建</string>
     <string name="Sort">檔案排序</string>
     <string name="Sort11">日期(小到大)</string>
     <string name="download">下載</string>

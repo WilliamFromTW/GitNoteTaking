@@ -23,7 +23,7 @@
 
     // Preference
     <string name="GitEditTextSize">Notes Text Size</string>
-    <string name="GitLocalDirName">Local Git root directory(default)</string>
+    <string name="GitLocalDirName">Local Git directory(Backup first，rebuild all notes)</string>
     <string name="GitRemoteName">Remote GIT Branch</string>
     <string name="GitCheckBoxCommitMessage">Show Commit Dialog</string>
 
@@ -104,7 +104,10 @@
     <string name="refres_files">Refresh</string>
     <string name="GitShowAttachDir">Show Attachment Dir</string>
     <string name="textViewSearch">Search</string>
-    <string name="pulling_failed">Pulling Failed!</string>
+    <string name="pulling_success">Pull Success!</string>
+    <string name="pulling_failed">Pull Failed!</string>
+    <string name="pushing_success">Push Success!</string>
+    <string name="pushing_failed">Push Failed!</string>
     <string name="Sort">FileSort</string>
     <string name="Sort11">DateAsc</string>
     <string name="download">download</string>
