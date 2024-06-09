@@ -21,6 +21,7 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Environment;
 import android.os.StrictMode;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -37,6 +38,7 @@ import android.widget.Toast;
 
 import org.eclipse.jgit.revwalk.RevCommit;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
@@ -381,6 +383,28 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             dialogbuilder.create().show();
+                        }else if (id == R.id.Backup) {
+                            String sBackupLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+                            String sBackupZip = ((TextView) aTextView[0]).getText().toString()+"_"+inmethod.commons.util.DateUtil.getDateStringWithFormat("yyyyMMdd")+".zip";
+                            try {
+                                MyGitUtility.backup(activity, sRemoteUrl,sBackupLocation+"/"+sBackupZip);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.backup_success)+"\n"+sBackupZip, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.backup_failed)+"\n"+sBackupZip, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                //throw new RuntimeException(e);
+                            }
                         }
                         return true;
                     }

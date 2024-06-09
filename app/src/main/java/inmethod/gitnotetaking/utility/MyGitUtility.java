@@ -222,6 +222,13 @@ public class MyGitUtility {
         return sReturn;
     }
 
+    public static void backup(Context context,String sRemoteUrl,String sBackupDestLocation) throws Exception {
+        String sLocalDirectory = getLocalGitDirectory(context, sRemoteUrl);
+        GitUtil  aGitUtil = new GitUtil(sRemoteUrl, sLocalDirectory);
+        aGitUtil.backup(sBackupDestLocation);
+        aGitUtil.close();
+    }
+
     public static ArrayList<RemoteGit> getRemoteGitList(Context context) {
         RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(context);
         ArrayList<RemoteGit> aList = aRemoteGitDAO.getAll();

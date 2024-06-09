@@ -17,5 +17,8 @@
     <item
         android:id="@+id/Remove"
         android:title="@string/title_remove"/>
+    <item
+        android:id="@+id/Backup"
+        android:title="@string/Backup"/>
 
 </menu>

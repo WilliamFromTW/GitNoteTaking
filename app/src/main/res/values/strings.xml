@@ -108,5 +108,9 @@
     <string name="Sort">FileSort</string>
     <string name="Sort11">DateAsc</string>
     <string name="download">download</string>
+    <string name="Backup">Backup</string>
+    <string name="backup_success">Backup Success</string>
+    <string name="backup_failed">Backup Failed</string>
+
 
 </resources>
