@@ -9,6 +9,7 @@
     <string name="action_create_folder">Create Folder</string>
     <string name="action_delete">Delete</string>
     <string name="title_remove">Remove</string>
+    <string name="message_remove">Remove Note (Y/N)?</string>
     <string name="title_push">Push Manually</string>
     <string name="title_pull">Pull Manually</string>
     <string name="action_cut">Cut</string>

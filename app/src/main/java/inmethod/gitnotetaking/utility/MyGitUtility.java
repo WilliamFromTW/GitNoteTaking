@@ -25,7 +25,7 @@ public class MyGitUtility {
 
     public static final String TAG = "GitNoteTaking";
     public static final int GIT_STATUS_SUCCESS = 0;
-    public static final int GIT_STATUS_FAIL = -1;
+    public static final int GIT_STATUS_PUSH_FAIL = -1;
     public static final int GIT_STATUS_CLONING = -3;
     public static final int GIT_STATUS_PULLING = -4;
     public static boolean bGitLock = false;
@@ -78,7 +78,7 @@ public class MyGitUtility {
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
         if (aRemoteGit == null) return false;
         if (!MyApplication.isNetworkConnected()){
-            aRemoteGit.setStatus( MyGitUtility.GIT_STATUS_FAIL);
+            aRemoteGit.setStatus( MyGitUtility.GIT_STATUS_PUSH_FAIL);
             aRemoteGitDAO.update(aRemoteGit);
             setGitLock(false);
             aRemoteGitDAO.close();
@@ -94,7 +94,6 @@ public class MyGitUtility {
             bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(aRemoteGit.getUid(), aRemoteGit.getPwd());
             if (!bIsRemoteRepositoryExist) {
                 Log.e(TAG, "check remote url failed");
-                aRemoteGit.setStatus( MyGitUtility.GIT_STATUS_FAIL);
                 aRemoteGitDAO.update(aRemoteGit);
                 setGitLock(false);
                 if (aGitUtil != null) aGitUtil.close();
@@ -113,7 +112,9 @@ public class MyGitUtility {
                     if (aGitUtil != null) aGitUtil.close();
                     return true;
                 } else {
-                    aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_FAIL);
+                    if (MyApplication.isNetworkConnected()) {
+                        aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_PUSH_FAIL);
+                    }
                     aRemoteGitDAO.update(aRemoteGit);
                     Log.d(TAG, "push failed!");
                     setGitLock(false);
@@ -146,7 +147,6 @@ public class MyGitUtility {
         RemoteGit aRemoteGit = aRemoteGitDAO.getByURL(sRemoteUrl);
         if (aRemoteGit == null) return false;
         if (!MyApplication.isNetworkConnected()){
-            aRemoteGit.setStatus( MyGitUtility.GIT_STATUS_FAIL);
             aRemoteGitDAO.update(aRemoteGit);
             setGitLock(false);
             aRemoteGitDAO.close();
@@ -169,7 +169,6 @@ public class MyGitUtility {
                     if (aGitUtil != null) aGitUtil.close();
                     return true;
                 } else {
-                    aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_FAIL);
                     Log.d(TAG, "commit failed!");
                     setGitLock(false);
                     if (aGitUtil != null) aGitUtil.close();
@@ -179,7 +178,6 @@ public class MyGitUtility {
                 ee.printStackTrace();
                 Log.d(TAG, "commit failed! Got LockFailedException = " + ee.getMessage());
 
-                aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_FAIL);
                 Log.d(TAG, "commit failed!");
                 setGitLock(false);
                 FileUtility.deleteLockFile(aGitUtil);
@@ -203,7 +201,6 @@ public class MyGitUtility {
                         return true;
                     }
                     if (aGitUtil != null) aGitUtil.close();
-                    aRemoteGit.setStatus(MyGitUtility.GIT_STATUS_FAIL);
                     return false;
             }
         } catch (Exception e) {
@@ -327,7 +324,6 @@ public class MyGitUtility {
             aGitUtil.setContentMergeStrategyOURS();
             bIsRemoteRepositoryExist = aGitUtil.checkRemoteRepository(sUserName, sUserPassword);
             if (!bIsRemoteRepositoryExist) {
-                aRemoteGit.setStatus(GIT_STATUS_FAIL);
                 aRemoteGitDAO.update(aRemoteGit);
                 Log.e(TAG, "check remote url failed");
                 setGitLock(false);
@@ -347,7 +343,6 @@ public class MyGitUtility {
                     return true;
                   } else {
                       aGitUtil.reset(ResetCommand.ResetType.MIXED, PreferenceManager.getDefaultSharedPreferences(context).getString("GitRemoteName", "master"));
-                      aRemoteGit.setStatus(GIT_STATUS_FAIL);
                       aRemoteGitDAO.update(aRemoteGit);
                       Log.d(TAG, "pull failed!");
                       setGitLock(false);
@@ -356,7 +351,6 @@ public class MyGitUtility {
                   }
                 }catch(LockFailedException lockfail){
                     lockfail.printStackTrace();
-                    aRemoteGit.setStatus(GIT_STATUS_FAIL);
                     aRemoteGitDAO.update(aRemoteGit);
                     Log.d(TAG, "pull failed!");
                     setGitLock(false);
@@ -364,7 +358,6 @@ public class MyGitUtility {
                     if (aGitUtil != null) aGitUtil.close();
                     return false;
                 }catch(JGitInternalException aJGitInternalException){
-                        aRemoteGit.setStatus(GIT_STATUS_FAIL);
                         aRemoteGitDAO.update(aRemoteGit);
                         Log.d(TAG, "pull failed!");
                         setGitLock(false);
@@ -380,7 +373,6 @@ public class MyGitUtility {
                         Log.e(TAG,"reset exception");
                         resetEx.printStackTrace();
                     }
-                    aRemoteGit.setStatus(GIT_STATUS_FAIL);
                     aRemoteGitDAO.update(aRemoteGit);
                     Log.d(TAG, "pull failed!");
                     setGitLock(false);
@@ -388,7 +380,6 @@ public class MyGitUtility {
                     return false;
                 }
             }
-            aRemoteGit.setStatus(GIT_STATUS_FAIL);
             aRemoteGitDAO.update(aRemoteGit);
             setGitLock(false);
             if (aGitUtil != null) aGitUtil.close();

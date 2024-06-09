@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.os.Build;
 import android.os.Bundle;
@@ -40,7 +39,6 @@ import android.widget.Toast;
 
 import org.eclipse.jgit.revwalk.RevCommit;
 
-import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
@@ -231,14 +229,66 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onMenuItemClick(MenuItem item) {
                         int id = item.getItemId();
                         if (id == R.id.Remove) {
-                            MyGitUtility.deleteByRemoteUrl(activity, ((TextView) aTextView[1]).getText().toString());
-                            Log.d(TAG, "try to delete local git repository");
-                            MyGitUtility.deleteLocalGitRepository(activity, sRemoteUrl);
-                            adapter.clear();
-                            ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(activity);
-                            for (final RemoteGit a : aList) {
-                                adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus(), a.getBranch()));
-                            }
+
+                            new AlertDialog.Builder(activity)
+                                    .setTitle( MyApplication.getAppContext().getString(R.string.title_remove))
+                                    .setMessage( MyApplication.getAppContext().getString(R.string.message_remove))
+                                    .setPositiveButton(MyApplication.getAppContext().getText(R.string.dialog_ok), new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    waitDialog.show();
+
+                                                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            try {
+                                                                MyGitUtility.deleteByRemoteUrl(activity, ((TextView) aTextView[1]).getText().toString());
+                                                                Log.d(TAG, "try to delete local git repository");
+                                                                MyGitUtility.deleteLocalGitRepository(activity, sRemoteUrl);
+                                                                adapter.clear();
+                                                                ArrayList<RemoteGit> aList = MyGitUtility.getRemoteGitList(activity);
+                                                                for (final RemoteGit a : aList) {
+                                                                    adapter.addData(new GitList(a.getNickname(), a.getUrl(), (int) a.getStatus(), a.getBranch()));
+                                                                }
+
+                                                                    runOnUiThread(new Runnable() {
+                                                                        @Override
+                                                                        public void run() {
+                                                                            Toast.makeText(activity, MyApplication.getAppContext().getText(R.string.pushing_success), Toast.LENGTH_SHORT).show();
+                                                                            waitDialog.dismiss();
+                                                                        }
+                                                                    });
+
+                                                            } catch (Exception e) {
+                                                                runOnUiThread(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        Toast.makeText(activity,MyApplication.getAppContext().getText(R.string.pushing_failed) , Toast.LENGTH_SHORT).show();
+                                                                        waitDialog.dismiss();
+                                                                    }
+                                                                });
+                                                                throw new RuntimeException(e);
+                                                            }
+                                                        }                                                // Your Code
+
+                                                    }, 300);
+                                                }
+                                            });
+
+
+
+
+                                        }
+                                    }).setNegativeButton(MyApplication.getAppContext().getText(R.string.dialog_cancel) , new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                        }
+                                    }).show();
+
+
+
                             return true;
                         } else if (id == R.id.Push) {
                             if (!MyApplication.isNetworkConnected()) {
@@ -592,7 +642,7 @@ public class MainActivity extends AppCompatActivity {
                         bCloning = false;
                         for (final RemoteGit a : aList) {
                             if (a.getStatus() == MyGitUtility.GIT_STATUS_CLONING) bCloning = true;
-                            else if (a.getStatus() == MyGitUtility.GIT_STATUS_FAIL) {
+                            else if (a.getStatus() == MyGitUtility.GIT_STATUS_PUSH_FAIL) {
                                 RemoteGitDAO aRemoteGitDAO = new RemoteGitDAO(activity);
                                 aRemoteGitDAO.delete(a.getUrl());
                                 aRemoteGitDAO.close();

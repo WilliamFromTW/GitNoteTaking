@@ -138,7 +138,7 @@ public class CloneGitActivity extends AppCompatActivity {
 
                                             aRemoteGitDAO.close();
                                         } else {
-                                            aValue.setStatus(MyGitUtility.GIT_STATUS_FAIL);
+                                            aValue.setStatus(MyGitUtility.GIT_STATUS_PUSH_FAIL);
                                             aRemoteGitDAO.updateByRemoteUrl(aValue);
                                             aRemoteGitDAO.close();
                                         }
@@ -146,7 +146,7 @@ public class CloneGitActivity extends AppCompatActivity {
                                 }).start();
 
                             } catch (Exception ee) {
-                                aValue.setStatus(MyGitUtility.GIT_STATUS_FAIL);
+                                aValue.setStatus(MyGitUtility.GIT_STATUS_PUSH_FAIL);
                                 aRemoteGitDAO.updateByRemoteUrl(aValue);
                                 aRemoteGitDAO.close();
                                 ee.printStackTrace();
