@@ -38,7 +38,7 @@ dependencies {
 //    implementation files('libs/org.eclipse.jgit.archive-6.6.1.202309021850-r.jar')
 
 
-    releaseImplementation files('libs/commons-net-3.5.jar')
+//    releaseImplementation files('libs/commons-net-3.5.jar')
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.material:material:1.11.0'
