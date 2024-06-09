@@ -22,6 +22,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.StrictMode;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -58,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
     private Activity activity = this;
     RecyclerView rv = null;
     RecyclerAdapterForDevice adapter = null;
-
+    AlertDialog.Builder waitBuilder = null;
+    AlertDialog waitDialog;
     int REQUEST_CODE_PERMISSIONS = 123;
 
     String [] _app_permissions = {
@@ -272,11 +275,6 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 });
                             } else {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                                builder.setCancelable(false);
-                                builder.setView(R.layout.loading_dialog);
-                                final AlertDialog dialog = builder.create();
-                                dialog.show();
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -290,7 +288,6 @@ public class MainActivity extends AppCompatActivity {
                                                 }
                                             });
                                         }
-                                        dialog.dismiss();
                                     }
                                 }).start();
                             }
@@ -386,18 +383,40 @@ public class MainActivity extends AppCompatActivity {
                         }else if (id == R.id.Backup) {
                             String sBackupLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
                             String sBackupZip = ((TextView) aTextView[0]).getText().toString()+"_"+inmethod.commons.util.DateUtil.getDateStringWithFormat("yyyyMMdd")+".zip";
-                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                            builder.setCancelable(false);
-                            builder.setView(R.layout.loading_dialog);
-                            final AlertDialog dialog = builder.create();
-                            dialog.show();
+                            waitBuilder = new AlertDialog.Builder(activity);
+                            waitBuilder.setCancelable(false);
+                            waitBuilder.setView(R.layout.loading_dialog);
+                            waitDialog = waitBuilder.create();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    waitDialog.show();
+
+                                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            try {
+                                                MyGitUtility.backup(activity, sRemoteUrl, sBackupLocation + "/" + sBackupZip);
+                                            } catch (Exception e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.backup_success) + "\n" + sBackupZip, Toast.LENGTH_SHORT).show();
+                                            waitDialog.dismiss();
+                                                }
+                                                });
+                                        }                                                // Your Code
+
+                                    }, 300);
+                                }
+                            });
                             try {
-                                MyGitUtility.backup(activity, sRemoteUrl,sBackupLocation+"/"+sBackupZip);
 
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        Toast.makeText(MyApplication.getAppContext(), MyApplication.getAppContext().getText(R.string.backup_success)+"\n"+sBackupZip, Toast.LENGTH_SHORT).show();
                                     }
                                 });
 
@@ -411,7 +430,6 @@ public class MainActivity extends AppCompatActivity {
                                 });
                                 //throw new RuntimeException(e);
                             }
-                            dialog.dismiss();
                         }
                         return true;
                     }
