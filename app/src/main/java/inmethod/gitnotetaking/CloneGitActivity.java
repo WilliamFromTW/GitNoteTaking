@@ -38,6 +38,8 @@ public class CloneGitActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_clone_git);
         final Activity activity = this;
+        View view =  findViewById(android.R.id.content);
+        MyApplication.setView(activity,view);
 
         sRemoteName = PreferenceManager.getDefaultSharedPreferences(activity).getString("GitRemoteName", "master");
         editRemoteURL = (EditText) findViewById(R.id.editRemoteURL);

@@ -127,6 +127,9 @@ public class ViewFileActivity extends AppCompatActivity implements PickiTCallbac
         }
 
         setContentView(R.layout.activity_view_file_main);
+        View view =  findViewById(android.R.id.content);
+        MyApplication.setView(activity,view);
+
         Intent myIntent = getIntent(); // gets the previously created intent
         sFilePath = myIntent.getStringExtra("FILE_PATH");
         sGitRemoteUrl = myIntent.getStringExtra("GIT_REMOTE_URL");

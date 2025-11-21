@@ -40,6 +40,9 @@ public class ModifyRemoteGitActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_modify_remote);
         activity = this;
+        View view =  findViewById(android.R.id.content);
+        MyApplication.setView(activity,view);
+
         Intent myIntent = getIntent();
         sRemoteURL = myIntent.getStringExtra("GIT_REMOTE_URL");
         editUserAccount = (EditText) findViewById(R.id.editUserAccount);
