@@ -3,12 +3,24 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 36
+
+    packaging {
+        resources {
+            exclude 'OSGI-INF/l10n/*'
+//            exclude 'org.eclipse.jgit:org.eclipse.jgit.archive:7.4.0.202509020913-r/org.eclipse.jgit.archive-7.4.0.202509020913-r.jar'
+
+            // Pick first occurrence of a file if duplicates are found
+            pickFirsts.add('OSGI-INF/l10n/*')
+//            pickFirsts.add('org.eclipse.jgit:org.eclipse.jgit.archive:7.4.0.202509020913-r/org.eclipse.jgit.archive-7.4.0.202509020913-r.jar')
+        }
+    }
+
     defaultConfig {
         applicationId "inmethod.gitnotetaking"
         minSdkVersion 33
         targetSdk 35
-        versionCode 232
-        versionName "3.198"
+        versionCode 233
+        versionName "3.199"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -32,7 +44,7 @@ android {
 }
 
 dependencies {
-    implementation files('libs/InMethodJakarta-v3.4b2-SNAPSHOT-20240609.jar')
+    implementation files('libs/InMethodJakarta-v3.4b2-SNAPSHOT-20251121.jar')
     implementation files('libs/InMethodTools-2.04-20240430.jar')
    // implementation 'androidx.core:core-ktx:1.17.0'
     implementation 'androidx.core:core-ktx:1.17.0'
@@ -51,8 +63,8 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.9.1'
     implementation "androidx.cardview:cardview:1.0.0"
     implementation 'com.github.HBiSoft:PickiT:2.0.5'
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.6.1.202309021850-r'
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.archive', version: '6.6.1.202309021850-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '7.4.0.202509020913-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.archive', version: '7.4.0.202509020913-r'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'

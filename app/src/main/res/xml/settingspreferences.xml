@@ -36,6 +36,13 @@
     <androidx.preference.CheckBoxPreference
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
+        app:defaultValue="true"
+        app:key="GitCloneSkipLocal"
+        app:title="@string/GitCloneSkipLocal">
+    </androidx.preference.CheckBoxPreference>
+    <androidx.preference.CheckBoxPreference
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
         app:defaultValue="false"
         app:key="GitShowAttachDir"
         app:title="@string/GitShowAttachDir">
