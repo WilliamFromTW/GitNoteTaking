@@ -33,18 +33,7 @@ public  class PreferencesSettings extends AppCompatActivity {
             fragment = new CustomPreferenceFragment();
         }
         getSupportFragmentManager() .beginTransaction().replace(android.R.id.content,  fragment ,CustomPreferenceFragment.FRAGMENT_TAG).commit();
-
-        WindowCompat.enableEdgeToEdge(this.getWindow());
-        ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
-
-            Insets bars = insets.getInsets(
-                    WindowInsetsCompat.Type.systemBars()
-                            | WindowInsetsCompat.Type.displayCutout()
-            );
-            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
-            return WindowInsetsCompat.CONSUMED;
-
-        });
+        MyApplication.setView(this,view);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

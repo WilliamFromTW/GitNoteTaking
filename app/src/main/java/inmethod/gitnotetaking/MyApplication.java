@@ -12,6 +12,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -87,6 +88,17 @@ public class MyApplication extends Application {
     public static void setView(Activity act, View view){
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM)  return;
         WindowCompat.enableEdgeToEdge(act.getWindow());
+
+        WindowCompat.setDecorFitsSystemWindows(act.getWindow(), false);
+
+        WindowInsetsControllerCompat controller =
+                WindowCompat.getInsetsController(act.getWindow(), act.getWindow().getDecorView());
+
+        if (controller != null) {
+            // 關鍵：將導航欄圖標顏色設為深色（淺色背景上可見）
+            // 這會強制系統移除半透明的黑色保護層 (Scrim)
+            controller.setAppearanceLightNavigationBars(true);
+        }
         /*
         ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
 
@@ -109,6 +121,7 @@ public class MyApplication extends Application {
             );
             v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
             return WindowInsetsCompat.CONSUMED;
+
 
         });
         /*
