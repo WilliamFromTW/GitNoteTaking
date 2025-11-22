@@ -5,20 +5,13 @@ android {
     compileSdkVersion 36
 
     packaging {
-        resources {
-            exclude 'OSGI-INF/l10n/*'
-//            exclude 'org.eclipse.jgit:org.eclipse.jgit.archive:7.4.0.202509020913-r/org.eclipse.jgit.archive-7.4.0.202509020913-r.jar'
-
-            // Pick first occurrence of a file if duplicates are found
-            pickFirsts.add('OSGI-INF/l10n/*')
-//            pickFirsts.add('org.eclipse.jgit:org.eclipse.jgit.archive:7.4.0.202509020913-r/org.eclipse.jgit.archive-7.4.0.202509020913-r.jar')
-        }
+        resources.excludes.add('OSGI-INF/l10n/*')
+        resources.pickFirsts.add('OSGI-INF/l10n/*')
     }
 
     defaultConfig {
         applicationId "inmethod.gitnotetaking"
         minSdkVersion 33
-        targetSdk 35
         versionCode 233
         versionName "3.199"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

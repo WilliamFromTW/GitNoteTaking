@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:iconSpaceReserved="false">
 
-
     <androidx.preference.EditTextPreference
         app:key="GitAuthorName"
         app:allowDividerAbove="true"
