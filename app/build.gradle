@@ -2,13 +2,18 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 34
+    compileSdkVersion 36
+
+    packaging {
+        resources.excludes.add('OSGI-INF/l10n/*')
+        resources.pickFirsts.add('OSGI-INF/l10n/*')
+    }
+
     defaultConfig {
         applicationId "inmethod.gitnotetaking"
         minSdkVersion 33
-        targetSdk 33
-        versionCode 228
-        versionName "3.194"
+        versionCode 233
+        versionName "3.199"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -20,18 +25,22 @@ android {
         }
     }
     compileOptions {
-        targetCompatibility = 11
-        sourceCompatibility = 11
+        targetCompatibility = 21
+        sourceCompatibility = 21
     }
     namespace 'inmethod.gitnotetaking'
     packagingOptions {
-        excludes += "plugin.properties"
+        resources {
+            excludes += ['plugin.properties']
+        }
     }
 }
 
 dependencies {
-    implementation files('libs/InMethodJakarta-v3.4b2-SNAPSHOT-20240609.jar')
+    implementation files('libs/InMethodJakarta-v3.4b2-SNAPSHOT-20251121.jar')
     implementation files('libs/InMethodTools-2.04-20240430.jar')
+   // implementation 'androidx.core:core-ktx:1.17.0'
+    implementation 'androidx.core:core-ktx:1.17.0'
 //    implementation files('libs/org.eclipse.jgit-6.6.1.202309021850-r.jar')
 //    implementation files('libs/commons-compress-1.26.2.jar')
 //    implementation files('libs/commons-io-2.16.1.jar')
@@ -39,20 +48,20 @@ dependencies {
 
 
 //    releaseImplementation files('libs/commons-net-3.5.jar')
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation 'com.google.android.material:material:1.13.0'
     implementation "androidx.preference:preference-ktx:1.2.1"
     implementation 'org.slf4j:slf4j-nop:1.7.32'
-    implementation 'androidx.annotation:annotation:1.4.1'
+    implementation 'androidx.annotation:annotation:1.9.1'
     implementation "androidx.cardview:cardview:1.0.0"
     implementation 'com.github.HBiSoft:PickiT:2.0.5'
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.6.1.202309021850-r'
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.archive', version: '6.6.1.202309021850-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '7.4.0.202509020913-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.archive', version: '7.4.0.202509020913-r'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'androidx.mediarouter:mediarouter:1.7.0'
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0"
 
 }

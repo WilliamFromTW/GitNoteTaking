@@ -30,7 +30,8 @@ public class CreateLocalGitActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_local_git);
         final Activity activity = this;
 
-
+        View view =  findViewById(android.R.id.content);
+        MyApplication.setView(activity,view);
         Button buttonOK = (Button) findViewById(R.id.buttonOK);
 
         buttonOK.setOnClickListener(new View.OnClickListener() {

@@ -25,5 +25,5 @@ Git特有功能：
 https://github.com/WilliamFromTW/GitNoteTaking
 
 ## 3rd party library
-https://www.eclipse.org/jgit  version 6.6.1    
+https://www.eclipse.org/jgit  version 7.4.0.202509020913   
 只支援android 13 或以上版本

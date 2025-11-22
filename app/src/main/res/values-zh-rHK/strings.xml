@@ -113,5 +113,6 @@
     <string name="Backup">備份</string>
     <string name="backup_success">備份到"Download"成功</string>
     <string name="backup_failed">備份失敗</string>
+    <string name="GitCloneSkipLocal">如果本機有資料，不克隆 git clone</string>
 
 </resources>

@@ -395,11 +395,15 @@ public class MyGitUtility {
 
 
     public static boolean cloneGit(Context context, String sRemoteUrl, String sRemoteName, String sUserName, String sUserPassword) {
-        String sLocalDirectory = getLocalGitDirectory(context, sRemoteUrl);
 
+        // 檢查本機是否已有
         if (checkLocalGitRepository(context, sRemoteUrl)) {
-            return false;
+            if( PreferenceManager.getDefaultSharedPreferences(context).getBoolean("GitCloneSkipLocal", false))
+              return true;
+            else
+              return false;
         }
+        String sLocalDirectory = getLocalGitDirectory(context, sRemoteUrl);
 
         setGitLock(true);
 

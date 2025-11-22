@@ -102,6 +102,9 @@ public class FileExplorerActivity extends AppCompatActivity  implements PickiTCa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_explorer_main);
+        View view =  findViewById(android.R.id.content);
+        MyApplication.setView(activity,view);
+
         Intent myIntent = getIntent(); // gets the previously created intent
         sGitRemoteUrl = myIntent.getStringExtra("GIT_REMOTE_URL");
         sGitRootDir = myIntent.getStringExtra("GIT_ROOT_DIR");

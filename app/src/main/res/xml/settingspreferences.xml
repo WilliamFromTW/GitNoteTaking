@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:iconSpaceReserved="false">
 
     <androidx.preference.EditTextPreference
         app:key="GitAuthorName"
@@ -31,6 +31,13 @@
         app:defaultValue="false"
         app:key="GitCheckBoxCommitMessage"
         app:title="@string/GitCheckBoxCommitMessage">
+    </androidx.preference.CheckBoxPreference>
+    <androidx.preference.CheckBoxPreference
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:defaultValue="true"
+        app:key="GitCloneSkipLocal"
+        app:title="@string/GitCloneSkipLocal">
     </androidx.preference.CheckBoxPreference>
     <androidx.preference.CheckBoxPreference
         app:allowDividerAbove="true"

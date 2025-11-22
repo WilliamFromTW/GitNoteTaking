@@ -26,6 +26,9 @@ public class ModifyLocalGitActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_modify_local);
         activity = this;
+        View view =  findViewById(android.R.id.content);
+        MyApplication.setView(activity,view);
+
         Intent myIntent = getIntent();
         sRemoteURL =   myIntent.getStringExtra("GIT_REMOTE_URL");
         editNickName = (EditText) findViewById(R.id.editLocalGitName);
